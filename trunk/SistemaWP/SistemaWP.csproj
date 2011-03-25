@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{83A21222-4BE1-4227-8FCA-C3977951DA1D}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SistemaWP</RootNamespace>
+    <AssemblyName>SistemaWP</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Aplicacion\ContEditarTexto.cs" />
+    <Compile Include="Dominio\Medicion.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Dominio\Documento.cs" />
+    <Compile Include="Dominio\Parrafo.cs" />
+    <Compile Include="Dominio\Unidad.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IU\Graficos\Lapiz.cs" />
+    <Compile Include="IU\PresentacionDocumento\ContPresentarDocumento.cs" />
+    <Compile Include="IU\Graficos\Brocha.cs" />
+    <Compile Include="IU\Graficos\ColorDocumento.cs" />
+    <Compile Include="IU\Graficos\IGraficador.cs" />
+    <Compile Include="IU\Graficos\Letra.cs" />
+    <Compile Include="IU\PresentacionDocumento\Posicion.cs" />
+    <Compile Include="IU\PresentacionDocumento\Punto.cs" />
+    <Compile Include="IU\PresentacionDocumento\TamBloque.cs" />
+    <Compile Include="IU\PresentadorDocumento.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IU\PresentadorDocumento.Designer.cs">
+      <DependentUpon>PresentadorDocumento.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IU\PresentacionDocumento\Bloque.cs" />
+    <Compile Include="IU\PresentacionDocumento\Estilo.cs" />
+    <Compile Include="IU\PresentacionDocumento\Linea.cs" />
+    <Compile Include="IU\PresentacionDocumento\Pagina.cs" />
+    <Compile Include="Aplicacion\Seleccion.cs" />
+    <Compile Include="IU\PresentacionDocumento\DocumentoImpreso.cs" />
+    <Compile Include="IU\VistaDocumento\Escritorio.cs" />
+    <Compile Include="IU\VistaDocumento\Graficador.cs" />
+    <Compile Include="IU\VistaDocumento\LienzoPagina.cs" />
+    <Compile Include="Programa.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\PruebaDocumento.cs" />
+    <Compile Include="Tests\PruebaOperacionesAleatoria.cs" />
+    <Compile Include="Tests\PruebaParrafo.cs" />
+    <EmbeddedResource Include="IU\PresentadorDocumento.resx">
+      <DependentUpon>PresentadorDocumento.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ServTec\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
