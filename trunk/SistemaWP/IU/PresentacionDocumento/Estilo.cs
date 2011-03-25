@@ -15,7 +15,7 @@ namespace SistemaWP.IU.PresentacionDocumento
         public Brocha ColorLetra { get; set; }
         public Estilo()
         {
-            Letra = new Letra() { Tamaño = new Medicion(10) };
+            Letra = new Letra() { Tamaño = new Medicion(4,Unidad.Milimetros) };
             ColorFondo = new BrochaSolida() { Color = new ColorDocumento(255, 255, 255) };
             ColorLetra = new BrochaSolida() { Color = new ColorDocumento(0, 0, 0) };
         }

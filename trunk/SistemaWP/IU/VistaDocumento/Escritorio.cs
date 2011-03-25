@@ -43,14 +43,14 @@ namespace SistemaWP.IU.VistaDocumento
                 l.Dibujar(graficador, Documento, pos, seleccion);
                 if (Medicion.Cero-inicio > Dimensiones.Alto+EsquinaSuperior.Y)
                 {
-                    graficador.DibujarRectangulo(new Lapiz() { Brocha = new BrochaSolida() { Color = new ColorDocumento(200, 200, 50) }, Ancho = new Medicion(1) },
-                           Punto.Origen, Dimensiones);
+                    /*graficador.DibujarRectangulo(new Lapiz() { Brocha = new BrochaSolida() { Color = new ColorDocumento(200, 200, 50) }, Ancho = new Medicion(1) },
+                           Punto.Origen, Dimensiones);*/
                     return;
                 }
                 inicio -= p.Dimensiones.Alto + EspacioEntrePaginas;
             }
-            graficador.DibujarRectangulo(new Lapiz() { Brocha = new BrochaSolida() { Color = new ColorDocumento(200, 200, 50) }, Ancho = new Medicion(1) },
-                Punto.Origen, Dimensiones);
+            /*graficador.DibujarRectangulo(new Lapiz() { Brocha = new BrochaSolida() { Color = new ColorDocumento(200, 200, 50) }, Ancho = new Medicion(1) },
+                Punto.Origen, Dimensiones);*/
             
         }
         

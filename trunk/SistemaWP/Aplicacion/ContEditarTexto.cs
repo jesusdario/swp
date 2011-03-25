@@ -49,6 +49,22 @@ namespace SistemaWP.Aplicacion
         {
             _documentoEdicion = Documento.Instancia;
         }
+        public void IrAPosicion(int numCaracter,bool seleccionar)
+        {
+            Parrafo p=_documentoEdicion.ObtenerPrimerParrafo();
+            int suma = 0;
+            Parrafo ultimoParrafo;
+            while (p != null)
+            {
+                int longitud=p.ObtenerLongitud();
+                if (suma+longitud>numCaracter)  {
+                    IndicarPosicion(p.ID,numCaracter-suma,seleccionar);
+                    return;
+                }
+                ultimoParrafo = p;
+                p=p.Siguiente;
+            }
+        }
         public bool ExisteSeleccion
         {
             get { return posicionFinRango != null; }
@@ -242,6 +258,11 @@ namespace SistemaWP.Aplicacion
             posicionFinRango = fin.ObtenerLongitud();
             parrafoSeleccionado = parrafoInicioRango;
             posicionInsercion = 0;
+        }
+
+        internal string ObtenerTexto()
+        {
+            return _documentoEdicion.ToString();
         }
     }
 }
