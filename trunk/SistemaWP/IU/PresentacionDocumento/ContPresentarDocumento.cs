@@ -41,10 +41,16 @@ namespace SistemaWP.IU.PresentacionDocumento
         public void Pegar()
         {
             string cad = Clipboard.GetText();
-            conttexto.InsertarTexto(cad);
-            EnActualizarPresentacion(true);
+            if (cad != null)
+            {
+                conttexto.InsertarTexto(cad);
+                EnActualizarPresentacion(true);
+            }
         }
-
+        public void InsertarTexto(string cadena)
+        {
+            conttexto.InsertarTexto(cadena);
+        }
         public void Copiar()
         {
             Seleccion sel = conttexto.ObtenerSeleccion();
@@ -55,7 +61,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                 cad = sel.ObtenerTexto();
             Clipboard.SetText(cad, TextDataFormat.UnicodeText);
         }
-
+        
         public void BorrarCaracter()
         {
             conttexto.BorrarCaracter();
@@ -187,6 +193,11 @@ namespace SistemaWP.IU.PresentacionDocumento
         {
             conttexto.SeleccionarTodo();
             EnActualizarPresentacion(false);
+        }
+
+        internal string ObtenerTexto()
+        {
+            return conttexto.ObtenerTexto();
         }
     }
 }

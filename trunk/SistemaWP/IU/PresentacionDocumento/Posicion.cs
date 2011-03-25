@@ -165,7 +165,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                 posicion -= Linea.Cantidad - PosicionCaracter;
                 indicelinea = IndiceLinea;
                 AvanzarLinea();
-                if (IndiceLinea == indicelinea) //Bucle infinoto?
+                if (posicion>Linea.Cantidad&&IndiceLinea == indicelinea) //Bucle infinoto?
                 {
                     PosicionCaracter = 0;
                     return;
