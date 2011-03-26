@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SistemaWP.Dominio;
+using System.Diagnostics;
 
 namespace SistemaWP.Aplicacion
 {
@@ -45,9 +46,9 @@ namespace SistemaWP.Aplicacion
         /// </summary>
         Documento _documentoEdicion;
         public Documento DocumentoEdicion { get { return _documentoEdicion; } }
-        public ContEditarTexto()
+        public ContEditarTexto(Documento documento)
         {
-            _documentoEdicion = Documento.Instancia;
+            _documentoEdicion = documento;
         }
         public void IrAPosicion(int numCaracter,bool seleccionar)
         {
@@ -154,6 +155,7 @@ namespace SistemaWP.Aplicacion
             switch (tipo)
             {
                 case TipoAvance.AvanzarPorCaracteres:
+                    Debug.Assert(posicionInsercion >= 1);
                     return posicionInsercion - 1;
                 case TipoAvance.AvanzarPorPalabras:
                     return parrafoSeleccionado.ObtenerAnteriorPalabra(posicionInsercion);
@@ -205,14 +207,15 @@ namespace SistemaWP.Aplicacion
             if (ExisteSeleccion)
             {
                 Seleccion s = ObtenerSeleccion();
+                Parrafo parrafoinicio = s.ObtenerParrafoInicial();
+                Parrafo parrafofin = s.ObtenerParrafoFinal();
                 int inicio=s.ObtenerPosicionInicial();
                 int fin=s.ObtenerPosicionFinal();
-                Parrafo res = _documentoEdicion.BorrarRango(s.ObtenerParrafoInicial(), 
-                    inicio, s.ObtenerParrafoFinal(), fin);
-                if (res == parrafoFinRango)
-                {
-                    posicionInsercion = inicio;
-                }
+                Parrafo res = _documentoEdicion.BorrarRango(
+                    parrafoinicio,inicio, 
+                    parrafofin, fin);
+                parrafoSeleccionado = parrafoinicio;
+                posicionInsercion = inicio;
                 LimpiarSeleccion();
             }
         }
