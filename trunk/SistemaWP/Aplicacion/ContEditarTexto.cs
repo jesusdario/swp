@@ -205,11 +205,13 @@ namespace SistemaWP.Aplicacion
             if (ExisteSeleccion)
             {
                 Seleccion s = ObtenerSeleccion();
+                int inicio=s.ObtenerPosicionInicial();
+                int fin=s.ObtenerPosicionFinal();
                 Parrafo res = _documentoEdicion.BorrarRango(s.ObtenerParrafoInicial(), 
-                    s.ObtenerPosicionInicial(), s.ObtenerParrafoFinal(), s.ObtenerPosicionFinal());
+                    inicio, s.ObtenerParrafoFinal(), fin);
                 if (res == parrafoFinRango)
                 {
-                    posicionInsercion = posicionFinRango.Value;
+                    posicionInsercion = inicio;
                 }
                 LimpiarSeleccion();
             }
