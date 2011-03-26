@@ -32,10 +32,6 @@ namespace SistemaWP.IU.VistaDocumento
             AsegurarVisibilidad(pos);
             Medicion inicio = EsquinaSuperior.Y;
             Medicion derecha = EsquinaSuperior.X;
-            /*
-             *    --->
-             *    v
-             * */
             for (int i = PaginaSuperior; i < Documento.ObtenerNumPaginas(); i++)
             {
                 Pagina p = Documento.ObtenerPagina(i);
@@ -43,15 +39,10 @@ namespace SistemaWP.IU.VistaDocumento
                 l.Dibujar(graficador, Documento, pos, seleccion);
                 if (Medicion.Cero-inicio > Dimensiones.Alto+EsquinaSuperior.Y)
                 {
-                    /*graficador.DibujarRectangulo(new Lapiz() { Brocha = new BrochaSolida() { Color = new ColorDocumento(200, 200, 50) }, Ancho = new Medicion(1) },
-                           Punto.Origen, Dimensiones);*/
                     return;
                 }
                 inicio -= p.Dimensiones.Alto + EspacioEntrePaginas;
             }
-            /*graficador.DibujarRectangulo(new Lapiz() { Brocha = new BrochaSolida() { Color = new ColorDocumento(200, 200, 50) }, Ancho = new Medicion(1) },
-                Punto.Origen, Dimensiones);*/
-            
         }
         
         public bool EnRango(Punto esquinaSuperior, TamBloque tamaño,Punto puntoTest)
@@ -123,10 +114,6 @@ namespace SistemaWP.IU.VistaDocumento
                     AsegurarVisibilidadPunto(new Punto(posicion.Pagina.Margen.Izquierdo,pt.Y+posicion.AltoLinea));
                 }
                 AsegurarVisibilidadMargen(posicion);
-                //AsegurarVisibilidadPunto(new Punto(pt.X + pos.Ancho, pt.Y + posicion.AltoLinea));
-                //AsegurarVisibilidadPunto(new Punto(pt.X, pt.Y + posicion.AltoLinea));
-                //AsegurarVisibilidadPunto(new Punto(pt.X-pos.Ancho,pt.Y+posicion.AltoLinea));
-                //AsegurarVisibilidadPunto(pt);                
             }
             LineaAnterior = posicion.IndiceLinea;
         }

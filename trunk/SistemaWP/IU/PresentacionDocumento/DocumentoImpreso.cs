@@ -45,6 +45,36 @@ namespace SistemaWP.IU.PresentacionDocumento
         {
             _documento = documento;            
         }
+        [System.Diagnostics.Conditional("DEBUG")]
+        public void RevisarIntegridad()
+        {
+            int lineaanterior=0;
+            foreach (Pagina p in _Paginas)
+            {
+                Debug.Assert(p.LineaInicio >= 0);
+                Debug.Assert(p.LineaInicio == lineaanterior);
+                Debug.Assert(p.LineaInicio < _Lineas.Count);
+                Debug.Assert(p.LineaInicio+p.Cantidad <= _Lineas.Count);
+                lineaanterior = p.LineaInicio + p.Cantidad;
+            }
+            int posparrafoanterior = 0;
+            foreach (Linea l in _Lineas)
+            {
+                if (l.Inicio == 0)
+                {
+                    posparrafoanterior = 0;
+                }
+                try {
+                    Parrafo par=_documento.ObtenerParrafo(l.Parrafo.ID);
+                } catch {
+                    Debug.Assert(false);
+                }
+                Debug.Assert(posparrafoanterior == l.Inicio);
+                Debug.Assert(l.Inicio >= 0);
+                Debug.Assert(l.Inicio+l.Cantidad <= l.Parrafo.ObtenerLongitud());
+                posparrafoanterior=l.Inicio+l.Cantidad;
+            }
+        }
         public void Completar(Posicion posicion, int paginaInicioBusqueda,int indiceLinea, int numCaracter)
         {
             if (_Paginas[paginaInicioBusqueda].ContieneLinea(indiceLinea))

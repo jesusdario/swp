@@ -17,11 +17,15 @@ namespace SistemaWP.IU
 {
     public partial class SWPEditor : Control
     {
-        ContPresentarDocumento contpresentacion = new ContPresentarDocumento();
+        private Documento _documento;
+        private ContPresentarDocumento contpresentacion;
+        
         Escritorio escritorio;
         public SWPEditor():base()
         {
             DoubleBuffered = true;
+            _documento = new Documento();
+            contpresentacion = new ContPresentarDocumento(_documento);
             escritorio = new Escritorio(contpresentacion);
             contpresentacion.ActualizarPresentacion += new EventHandler(contpresentacion_ActualizarPresentacion);
             escritorio.Dimensiones = new TamBloque(new Medicion(50, Unidad.Milimetros), new Medicion(50, Unidad.Milimetros));
@@ -58,25 +62,37 @@ namespace SistemaWP.IU
             e.Handled = true;
             base.OnKeyPress(e);
         }
-        
         private Unidad CentesimaPulgada = new Unidad("CentPlg", "CP", 0.01, Unidad.Pulgadas);
         public void Print()
         {
             PrintDialog impr = new PrintDialog();
+            PrintDocument docimpr = new PrintDocument();
+            impr.Document = docimpr;
             impr.UseEXDialog = true;
             if (impr.ShowDialog(this) == DialogResult.OK)
             {
-                PrintDocument docimpr = new PrintDocument();
-                docimpr.PrinterSettings = impr.PrinterSettings;
-                docimpr.DefaultPageSettings.PaperSize = new PaperSize("DEF",
-                    (int)new Medicion(210,Unidad.Milimetros).ConvertirA(CentesimaPulgada).Valor,
-                    (int)new Medicion(270, Unidad.Milimetros).ConvertirA(CentesimaPulgada).Valor);
-                docimpr.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
+                //docimpr.PrinterSettings = impr.PrinterSettings;
+                docimpr.QueryPageSettings += new QueryPageSettingsEventHandler(docimpr_QueryPageSettings);
+                //docimpr.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
                 docimpr.OriginAtMargins = true;
                 docimpr.PrintPage += new PrintPageEventHandler(impresora_PrintPage);
                 numpagina = null;
                 docimpr.Print();
             }
+        }
+
+        void docimpr_QueryPageSettings(object sender, QueryPageSettingsEventArgs e)
+        {
+            if (!numpagina.HasValue)
+            {
+                numpagina = 0;
+            }
+            int lim = escritorio.Controlador.Documento.ObtenerNumPaginas();
+            Pagina pag = escritorio.Controlador.Documento.ObtenerPagina(numpagina.Value);
+            
+            e.PageSettings.PaperSize = new PaperSize("Personalizado",
+                (int)pag.Dimensiones.Ancho.ConvertirA(CentesimaPulgada).Valor,
+                (int)pag.Dimensiones.Alto.ConvertirA(CentesimaPulgada).Valor);
         }
         protected override void OnKeyDown(KeyEventArgs e)
         {
@@ -243,30 +259,6 @@ namespace SistemaWP.IU
         {
             contpresentacion.Pegar();            
         }
-
-        //void docimpr_QueryPageSettings(object sender, QueryPageSettingsEventArgs e)
-        //{
-        //    if (!numpagina.HasValue)
-        //    {
-        //        numpagina = 0;
-        //    }
-        //    int lim = escritorio.Controlador.Documento.ObtenerNumPaginas();
-        //    Pagina pag = escritorio.Controlador.Documento.ObtenerPagina(numpagina);
-
-        //    e.PageSettings.PaperSize = new PaperSize(pag.Dimensiones.Ancho.Valor, pag.Dimensiones.Alto.Valor);
-
-        //}
-
-        //void doc_QueryPageSettings(object sender, QueryPageSettingsEventArgs e)
-        //{
-        //    if (!numpagina.HasValue) {
-        //        numpagina=0;
-        //    }
-        //    int lim=escritorio.Controlador.Documento.ObtenerNumPaginas();
-        //    Pagina pag=escritorio.Controlador.Documento.ObtenerPagina(numpagina);
-            
-        //    e.PageSettings.PaperSize = new PaperSize(pag.Dimensiones.Ancho, pag.Dimensiones.Alto);
-        //}
         int? numpagina;
         void impresora_PrintPage(object sender, PrintPageEventArgs e)
         {
@@ -278,6 +270,7 @@ namespace SistemaWP.IU
                 e.HasMorePages = false;
             }
             Graficador g=new Graficador(e.Graphics);
+            g.CambiarResolucion(e.PageSettings.PrinterResolution.X, e.PageSettings.PrinterResolution.Y);
             escritorio.Controlador.Documento.DibujarPagina(g, new Punto(Medicion.Cero, Medicion.Cero), numpagina.Value, null);
             numpagina++;
         }
@@ -300,10 +293,6 @@ namespace SistemaWP.IU
         }
         
         bool EnCaptura = false;
-        Thread TareaRegistro = null;
-        float ultimaposx = 0;
-        float ultimaposy = 0;
-        int nummensajes;
         protected void RegistrarPosicionSinc(float x, float y, bool ampliarSeleccion)
         {
             using (Graphics g = Graphics.FromHwnd(this.Handle))
@@ -315,9 +304,6 @@ namespace SistemaWP.IU
             }
         }
         protected void RegistrarPosicion(float x,float y,bool ampliarSeleccion) {
-            DateTime fecharegistro=DateTime.Now;;    
-            ultimaposx=x;
-            ultimaposy=y;
             RegistrarPosicionSinc(x, y, ampliarSeleccion);
             
         }
@@ -325,7 +311,7 @@ namespace SistemaWP.IU
         {
             if (!EnCaptura)
             {
-                RegistrarPosicion(e.X, e.Y, false);
+                RegistrarPosicion(e.X, e.Y, (ModifierKeys&Keys.Shift)!=0);
                 Capture = true;
                 EnCaptura = true;
             } 

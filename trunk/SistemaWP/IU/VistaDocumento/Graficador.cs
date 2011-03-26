@@ -63,15 +63,20 @@ namespace SistemaWP.IU.VistaDocumento
         Unidad unidaddispositivox;
         Unidad unidaddispositivoy;
         Unidad intermedia;
-        public Graficador(System.Drawing.Graphics graficos)
+        public void CambiarResolucion(float dpix, float dpiy)
         {
-            float dpix = graficos.DpiX;
-            float dpiy = graficos.DpiY;
-            //graficos.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            graficos.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             unidaddispositivox = new Unidad("UnidadDispositivoX", "dpix", 1 / dpix, Unidad.Pulgadas);
             unidaddispositivoy = new Unidad("UnidadDispositivoY", "dpiy", 1 / dpiy, Unidad.Pulgadas);
-            intermedia = new Unidad("UnidadDispositivoY", "dpixy", 2 / (dpix + dpiy), Unidad.Pulgadas);
+            intermedia = new Unidad("UnidadDispositivoXY", "dpixy", 2 / (dpix + dpiy), Unidad.Pulgadas);
+            Medicion a = new Medicion(96, unidaddispositivox).ConvertirA(Unidad.Pulgadas);
+        }
+        public Graficador(System.Drawing.Graphics graficos)
+        {
+            //float dpix = graficos.DpiX;
+            //float dpiy = graficos.DpiY;
+            //graficos.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+            CambiarResolucion(graficos.DpiX, graficos.DpiY);
+            graficos.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             g = graficos;
             
             _brochas = new Stock<Brocha, SolidBrush>(delegate(Brocha brocha) {

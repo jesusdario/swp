@@ -11,16 +11,18 @@ namespace SistemaWP.IU.PresentacionDocumento
 {
     class ContPresentarDocumento
     {
-        ContEditarTexto conttexto = new ContEditarTexto();
+        ContEditarTexto conttexto;
         PresentacionDocumento.DocumentoImpreso _documento;
         public DocumentoImpreso Documento { get { return _documento; } }
         public event EventHandler ActualizarPresentacion;
-        public ContPresentarDocumento()
+        public ContPresentarDocumento(Documento documento)
         {
+            conttexto = new ContEditarTexto(documento);
             conttexto.IndicarPosicion(1, 0, false);
-            _documento = new SistemaWP.IU.PresentacionDocumento.DocumentoImpreso(conttexto.DocumentoEdicion);
+            _documento = new SistemaWP.IU.PresentacionDocumento.DocumentoImpreso(documento);
             _documento.Repaginar(0);
         }
+        
         protected void EnActualizarPresentacion(bool repaginar)
         {
             lock (this)
@@ -29,6 +31,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                 {
                     _documento.Repaginar(-1);
                 }
+                _documento.RevisarIntegridad();
                 if (ActualizarPresentacion != null)
                     ActualizarPresentacion(this, EventArgs.Empty);
             }
