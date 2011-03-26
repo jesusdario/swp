@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace SistemaWP.Dominio
 {
@@ -135,59 +136,78 @@ namespace SistemaWP.Dominio
         {
             if (parrafoSeleccionado == parrafoFinRango)
             {
-                parrafoSeleccionado.BorrarRangoCaracteres(
-                    posicionInicio, posicionFinRango);
+                parrafoSeleccionado.BorrarRangoCaracteres(posicionInicio, posicionFinRango);
                 return parrafoSeleccionado;
             }
             else
             {
-                if (parrafoSeleccionado.EsSiguiente(parrafoFinRango))
+                Debug.Assert(parrafoSeleccionado.EsSiguiente(parrafoFinRango));
+                parrafoSeleccionado.BorrarHastaFin(posicionInicio);
+                Parrafo s = parrafoSeleccionado.Siguiente;                
+                while (s != null)
                 {
-                    Parrafo s = parrafoSeleccionado;
-                    s.BorrarHastaFin(posicionInicio);
+                    if (s == parrafoFinRango)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        m_Parrafos.Remove(s.ID);
+                    }
+                    s = s.Siguiente;
+                }
+                parrafoFinRango.BorrarHastaInicio(posicionFinRango);
+                parrafoSeleccionado.ConectarDespues(parrafoFinRango);
+                FusionarSiguiente(parrafoFinRango);
+                AsegurarParrafo(parrafoSeleccionado);
+                return parrafoSeleccionado;
+                //if (parrafoSeleccionado.EsSiguiente(parrafoFinRango))
+                //{
+                //    Parrafo s = parrafoSeleccionado;
+                //    s.BorrarHastaFin(posicionInicio);
 
-                    while (s != null)
-                    {
-                        if (s == parrafoFinRango)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            m_Parrafos.Remove(s.ID);
-                        }
-                        s = s.Siguiente;
-                    }
-                    parrafoSeleccionado.ConectarDespues(parrafoFinRango);
-                    parrafoFinRango.BorrarHastaInicio(posicionFinRango);
-                    parrafoSeleccionado.FusionarCon(parrafoFinRango);
-                    m_Parrafos.Remove(parrafoFinRango.ID);
-                    AsegurarParrafo(parrafoSeleccionado);
-                    return parrafoSeleccionado;
-                }
-                else
-                {
-                    Parrafo s = parrafoSeleccionado;
-                    s.BorrarHastaInicio(posicionInicio);
-                    while (s != null)
-                    {
-                        if (s == parrafoFinRango)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            m_Parrafos.Remove(s.ID);
-                        }
-                        s = s.Anterior;
-                    }
-                    parrafoSeleccionado.ConectarAntes(parrafoFinRango);
-                    parrafoFinRango.BorrarHastaFin(posicionFinRango);
-                    parrafoFinRango.FusionarCon(parrafoSeleccionado);
-                    m_Parrafos.Remove(parrafoSeleccionado.ID);
-                    AsegurarParrafo(parrafoFinRango);
-                    return parrafoFinRango;
-                }
+                //    while (s != null)
+                //    {
+                //        if (s == parrafoFinRango)
+                //        {
+                //            break;
+                //        }
+                //        else
+                //        {
+                //            m_Parrafos.Remove(s.ID);
+                //        }
+                //        s = s.Siguiente;
+                //    }
+                //    parrafoSeleccionado.ConectarDespues(parrafoFinRango);
+                //    parrafoFinRango.BorrarHastaInicio(posicionFinRango);
+                //    parrafoSeleccionado.FusionarCon(parrafoFinRango);
+                //    m_Parrafos.Remove(parrafoFinRango.ID);
+                //    AsegurarParrafo(parrafoSeleccionado);
+                //    return parrafoSeleccionado;
+                //}
+                //else
+                //{
+                //    Parrafo s = parrafoSeleccionado;
+                //    s.BorrarHastaInicio(posicionInicio);
+                //    while (s != null)
+                //    {
+                //        if (s == parrafoFinRango)
+                //        {
+                //            break;
+                //        }
+                //        else
+                //        {
+                //            m_Parrafos.Remove(s.ID);
+                //        }
+                //        s = s.Anterior;
+                //    }
+                //    parrafoSeleccionado.ConectarAntes(parrafoFinRango);
+                //    parrafoFinRango.BorrarHastaFin(posicionFinRango);
+                //    parrafoFinRango.FusionarCon(parrafoSeleccionado);
+                //    m_Parrafos.Remove(parrafoSeleccionado.ID);
+                //    AsegurarParrafo(parrafoFinRango);
+                //    return parrafoFinRango;
+                //}
             }
         }
 
