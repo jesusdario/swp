@@ -5,15 +5,18 @@ using System.Text;
 using SistemaWP.Tests;
 using SistemaWP.IU;
 using System.Windows.Forms;
+using SistemaWP.Dominio;
 
 namespace SistemaWP
 {
+    
     class Programa
     {
         //STAThread es para windows forms.
         [STAThread]
         public static void Main(string[] args)
         {
+
             
             try
             {
