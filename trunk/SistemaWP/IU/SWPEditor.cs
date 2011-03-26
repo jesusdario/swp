@@ -38,6 +38,10 @@ namespace SistemaWP.IU
         {
             return true;
         }
+        protected override bool IsInputKey(Keys keyData)
+        {
+            return true;
+        }
         protected override void OnResize(EventArgs e)
         {
             using (Graphics graf = Graphics.FromHwnd(Handle))
