@@ -24,6 +24,11 @@ namespace SistemaWP
             {
                 MessageBox.Show(ex.Message+"\r\n"+ex.StackTrace, "Advertencia");
             }
+            return;
+            
+        }
+        public static void Tests()
+        {
             try
             {
                 PruebaParrafo.PruebaAgregarCaracter();
@@ -39,7 +44,7 @@ namespace SistemaWP
                 Console.WriteLine(ex.Message + ":" + ex.StackTrace);
             }
             return;
-            
+
         }
     }
 }
