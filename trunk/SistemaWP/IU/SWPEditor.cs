@@ -162,17 +162,12 @@ namespace SistemaWP.IU
         {
             contpresentacion.InsertarTexto(text);
         }
-        public override string Text
-        {
-            get
-            {
-                return contpresentacion.ObtenerTexto();
-            }
-            set
-            {
-                contpresentacion.SeleccionarTodo();
-                contpresentacion.InsertarTexto(value);
-            }
+        public string GetText() {
+            return contpresentacion.ObtenerTexto();
+        }
+        public void SetText(string value) {
+            contpresentacion.SeleccionarTodo();
+            contpresentacion.InsertarTexto(value);        
         }
         public void SelectAll()
         {

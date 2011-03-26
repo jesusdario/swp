@@ -23,181 +23,248 @@ namespace SistemaWP.IU.PresentacionDocumento
         }
         protected void EnActualizarPresentacion(bool repaginar)
         {
-            if (repaginar)
+            lock (this)
             {
-                _documento.Repaginar(-1);
+                if (repaginar)
+                {
+                    _documento.Repaginar(-1);
+                }
+                if (ActualizarPresentacion != null)
+                    ActualizarPresentacion(this, EventArgs.Empty);
             }
-            if (ActualizarPresentacion != null)
-                ActualizarPresentacion(this,EventArgs.Empty);
         }
         public void TeclaPulsada(char caracter)
         {
-            if ((int)caracter >= 32)
+            lock (this)
             {
-                conttexto.AgregarCaracter(caracter);
-                EnActualizarPresentacion(true);
+                if ((int)caracter >= 32)
+                {
+                    conttexto.AgregarCaracter(caracter);
+                    EnActualizarPresentacion(true);
+                }
             }
         }
         public void Pegar()
         {
-            string cad = Clipboard.GetText();
-            if (cad != null)
+            lock (this)
             {
-                conttexto.InsertarTexto(cad);
-                EnActualizarPresentacion(true);
+                string cad = Clipboard.GetText();
+                if (cad != null)
+                {
+                    conttexto.InsertarTexto(cad);
+                    EnActualizarPresentacion(true);
+                }
             }
         }
         public void InsertarTexto(string cadena)
         {
-            conttexto.InsertarTexto(cadena);
+            lock (this)
+            {
+                conttexto.InsertarTexto(cadena);
+            }
         }
         public void Copiar()
         {
-            Seleccion sel = conttexto.ObtenerSeleccion();
-            string cad = null;
-            if (sel == null)
-                cad = string.Empty;
-            else
-                cad = sel.ObtenerTexto();
-            Clipboard.SetText(cad, TextDataFormat.UnicodeText);
+            lock (this)
+            {
+                Seleccion sel = conttexto.ObtenerSeleccion();
+                string cad = null;
+                if (sel == null)
+                    cad = string.Empty;
+                else
+                    cad = sel.ObtenerTexto();
+                Clipboard.SetText(cad, TextDataFormat.UnicodeText);
+            }
         }
         
         public void BorrarCaracter()
         {
-            conttexto.BorrarCaracter();
-            EnActualizarPresentacion(true);
+            lock (this)
+            {
+                conttexto.BorrarCaracter();
+                EnActualizarPresentacion(true);
+            }
         }
 
         public void BorrarCaracterAnterior()
         {
-            conttexto.BorrarCaracterAnterior();
-            EnActualizarPresentacion(true);
+            lock (this)
+            {
+                conttexto.BorrarCaracterAnterior();
+                EnActualizarPresentacion(true);
+            }
         }
 
         public void IrAnteriorCaracter(bool moverSeleccion, TipoAvance tipoAvance)
         {
-            if (tipoAvance==TipoAvance.AvanzarPorLineas)
+            lock (this)
             {
-                Posicion posicion=ObtenerPosicion();
-                Posicion nueva=posicion.ObtenerInicioLinea();
-                CambiarPosicion(nueva, moverSeleccion);
+                if (tipoAvance == TipoAvance.AvanzarPorLineas)
+                {
+                    Posicion posicion = ObtenerPosicion();
+                    Posicion nueva = posicion.ObtenerInicioLinea();
+                    CambiarPosicion(nueva, moverSeleccion);
+                }
+                else if (tipoAvance == TipoAvance.AvanzarPorPaginas)
+                {
+                    IrPaginaAnterior(moverSeleccion);
+                }
+                else
+                {
+                    conttexto.IrAnteriorCaracter(moverSeleccion, tipoAvance);
+                }
+                EnActualizarPresentacion(false);
             }
-            else if (tipoAvance == TipoAvance.AvanzarPorPaginas)
-            {
-                IrPaginaAnterior(moverSeleccion);
-            } else 
-            {
-                conttexto.IrAnteriorCaracter(moverSeleccion, tipoAvance);                
-            }
-            EnActualizarPresentacion(false);
         }
 
         public void IrSiguienteCaracter(bool moverSeleccion, TipoAvance tipoAvance)
         {
-            if (tipoAvance == TipoAvance.AvanzarPorLineas)
+            lock (this)
             {
-                Posicion posicion = ObtenerPosicion();
-                Posicion nueva = posicion.ObtenerFinLinea();
-                CambiarPosicion(nueva, moverSeleccion);
+                if (tipoAvance == TipoAvance.AvanzarPorLineas)
+                {
+                    Posicion posicion = ObtenerPosicion();
+                    Posicion nueva = posicion.ObtenerFinLinea();
+                    CambiarPosicion(nueva, moverSeleccion);
+                }
+                else if (tipoAvance == TipoAvance.AvanzarPorPaginas)
+                {
+                    IrPaginaSiguiente(moverSeleccion);
+                }
+                else
+                {
+                    conttexto.IrSiguienteCaracter(moverSeleccion, tipoAvance);
+                }
+                EnActualizarPresentacion(false);
             }
-            else if (tipoAvance == TipoAvance.AvanzarPorPaginas)
-            {
-                IrPaginaSiguiente(moverSeleccion);
-            } else 
-            {
-                conttexto.IrSiguienteCaracter(moverSeleccion, tipoAvance);
-            }
-            EnActualizarPresentacion(false);
         }
 
         public void InsertarParrafo(bool ampliarSeleccion)
         {
-            conttexto.InsertarParrafo();
-            EnActualizarPresentacion(true);
+            lock (this)
+            {
+                conttexto.InsertarParrafo();
+                EnActualizarPresentacion(true);
+            }
         }
         private void CambiarPosicion(Posicion nuevaPosicion,bool ampliarSeleccion)
         {
-            conttexto.IndicarPosicion(nuevaPosicion.Linea.Parrafo.ID,nuevaPosicion.Linea.Inicio+nuevaPosicion.PosicionCaracter,ampliarSeleccion);
+            lock (this)
+            {
+                conttexto.IndicarPosicion(nuevaPosicion.Linea.Parrafo.ID, nuevaPosicion.Linea.Inicio + nuevaPosicion.PosicionCaracter, ampliarSeleccion);
+            }
         }
         internal void IrLineaSuperior(bool ampliarSeleccion)
         {
-            Posicion pos = ObtenerPosicion();
-            Posicion posanterior = pos.ObtenerLineaSuperior();
-            CambiarPosicion(posanterior,ampliarSeleccion);
-            EnActualizarPresentacion(false);
+            lock (this)
+            {
+                Posicion pos = ObtenerPosicion();
+                Posicion posanterior = pos.ObtenerLineaSuperior();
+                CambiarPosicion(posanterior, ampliarSeleccion);
+                EnActualizarPresentacion(false);
+            }
         }
 
         internal void IrLineaInferior(bool ampliarSeleccion)
         {
-            Posicion pos = ObtenerPosicion();
-            Posicion possiguiente = pos.ObtenerLineaInferior();
-            CambiarPosicion(possiguiente, ampliarSeleccion);
-            EnActualizarPresentacion(false);
+            lock (this)
+            {
+                Posicion pos = ObtenerPosicion();
+                Posicion possiguiente = pos.ObtenerLineaInferior();
+                CambiarPosicion(possiguiente, ampliarSeleccion);
+                EnActualizarPresentacion(false);
+            }
         }
         internal void IrPaginaAnterior(bool ampliarSeleccion)
         {
-            Posicion pos = ObtenerPosicion();
-            Posicion possiguiente = pos.ObtenerPaginaAnterior();
-            CambiarPosicion(possiguiente, ampliarSeleccion);
-            EnActualizarPresentacion(false);
+            lock (this)
+            {
+                Posicion pos = ObtenerPosicion();
+                Posicion possiguiente = pos.ObtenerPaginaAnterior();
+                CambiarPosicion(possiguiente, ampliarSeleccion);
+                EnActualizarPresentacion(false);
+            }
         }
         internal void IrPaginaSiguiente(bool ampliarSeleccion)
         {
-            Posicion pos = ObtenerPosicion();
-            Posicion possiguiente = pos.ObtenerPaginaSiguiente();
-            CambiarPosicion(possiguiente, ampliarSeleccion);
-            EnActualizarPresentacion(false);
+            lock (this)
+            {
+                Posicion pos = ObtenerPosicion();
+                Posicion possiguiente = pos.ObtenerPaginaSiguiente();
+                CambiarPosicion(possiguiente, ampliarSeleccion);
+                EnActualizarPresentacion(false);
+            }
         }
         public void DibujarPaginas(IGraficador generador,out Punto InicioCursor,out Punto FinCursor)
         {
-
-            _documento.DibujarPagina(generador,Punto.Origen, 0, conttexto.ObtenerSeleccion());
-            Posicion pos = _documento.ObtenerPosicionCursor(0,
-                conttexto.ObtenerParrafoSeleccionado(),
-                conttexto.ObtenerPosicionInsercion());
-            _documento.CompletarPixels(pos);
-            InicioCursor = new Punto(pos.PosicionPixelX, pos.PosicionPixelY);
-            FinCursor = new Punto(pos.PosicionPixelX, pos.PosicionPixelY + pos.AltoLinea);
+            lock (this)
+            {
+                _documento.DibujarPagina(generador, Punto.Origen, 0, conttexto.ObtenerSeleccion());
+                Posicion pos = _documento.ObtenerPosicionCursor(0,
+                    conttexto.ObtenerParrafoSeleccionado(),
+                    conttexto.ObtenerPosicionInsercion());
+                _documento.CompletarPixels(pos);
+                InicioCursor = new Punto(pos.PosicionPixelX, pos.PosicionPixelY);
+                FinCursor = new Punto(pos.PosicionPixelX, pos.PosicionPixelY + pos.AltoLinea);
+            }
             //e.Graphics.DrawLine(Pens.Black, new PointF(pos.PosicionPixelX, pos.PosicionPixelY), new PointF(pos.PosicionPixelX, pos.PosicionPixelY + pos.AltoLinea));
         }
 
         public void RegistrarPosicion(int pagina,Punto punto, bool ampliarSeleccion)
         {
-            Posicion pos = _documento.ObtenerPosicionPixels(pagina, punto);
-            conttexto.IndicarPosicion(pos.Linea.Parrafo.ID, pos.Linea.Inicio + pos.PosicionCaracter, ampliarSeleccion);
-            EnActualizarPresentacion(false);
+            lock (this)
+            {
+                Posicion pos = _documento.ObtenerPosicionPixels(pagina, punto);
+                conttexto.IndicarPosicion(pos.Linea.Parrafo.ID, pos.Linea.Inicio + pos.PosicionCaracter, ampliarSeleccion);
+                EnActualizarPresentacion(false);
+            }
         }
 
         public void Cortar()
         {
-            Seleccion sel=conttexto.ObtenerSeleccion();
-            if (sel != null)
+            lock (this)
             {
-                string cad=sel.ObtenerTexto();
-                conttexto.BorrarCaracter();
+                Seleccion sel = conttexto.ObtenerSeleccion();
+                if (sel != null)
+                {
+                    string cad = sel.ObtenerTexto();
+                    conttexto.BorrarCaracter();
+                }
+                EnActualizarPresentacion(true);
             }
-            EnActualizarPresentacion(true);
         }
 
         internal Seleccion ObtenerSeleccion()
         {
-            return conttexto.ObtenerSeleccion();
+            lock (this)
+            {
+                return conttexto.ObtenerSeleccion();
+            }
         }
 
         internal Posicion ObtenerPosicion()
         {
-            return _documento.ObtenerPosicionCursor(0, conttexto.ObtenerParrafoSeleccionado(), conttexto.ObtenerPosicionInsercion());
+            lock (this)
+            {
+                return _documento.ObtenerPosicionCursor(0, conttexto.ObtenerParrafoSeleccionado(), conttexto.ObtenerPosicionInsercion());
+            }
         }
 
         internal void SeleccionarTodo()
         {
-            conttexto.SeleccionarTodo();
-            EnActualizarPresentacion(false);
+            lock (this)
+            {
+                conttexto.SeleccionarTodo();
+                EnActualizarPresentacion(false);
+            }
         }
 
         internal string ObtenerTexto()
         {
-            return conttexto.ObtenerTexto();
+            lock (this)
+            {
+                return conttexto.ObtenerTexto();
+            }
         }
     }
 }
