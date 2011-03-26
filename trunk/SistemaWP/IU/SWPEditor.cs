@@ -38,81 +38,6 @@ namespace SistemaWP.IU
         {
             return true;
         }
-        protected override bool ProcessDialogChar(char charCode)
-        {
-            //return base.ProcessDialogChar(charCode);
-            OnKeyPress(new KeyPressEventArgs(charCode));
-            return true;
-        }
-        //protected override bool ProcessKeyMessage(ref Message m)
-        //{
-        //    return base.ProcessKeyMessage(ref m);
-        //}
-        //protected override bool ProcessDialogKey(Keys keyData)
-        //{
-        //    return base.ProcessDialogKey(keyData);
-        //}
-        //protected override bool ProcessKeyPreview(ref Message m)
-        //{
-        //    return base.ProcessKeyPreview(ref m);
-        //}
-        //protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        //{
-        //    //return ProcessKeyEventArgs(ref msg);
-        //    return base.ProcessCmdKey(ref msg, keyData);
-        //    if (msg.Msg == 0x0100)
-        //    {//WM_KEYDOWN: 
-        //        OnKeyDown(new KeyEventArgs(keyData));
-        //        return true;
-        //    }
-        //    else if (msg.Msg == 0x102)
-        //    {
-        //        //    OnKeyPress(new KeyPressEventArgs((char)msg.WParam));
-        //        //    return true;
-        //        //}//WM_CHAR
-        //        //return false;
-        //    }
-        //}
-        //protected override bool ProcessKeyEventArgs(ref Message m)
-        //{
-        //    base.ProcessKeyEventArgs(ref m);
-        //    return true;
-        //}
-        //protected override void OnCreateControl()
-        //{
-        //    base.OnCreateControl();
-        //    bool res = this.Focus();
-        //}
-        //protected override bool IsInputKey(Keys keyData)
-        //{
-        //    return true;
-        //}
-        //protected override bool CanRaiseEvents
-        //{
-        //    get
-        //    {
-        //        return true;
-        //    }
-        //}
-        //protected override void OnGotFocus(EventArgs e)
-        //{
-        //    base.OnGotFocus(e);
-            
-        //}
-        //protected override void OnLoad(EventArgs e)
-        //{
-        //    float tamx = Width;
-        //    float tamy = Height;
-        //    using (Graphics graf=Graphics.FromHwnd(Handle))
-        //    {
-        //        Graficador g = new Graficador(graf);
-        //        escritorio.Dimensiones = g.Traducir(new SizeF(Width,Height));
-        //        escritorio.Controlador.ActualizarPresentacion += new EventHandler(Controlador_ActualizarPresentacion);
-        //    }
-        //    base.OnLoad(e);
-            
-        //}
-        
         protected override void OnResize(EventArgs e)
         {
             using (Graphics graf = Graphics.FromHwnd(Handle))
@@ -122,10 +47,7 @@ namespace SistemaWP.IU
             }
             base.OnResize(e);
         }
-        void Controlador_ActualizarPresentacion(object sender, EventArgs e)
-        {
-            Refresh();
-        }
+        
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
             contpresentacion.TeclaPulsada(e.KeyChar);
