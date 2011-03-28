@@ -5,6 +5,8 @@ using System.Drawing;
 using SistemaWP.Dominio;
 using SistemaWP.IU.Graficos;
 using SistemaWP.IU.VistaDocumento;
+using SistemaWP.Dominio.TextoFormato;
+using System.Diagnostics;
 
 namespace SistemaWP.IU.PresentacionDocumento
 {
@@ -13,29 +15,33 @@ namespace SistemaWP.IU.PresentacionDocumento
         public Letra Letra { get; set; }
         public Brocha ColorFondo { get; set; }
         public Brocha ColorLetra { get; set; }
-        public Estilo()
+        public Estilo(Bloque bloque)
         {
-            Letra = new Letra() { Tamaño = new Medicion(4,Unidad.Milimetros) };
-            ColorFondo = new BrochaSolida() { Color = new ColorDocumento(255, 255, 255) };
-            ColorLetra = new BrochaSolida() { Color = new ColorDocumento(0, 0, 0) };
+            Debug.Assert(bloque != null);
+            Formato f = bloque.Formato;
+            
+            ColorFondo = new BrochaSolida(f.ObtenerColorFondo());
+            ColorLetra = new BrochaSolida(f.ObtenerColorLetra());
+            Letra = new Letra()
+            {
+                Tamaño = f.ObtenerTamLetra(),
+                Familia = f.ObtenerFamiliaLetra(),
+                Negrilla = f.ObtenerNegrilla(),
+                Subrayado = f.ObtenerSubrayado(),
+                Cursiva = f.ObtenerCursiva()
+            };
         }
-        public Punto DibujarFondo(IGraficador graficos, Punto posicionbase, string texto)
-        {
-            TamBloque b = Medir(texto);
-            graficos.RellenarRectangulo(ColorFondo, posicionbase, b);
-            return new Punto(posicionbase.X + b.Ancho, posicionbase.Y);
-        }
-        public void DibujarSinFondo(IGraficador graficos, Punto posicionbase, string texto)
-        {
-            graficos.DibujarTexto(posicionbase, Letra, ColorLetra, texto);
-        }
+        //public void DibujarSinFondo(IGraficador graficos, Punto posicionbase, string texto)
+        //{
+        //    graficos.DibujarTexto(posicionbase, Letra, ColorLetra, texto);
+        //}
         public void Dibujar(IGraficador graficos, Punto posicionbase, string texto)
         {
-            TamBloque b=Medir(texto);
-            graficos.RellenarRectangulo(ColorFondo, posicionbase, b);
+            //TamBloque b=Medir(texto);
+            //graficos.RellenarRectangulo(ColorFondo, posicionbase, b);
             graficos.DibujarTexto(posicionbase, Letra, ColorLetra, texto);
         }
-        public Punto DibujarConTam(IGraficador graficos, Punto posicionbase, string texto,string anteriortexto)
+        public Punto DibujarFondo(IGraficador graficos, Punto posicionbase, string texto, string anteriortexto)
         {
             if (!string.IsNullOrEmpty(anteriortexto))
             {
@@ -43,6 +49,16 @@ namespace SistemaWP.IU.PresentacionDocumento
             }
             TamBloque b = Medir(texto);
             graficos.RellenarRectangulo(ColorFondo, posicionbase, b);
+            return new Punto(posicionbase.X + b.Ancho, posicionbase.Y);
+        }
+        public Punto DibujarConTam(IGraficador graficos, Punto posicionbase, string texto, string anteriortexto)
+        {
+            if (!string.IsNullOrEmpty(anteriortexto))
+            {
+                posicionbase.X += grafpantalla.MedirUnion(Letra, anteriortexto, texto);
+            }
+            TamBloque b = Medir(texto);
+            //graficos.RellenarRectangulo(ColorFondo, posicionbase, b);
             graficos.DibujarTexto(posicionbase, Letra, ColorLetra, texto);
             return new Punto(posicionbase.X+b.Ancho,posicionbase.Y);
         }
@@ -58,6 +74,22 @@ namespace SistemaWP.IU.PresentacionDocumento
         {
             return grafpantalla.MedirTexto(Letra, texto);
             
+        }
+        public Medicion MedirBase()
+        {
+            return grafpantalla.MedirBaseTexto(Letra);
+        }
+        public Medicion MedirAlto()
+        {
+            return grafpantalla.MedirAltoTexto(Letra);
+        }
+        public Medicion MedirEspacioLineas()
+        {
+            return grafpantalla.MedirEspacioLineas(Letra);
+        }
+        internal Estilo Clonar()
+        {
+            return (Estilo)this.MemberwiseClone();
         }
     }
 }

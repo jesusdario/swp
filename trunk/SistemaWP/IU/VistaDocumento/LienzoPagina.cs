@@ -5,6 +5,7 @@ using SistemaWP.IU.Graficos;
 using SistemaWP.Dominio;
 using SistemaWP.IU.PresentacionDocumento;
 using SistemaWP.Aplicacion;
+using SistemaWP.Dominio.TextoFormato;
 
 namespace SistemaWP.IU.VistaDocumento
 {
@@ -19,7 +20,7 @@ namespace SistemaWP.IU.VistaDocumento
         }
         public void DibujarCursor(IGraficador graficador,Posicion posicion)
         {
-            Lapiz lp = new Lapiz() { Ancho = new Medicion(0.5, Unidad.Milimetros), Brocha = new BrochaSolida() { Color = new ColorDocumento(127, 0, 0) } };
+            Lapiz lp = new Lapiz() { Ancho = new Medicion(0.5, Unidad.Milimetros), Brocha = new BrochaSolida(new ColorDocumento(127, 0, 0)) };
             Posicion pos = posicion ;
             Punto punto2 = new Punto(pos.PosicionPagina.X, pos.PosicionPixelY + pos.AltoLinea);
             graficador.DibujarLinea(lp, pos.PosicionPagina - PosicionInicioDibujo, punto2-PosicionInicioDibujo);
@@ -32,7 +33,7 @@ namespace SistemaWP.IU.VistaDocumento
             graf.RellenarRectangulo(BrochaSolida.Blanco, new Punto(Medicion.Cero, Medicion.Cero)-PosicionInicioDibujo, p.Dimensiones);
             graf.DibujarRectangulo(Lapiz.Negro, new Punto(Medicion.Cero, Medicion.Cero) - PosicionInicioDibujo, p.Dimensiones);
             documento.DibujarPagina(graf, new Punto(Medicion.Cero, Medicion.Cero) - PosicionInicioDibujo, IDPagina, seleccion);
-            if (IDPagina == posicion.IndicePagina)
+            if (IDPagina == posicion.IndicePagina&&seleccion==null)
             {
                 DibujarCursor(graf,posicion);
             }

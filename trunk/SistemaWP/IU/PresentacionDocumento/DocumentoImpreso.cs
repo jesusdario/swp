@@ -41,6 +41,7 @@ namespace SistemaWP.IU.PresentacionDocumento
         List<Pagina> _Paginas = new List<Pagina>();
         ListaLineas _Lineas = new ListaLineas();
         Documento _documento;
+        public Documento Documento { get { return _documento; } }
         public DocumentoImpreso(Documento documento)
         {
             _documento = documento;            
@@ -75,7 +76,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                 posparrafoanterior=l.Inicio+l.Cantidad;
             }
         }
-        public void Completar(Posicion posicion, int paginaInicioBusqueda,int indiceLinea, int numCaracter)
+        internal void Completar(Posicion posicion, int paginaInicioBusqueda,int indiceLinea, int numCaracter)
         {
             if (_Paginas[paginaInicioBusqueda].ContieneLinea(indiceLinea))
             {
@@ -107,46 +108,6 @@ namespace SistemaWP.IU.PresentacionDocumento
         {
             return _Lineas.BuscarInicialDeParrafo(lineaInicio, p);
         }
-        //    Linea l = _Lineas[lineaInicio];
-        //    if (l.Parrafo == p)
-        //    {
-        //        if (l.Inicio == 0)
-        //        {
-        //            return lineaInicio;
-        //        }
-        //        else
-        //        {
-        //            while (l.Inicio != 0)
-        //            {
-        //                lineaInicio--;
-        //                l = _Lineas[lineaInicio];
-        //            }
-        //            return lineaInicio;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (l.Parrafo.EsSiguiente(p))
-        //        {
-        //            int lim=_Lineas.Count;
-        //            while (lineaInicio<lim&&l.Parrafo != p)
-        //            {
-        //                lineaInicio++;
-        //                l = _Lineas[lineaInicio];
-        //            }
-        //            return lineaInicio;
-        //        }
-        //        else
-        //        {
-        //            while (lineaInicio>0&&l.Parrafo != p)
-        //            {
-        //                lineaInicio--;
-        //                l = _Lineas[lineaInicio];
-        //            }
-        //            return lineaInicio;
-        //        }
-        //    }
-        //}
         private void Completar2(Posicion posicion, int indicePagina, int indiceLinea, int numCaracter)
         {
             Pagina p=_Paginas[indicePagina];
@@ -155,7 +116,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             posicion.Pagina = p;
             posicion.Pagina.Completar(_Lineas, posicion, indiceLinea, numCaracter);
         }
-        public void CompletarPixels(Posicion posicion)
+        internal void CompletarPixels(Posicion posicion)
         {
             posicion.Pagina.CompletarPixels(_Lineas, posicion);
             
@@ -163,7 +124,8 @@ namespace SistemaWP.IU.PresentacionDocumento
         public void DibujarPagina(IGraficador g, Punto esquinaSuperior, int numpagina, Seleccion seleccion)
         {
             if (_Paginas.Count == 0) return;
-            _Paginas[numpagina].Dibujar(g, esquinaSuperior,_Lineas, seleccion);
+            AvanceBloques av = new AvanceBloques(_Lineas[_Paginas[numpagina].LineaInicio]);
+            _Paginas[numpagina].Dibujar(g, esquinaSuperior,_Lineas, seleccion,av);
         }
         public Posicion CrearPosicion(int indicePagina, int indiceLinea, int numCaracter)
         {

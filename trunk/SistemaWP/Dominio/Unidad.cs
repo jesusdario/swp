@@ -17,10 +17,12 @@ namespace SistemaWP.Dominio
             FactorConversion = factorConversion;
             UnidadRelativa = unidadRelativa;
         }
-        
         public static readonly Unidad Metros = new Unidad("Metros", "m", 1, null);
         public static readonly Unidad Centimetros = new Unidad("Centimetros", "cm", 0.01, Metros);
         public static readonly Unidad Milimetros = new Unidad("Milímetros", "mm", 0.001, Metros);
         public static readonly Unidad Pulgadas = new Unidad("Pulgadas", "\"", 0.0254,Metros);
+        public static readonly Unidad Puntos = new Unidad("Puntos", "\"", 1/72.0, Pulgadas);
+        public static readonly Unidad Documento = new Unidad("Documento", "doc", 1 / 300.0, Pulgadas);
+        public static readonly Unidad Pagina = new Unidad("Pantalla", "pg", 1 / 96.0, Pulgadas);
     }
 }

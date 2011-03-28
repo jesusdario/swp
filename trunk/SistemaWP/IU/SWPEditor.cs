@@ -81,19 +81,7 @@ namespace SistemaWP.IU
             }
         }
 
-        void docimpr_QueryPageSettings(object sender, QueryPageSettingsEventArgs e)
-        {
-            if (!numpagina.HasValue)
-            {
-                numpagina = 0;
-            }
-            int lim = escritorio.Controlador.Documento.ObtenerNumPaginas();
-            Pagina pag = escritorio.Controlador.Documento.ObtenerPagina(numpagina.Value);
-            
-            e.PageSettings.PaperSize = new PaperSize("Personalizado",
-                (int)pag.Dimensiones.Ancho.ConvertirA(CentesimaPulgada).Valor,
-                (int)pag.Dimensiones.Alto.ConvertirA(CentesimaPulgada).Valor);
-        }
+        
         protected override void OnKeyDown(KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -260,6 +248,19 @@ namespace SistemaWP.IU
             contpresentacion.Pegar();            
         }
         int? numpagina;
+        void docimpr_QueryPageSettings(object sender, QueryPageSettingsEventArgs e)
+        {
+            if (!numpagina.HasValue)
+            {
+                numpagina = 0;
+            }
+            int lim = escritorio.Controlador.Documento.ObtenerNumPaginas();
+            Pagina pag = escritorio.Controlador.Documento.ObtenerPagina(numpagina.Value);
+
+            e.PageSettings.PaperSize = new PaperSize("Personalizado",
+                (int)pag.Dimensiones.Ancho.ConvertirA(CentesimaPulgada).Valor,
+                (int)pag.Dimensiones.Alto.ConvertirA(CentesimaPulgada).Valor);
+        }
         void impresora_PrintPage(object sender, PrintPageEventArgs e)
         {
             if (!numpagina.HasValue) {
@@ -270,7 +271,11 @@ namespace SistemaWP.IU
                 e.HasMorePages = false;
             }
             Graficador g=new Graficador(e.Graphics);
-            g.CambiarResolucion(e.PageSettings.PrinterResolution.X, e.PageSettings.PrinterResolution.Y);
+            e.Graphics.ResetTransform();
+            e.Graphics.PageUnit = GraphicsUnit.Display;
+            g.CambiarResolucion(96, 96);//Utilizar resolucion pantalla
+            
+            //g.CambiarResolucion(e.PageSettings.PrinterResolution.X, e.PageSettings.PrinterResolution.Y);
             escritorio.Controlador.Documento.DibujarPagina(g, new Punto(Medicion.Cero, Medicion.Cero), numpagina.Value, null);
             numpagina++;
         }
@@ -309,6 +314,10 @@ namespace SistemaWP.IU
         }
         protected override void OnMouseDown(MouseEventArgs e)
         {
+            if (!Focused)
+            {
+                Select();
+            }
             if (!EnCaptura)
             {
                 RegistrarPosicion(e.X, e.Y, (ModifierKeys&Keys.Shift)!=0);
@@ -324,9 +333,16 @@ namespace SistemaWP.IU
                 RegistrarPosicion(e.X, e.Y, true);
                 Capture = false;
                 EnCaptura = false;
+                Seleccion s = contpresentacion.ObtenerSeleccion();
+                if (s != null && s.ObtenerPosicionInicial() == s.ObtenerPosicionFinal() &&
+                    s.ObtenerParrafoInicial() == s.ObtenerParrafoFinal())
+                {
+                    contpresentacion.QuitarSeleccion();
+                }
             }
             base.OnMouseUp(e);
         }
+       
         protected override void OnMouseMove(MouseEventArgs e)
         {
             if (EnCaptura)
@@ -335,6 +351,73 @@ namespace SistemaWP.IU
             }
             base.OnMouseMove(e);
         }
-        
+
+        public void ChangeFontColor(System.Drawing.Color color)
+        {
+            contpresentacion.CambiarColorLetra(new SistemaWP.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
+        }
+        public void ChangeFontBackground(System.Drawing.Color color)
+        {
+            contpresentacion.CambiarColorFondo(new SistemaWP.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
+        }
+        public void ChangeFontBold()
+        {
+            contpresentacion.CambiarLetraNegrilla();
+        }
+
+        public void ChangeFontItalic()
+        {
+            contpresentacion.CambiarLetraCursiva();
+        }
+
+        public void ChangeFontUnderlined()
+        {
+            contpresentacion.CambiarLetraSubrayado();
+        }
+
+        public void IncreaseFontSize()
+        {
+            contpresentacion.AgrandarLetra();
+        }
+
+        public void ReduceFontSize()
+        {
+            contpresentacion.ReducirLetra();
+        }
+
+        internal void ChangeFont(Font font)
+        {
+            contpresentacion.CambiarLetra(font.FontFamily.Name,new Medicion(font.SizeInPoints,Unidad.Puntos));
+        }
+
+        internal void SetFontSizeInPoints(decimal valor)
+        {
+            contpresentacion.CambiarTamLetra(new Medicion((float)valor, Unidad.Puntos));
+        }
+
+        internal void AlignLeft()
+        {
+            contpresentacion.AlinearIzquierda();
+        }
+
+        internal void AlignCenter()
+        {
+            contpresentacion.AlinearCentro();
+        }
+
+        internal void AlignRight()
+        {
+            contpresentacion.AlinearDerecha();
+        }
+
+        internal void IncreaseLineSpace()
+        {
+            contpresentacion.AumentarInterlineado();
+        }
+
+        internal void DecreaseLineSpace()
+        {
+            contpresentacion.DisminuirInterlineado();
+        }
     }
 }

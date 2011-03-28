@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SistemaWP.Dominio.TextoFormato;
 
 namespace SistemaWP.IU.Graficos
 {
@@ -9,7 +10,12 @@ namespace SistemaWP.IU.Graficos
     }
     public class BrochaSolida : Brocha
     {
-        public ColorDocumento Color { get; set; }
+        public ColorDocumento Color { get; private set; }
+        public BrochaSolida(ColorDocumento color)
+        {
+            Color = color;
+        }
+ 
         public override int GetHashCode()
         {
             return Color.GetHashCode();
@@ -19,11 +25,12 @@ namespace SistemaWP.IU.Graficos
             BrochaSolida b = (BrochaSolida)obj;
             return Color.Equals(b.Color);
         }
-        public static readonly BrochaSolida Negro = new BrochaSolida() { Color = ColorDocumento.Negro };
-        public static readonly BrochaSolida Rojo = new BrochaSolida() { Color = ColorDocumento.Rojo };
-        public static readonly BrochaSolida Amarillo = new BrochaSolida() { Color = ColorDocumento.Amarillo };
-        public static readonly BrochaSolida Verde = new BrochaSolida() { Color = ColorDocumento.Verde };
-        public static readonly BrochaSolida Azul = new BrochaSolida() { Color = ColorDocumento.Azul };
-        public static readonly BrochaSolida Blanco = new BrochaSolida() { Color = ColorDocumento.Blanco };
+        public static readonly BrochaSolida Transparente = new BrochaSolida(new ColorDocumento(0,0,0,0));
+        public static readonly BrochaSolida Negro = new BrochaSolida(ColorDocumento.Negro);
+        public static readonly BrochaSolida Rojo = new BrochaSolida(ColorDocumento.Rojo);
+        public static readonly BrochaSolida Amarillo = new BrochaSolida(ColorDocumento.Amarillo);
+        public static readonly BrochaSolida Verde = new BrochaSolida(ColorDocumento.Verde);
+        public static readonly BrochaSolida Azul = new BrochaSolida(ColorDocumento.Azul);
+        public static readonly BrochaSolida Blanco = new BrochaSolida(ColorDocumento.Blanco);
     }
 }

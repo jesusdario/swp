@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using SistemaWP.Dominio;
 using System.Diagnostics;
+using SistemaWP.Dominio.TextoFormato;
 
 namespace SistemaWP.Aplicacion
 {
@@ -140,6 +141,11 @@ namespace SistemaWP.Aplicacion
         }
         int SiguientePosicion(TipoAvance tipo)
         {
+            if (anteriorFormato != null)
+            {
+                parrafoSeleccionado.SimplificarFormato();
+                anteriorFormato = null;
+            }
             switch (tipo)
             {
                 case TipoAvance.AvanzarPorCaracteres:
@@ -152,6 +158,11 @@ namespace SistemaWP.Aplicacion
         }
         int AnteriorPosicion(TipoAvance tipo)
         {
+            if (anteriorFormato != null)
+            {
+                parrafoSeleccionado.SimplificarFormato();
+                anteriorFormato = null;
+            }
             switch (tipo)
             {
                 case TipoAvance.AvanzarPorCaracteres:
@@ -243,17 +254,17 @@ namespace SistemaWP.Aplicacion
                 return null;
             }
         }
-        internal int ObtenerPosicionInsercion()
+        public int ObtenerPosicionInsercion()
         {
             return posicionInsercion;
         }
 
-        internal Parrafo ObtenerParrafoSeleccionado()
+        public Parrafo ObtenerParrafoSeleccionado()
         {
             return parrafoSeleccionado;
         }
 
-        internal void SeleccionarTodo()
+        public void SeleccionarTodo()
         {         
             Parrafo inicio=_documentoEdicion.ObtenerPrimerParrafo();
             Parrafo fin = _documentoEdicion.ObtenerUltimoParrafo();
@@ -265,9 +276,154 @@ namespace SistemaWP.Aplicacion
             posicionInsercion = 0;
         }
 
-        internal string ObtenerTexto()
+        public string ObtenerTexto()
         {
             return _documentoEdicion.ToString();
+        }
+        Formato anteriorFormato;
+        private void AplicarFormato(Formato formato)
+        {
+            Seleccion s = ObtenerSeleccion();
+            if (s != null)
+            {
+                _documentoEdicion.CambiarFormato(formato, s.ObtenerParrafoInicial(), s.ObtenerPosicionInicial(), s.ObtenerParrafoFinal(), s.ObtenerPosicionFinal());
+            }
+            else
+            {
+                _documentoEdicion.CambiarFormato(formato, parrafoSeleccionado, posicionInsercion, parrafoSeleccionado, posicionInsercion);
+            }
+        }
+        public Formato ObtenerFormatoComunSeleccion()
+        {
+            Seleccion s = ObtenerSeleccion();
+            if (s != null)
+            {
+                return _documentoEdicion.ObtenerFormatoComun(s.ObtenerParrafoInicial(), s.ObtenerPosicionInicial(), s.ObtenerParrafoFinal(), s.ObtenerPosicionFinal());
+            }
+            return null;
+        }
+        public void AplicarNegrilla()
+        {
+            bool valor = true;
+            if (anteriorFormato != null && anteriorFormato.Negrilla.HasValue && anteriorFormato.Negrilla.Value)
+            {
+                valor = false;
+            }
+            Formato f = Formato.CrearNegrilla(valor);
+            AplicarFormato(f);
+            anteriorFormato = f;
+        }
+        public void AplicarCursiva()
+        {
+            bool valor = true;
+            if (anteriorFormato!=null&&anteriorFormato.Cursiva.HasValue && anteriorFormato.Cursiva.Value)
+            {
+                valor = false;
+            }
+            Formato f = Formato.CrearCursiva(valor);
+            AplicarFormato(f);
+            anteriorFormato = f;
+        }
+        public void AplicarSubrayado()
+        {
+            bool valor = true;
+            if (anteriorFormato != null && anteriorFormato.Subrayado.HasValue && anteriorFormato.Subrayado.Value)
+            {
+                valor = false;
+            }
+            Formato f = Formato.CrearSubrayado(valor);
+            AplicarFormato(f);
+            anteriorFormato = f;
+        }
+        public void AgrandarLetra()
+        {
+            Formato f = Formato.CrearEscalaLetra(1.1f);
+            AplicarFormato(f);
+            anteriorFormato = f;
+        }
+        public void ReducirLetra()
+        {
+            Formato f = Formato.CrearEscalaLetra(1/1.1f); 
+            AplicarFormato(f);
+            anteriorFormato = f;
+        }
+        public void CambiarColorLetra(ColorDocumento nuevoColor)
+        {
+            Formato f = Formato.CrearColorLetra(nuevoColor);
+            AplicarFormato(f);
+            anteriorFormato = f;
+        }
+        public void CambiarColorFondo(ColorDocumento nuevoColorFondo)
+        {
+            Formato f = Formato.CrearColorFondo(nuevoColorFondo);
+            AplicarFormato(f);
+            anteriorFormato = f;
+        }
+
+        public void CambiarLetra(string familia, Medicion tamLetra)
+        {
+            Formato f = Formato.CrearLetra(familia, tamLetra);
+            AplicarFormato(f);
+            anteriorFormato = f;
+        }
+        public void CambiarTipoLetra(string familia)
+        {
+            Formato f = Formato.CrearTipoLetra(familia);
+            AplicarFormato(f);
+            anteriorFormato = f;
+        }
+        public void CambiarTamLetra(Medicion tamLetra)
+        {
+            Formato f = Formato.CrearTamLetra(tamLetra);
+            AplicarFormato(f);
+            anteriorFormato = f;
+        }
+        private void AplicarOperacionParrafos(Action<Parrafo> accion)
+        {
+            Seleccion s = ObtenerSeleccion();
+            if (s == null)
+            {
+                accion(parrafoSeleccionado);
+            }
+            else
+            {
+                _documentoEdicion.AplicarOperacionParrafos(s.ObtenerParrafoInicial(), s.ObtenerParrafoFinal(),
+                    accion);
+            }
+        }
+        //public void AlternarEspacioAnteriorParrafo()
+        //{
+        //    Medicion delta=new Medicion(6,Unidad.Puntos);
+        //    AplicarOperacionParrafos(x => x.CambiarFormatoParrafo(FormatoParrafo.CrearEspaciadoAnterior(delta)));
+        //}
+        //public void AlternarEspacioPosteriorParrafo()
+        //{
+        //    Medicion delta = new Medicion(6, Unidad.Puntos);
+        //    AplicarOperacionParrafos(x => x.IncrementarEspacioDespuesParrafo(delta));
+        //}
+        public void AlinearIzquierda()
+        {
+            AplicarOperacionParrafos(x => x.AlinearIzquierda());
+        }
+
+        public void AlinearCentro()
+        {
+            AplicarOperacionParrafos(x => x.AlinearCentro());
+        }
+
+        public void AlinearDerecha()
+        {
+            AplicarOperacionParrafos(x => x.AlinearDerecha());
+        }
+
+        internal void AumentarInterlineado()
+        {
+            AplicarOperacionParrafos(x => x.AumentarInterlineado());
+        }
+
+        internal void DisminuirInterlineado()
+        {
+            AplicarOperacionParrafos(x => x.DisminuirInterlineado());
         }
     }
 }

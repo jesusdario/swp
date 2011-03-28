@@ -16,7 +16,6 @@ namespace SistemaWP
         [STAThread]
         public static void Main(string[] args)
         {
-
             
             try
             {

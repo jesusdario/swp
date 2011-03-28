@@ -5,6 +5,9 @@ using SistemaWP.IU.PresentacionDocumento;
 using SistemaWP.IU.Graficos;
 using System.Drawing;
 using SistemaWP.Dominio;
+using System.Diagnostics;
+using System.Linq;
+using SistemaWP.Dominio.TextoFormato;
 
 namespace SistemaWP.IU.VistaDocumento
 {
@@ -17,6 +20,7 @@ namespace SistemaWP.IU.VistaDocumento
         }
         public T Obtener(K llave)
         {
+            Debug.Assert(llave != null);
             if (!_datos.ContainsKey(llave))
             {
                 T nuevovalor=_constructor(llave);
@@ -72,9 +76,6 @@ namespace SistemaWP.IU.VistaDocumento
         }
         public Graficador(System.Drawing.Graphics graficos)
         {
-            //float dpix = graficos.DpiX;
-            //float dpiy = graficos.DpiY;
-            //graficos.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
             CambiarResolucion(graficos.DpiX, graficos.DpiY);
             graficos.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             g = graficos;
@@ -90,8 +91,31 @@ namespace SistemaWP.IU.VistaDocumento
                 //return new Pen(;
             });
             _letras=new Stock<Letra,Font>(delegate(Letra letra) {
-                Medicion med=letra.Tamaño.ConvertirA(Unidad.Milimetros);
-                return new Font(letra.Familia,(float)med.Valor,GraphicsUnit.Millimeter);
+                Medicion med=letra.Tamaño.ConvertirA(Unidad.Puntos);
+                bool negrilla = false, cursiva = false, subrayado = false,normal=false;
+                FontFamily f = FontFamily.Families.Where(x => x.Name.EndsWith(letra.Familia, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+                FontStyle estilo;
+                if (f != null)
+                {
+                    negrilla=f.IsStyleAvailable(FontStyle.Bold);
+                    cursiva = f.IsStyleAvailable(FontStyle.Italic);
+                    subrayado = f.IsStyleAvailable(FontStyle.Underline);
+                    normal = f.IsStyleAvailable(FontStyle.Regular);                    
+                }
+                estilo= ( letra.Negrilla&&negrilla?FontStyle.Bold:0)
+                    | (letra.Subrayado && subrayado ? FontStyle.Underline : 0)
+                    | (letra.Cursiva &&cursiva? FontStyle.Italic : 0);
+                if ((estilo & FontStyle.Regular) != 0 && !normal)
+                {
+                    if (cursiva)
+                        estilo |= FontStyle.Italic;
+                    else if (negrilla)
+                        estilo |= FontStyle.Bold;
+                    else if (subrayado)
+                        estilo |= FontStyle.Underline;                    
+                }
+                return new Font(letra.Familia, (float)(med.Valor == 0 ? 1 : med.Valor),
+                   estilo,GraphicsUnit.Point);
             });
         }
         public void DibujarLinea(Lapiz lapiz, Punto inicio, Punto fin)
@@ -130,6 +154,7 @@ namespace SistemaWP.IU.VistaDocumento
             FormatoMedicion = new StringFormat(StringFormat.GenericTypographic);
             FormatoMedicion.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
             FormatoPresentacion = FormatoMedicion;
+
             //Formato.FormatFlags |= StringFormatFlags.DisplayFormatControl;
             //Formato.FormatFlags &= ~StringFormatFlags.FitBlackBox;
             /*Formato.Trimming = StringTrimming.None;
@@ -159,10 +184,11 @@ namespace SistemaWP.IU.VistaDocumento
         {
             if (a.Length > 0 && b.Length > 0)
             {
-                TamBloque t1=MedirTexto(letra, a[a.Length - 1].ToString() + b[0]);
+                TamBloque t1 = MedirTexto(letra, a[a.Length - 1].ToString() + b[0]);
                 TamBloque t2 = MedirTexto(letra, a[a.Length - 1].ToString());
                 TamBloque t3 = MedirTexto(letra, b[0].ToString());
-                return t1.Ancho-(t2.Ancho + t3.Ancho);
+                //return t1.Ancho-(t2.Ancho + t3.Ancho);
+                return t1.Ancho - (t2.Ancho + t3.Ancho);
             }
             return Medicion.Cero;
         }
@@ -171,6 +197,28 @@ namespace SistemaWP.IU.VistaDocumento
             PointF p=Traducir(Punto);
             g.TranslateTransform(p.X, p.Y);
 
+        }
+        public Medicion MedirBaseTexto(Letra letra)
+        {
+            Font f=_letras.Obtener(letra);
+            float factor = f.SizeInPoints / (float)f.FontFamily.GetEmHeight(f.Style);
+            return new Medicion(f.FontFamily.GetCellDescent(f.Style) * factor, Unidad.Puntos);
+        }
+
+
+        internal Medicion MedirAltoTexto(Letra letra)
+        {
+            Font f = _letras.Obtener(letra);
+            
+            float factor = f.SizeInPoints / (float)f.FontFamily.GetEmHeight(f.Style);
+            return new Medicion(f.FontFamily.GetCellAscent(f.Style) * factor,Unidad.Puntos);
+        }
+
+        internal Medicion MedirEspacioLineas(Letra letra)
+        {
+            Font f = _letras.Obtener(letra);
+            float factor = f.SizeInPoints / (float)f.FontFamily.GetEmHeight(f.Style);
+            return new Medicion(f.FontFamily.GetLineSpacing(f.Style) * factor, Unidad.Puntos);
         }
     }
     

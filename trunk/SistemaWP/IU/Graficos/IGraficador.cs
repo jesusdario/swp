@@ -14,6 +14,7 @@ namespace SistemaWP.IU.Graficos
         SistemaWP.IU.PresentacionDocumento.TamBloque MedirTexto(SistemaWP.IU.Graficos.Letra letra, string texto);
         void RellenarRectangulo(SistemaWP.IU.Graficos.Brocha brocha, SistemaWP.IU.PresentacionDocumento.Punto inicio, SistemaWP.IU.PresentacionDocumento.TamBloque bloque);
         Medicion MedirUnion(Letra letra, string a, string b);
-        void TrasladarOrigen(SistemaWP.IU.PresentacionDocumento.Punto Punto); 
+        void TrasladarOrigen(SistemaWP.IU.PresentacionDocumento.Punto Punto);
+        Medicion MedirBaseTexto(Letra letra);
     }
 }
