@@ -5,6 +5,7 @@ using SistemaWP.Dominio;
 using System.Drawing;
 using SistemaWP.Aplicacion;
 using SistemaWP.IU.Graficos;
+using SistemaWP.Dominio.TextoFormato;
 namespace SistemaWP.IU.PresentacionDocumento
 {
     public class Pagina
@@ -26,19 +27,24 @@ namespace SistemaWP.IU.PresentacionDocumento
         {
             posicion.Linea = lineas[lineaPagina];
             posicion.IndiceLinea = lineaPagina;
-            posicion.IndiceLineaPagina = lineaPagina - posicion.Pagina.LineaInicio;            
-            posicion.Linea.Completar(lineas, posicion, numCaracter);
+            posicion.IndiceLineaPagina = lineaPagina - posicion.Pagina.LineaInicio;
+            posicion.Linea.Completar(lineas, posicion, ObtenerAnchoLineas(),numCaracter);
         }
-        public void Dibujar(IGraficador g, Punto esquinaSuperior, List<Linea> _Lineas, Seleccion seleccion)
+        private Medicion ObtenerAnchoLineas()
+        {
+            return Dimensiones.Ancho - Margen.Derecho - Margen.Izquierdo;
+        }
+        public void Dibujar(IGraficador g, Punto esquinaSuperior, List<Linea> _Lineas, Seleccion seleccion,AvanceBloques avance)
         {
             Punto pt = esquinaSuperior;
             pt.X += Margen.Izquierdo;
             pt.Y += Margen.Superior;
+            Medicion anchoPagina = ObtenerAnchoLineas();
             int lim=LineaInicio+Cantidad;
             for (int numlinea=LineaInicio;numlinea<lim;numlinea++) 
             {
                 Linea l = _Lineas[numlinea];
-                pt=l.Dibujar(g,pt, seleccion);
+                pt=l.Dibujar(g,pt, seleccion,avance,anchoPagina,true,true);
             }
         }
         public Medicion ObtenerAltoLineas(List<Linea> _Lineas)
@@ -58,15 +64,18 @@ namespace SistemaWP.IU.PresentacionDocumento
             Medicion alto=Dimensiones.Alto-Margen.Superior-Margen.Inferior;
             int caracterinicio=CaracterInicial;
             Medicion altoactual = Medicion.Cero;
+            bool primeralinea = true;
             while (p != null)
             {
-                Linea l=Linea.ObtenerSiguienteLinea(p, caracterinicio, ancho);                
-                if (altoactual+l.AltoLinea > alto) //la línea pasa el fin de página.
+                Linea l=Linea.ObtenerSiguienteLinea(p, caracterinicio, ancho,true,true);                
+                if (!primeralinea&&altoactual+l.AltoLinea > alto) //la línea pasa el fin de página.
                 {
                     ParrafoFinal = p;
                     CaracterSiguiente = caracterinicio;
                     return;
-                }                
+                }
+                primeralinea = false;
+                //SIEMPRE INCLUIR LA PRIMERA LINEA AUNQUE SALGA DE LA PAGINA
                 altoactual = altoactual + l.AltoLinea;
                 _Lineas.Add(l);
                 caracterinicio = l.Inicio + l.Cantidad;
@@ -82,7 +91,7 @@ namespace SistemaWP.IU.PresentacionDocumento
 
         internal void CompletarPixels(List<Linea> _Lineas, Posicion posicion)
         {
-            posicion.Linea.CompletarPosicionPixels(_Lineas, posicion);
+            posicion.Linea.CompletarPosicionPixels(_Lineas, posicion,ObtenerAnchoLineas(),true,true);
             posicion.PosicionPagina = posicion.PosicionPagina+(new Punto(Margen.Izquierdo, Margen.Superior));
             
         }
@@ -94,13 +103,13 @@ namespace SistemaWP.IU.PresentacionDocumento
             Medicion posx = punto.X-Margen.Izquierdo;
             Medicion posy = punto.Y-Margen.Superior;
             if (posy < Medicion.Cero) posy = Medicion.Cero;
-
+            Medicion anchoLineas=ObtenerAnchoLineas();
             for (int i = LineaInicio; i < lim; i++)
             {
                 Linea l = _Lineas[i];
                 if (posy >= suma && posy <= suma + l.AltoLinea)
                 {
-                    int numcaracter = l.ObtenerNumCaracter(posx);
+                    int numcaracter = l.ObtenerNumCaracter(posx,anchoLineas);
                     Completar(_Lineas, posicion, i, numcaracter);
                     return posicion;
                 }
@@ -109,7 +118,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             if (posy > suma && Cantidad > 0)
             {
                 Linea l=_Lineas[lim - 1];
-                int nc = l.ObtenerNumCaracter(posx);
+                int nc = l.ObtenerNumCaracter(posx, anchoLineas);
                 Completar(_Lineas, posicion, lim-1, nc);
                 return posicion; 
                 //return documento.CrearPosicion(numpagina, lim - 1, nc);

@@ -3,18 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using SistemaWP.Dominio.TextoFormato;
 
 namespace SistemaWP.Dominio
 {
     public class Parrafo
     {
         Documento _contenedor;
-        StringBuilder bufferTexto = new StringBuilder();
+        TextoFormato.Texto bufferTexto = new TextoFormato.Texto();
         public int ID { get; private set; }       
         private int Posicion { get; set; }
         public Parrafo Anterior { get; private set; }
         public Parrafo Siguiente { get; private set; }
-
+        FormatoParrafo _Formato;
+        public FormatoParrafo Formato { 
+            get {
+                if (_Formato == null) return FormatoParrafo.ObtenerPredefinido();
+                return _Formato;
+            }
+            set
+            {
+                _Formato = value;
+            }
+        }
         public void ConectarDespues(Parrafo parrafo)
         {
             if (parrafo != null)
@@ -38,6 +49,17 @@ namespace SistemaWP.Dominio
             Posicion = 1;
             Anterior = anterior;
             Siguiente = siguiente;
+            bufferTexto.Iniciar();
+        }
+        public Parrafo(Documento contenedor, int id, Parrafo anterior, Parrafo siguiente,Parrafo formatoBase)
+        {
+            ID = id;
+            _contenedor = contenedor;
+            _Formato = formatoBase._Formato==null?null:formatoBase.Formato.Clonar();
+            Posicion = 1;
+            Anterior = anterior;
+            Siguiente = siguiente;
+            bufferTexto.Iniciar();
         }
         public string ObtenerSubCadena(int inicio, int cantidad)
         {
@@ -71,8 +93,12 @@ namespace SistemaWP.Dominio
 
         public void FusionarCon(Parrafo parrafoSiguiente)
         {
-            bufferTexto.Append(parrafoSiguiente.ToString());
+            bufferTexto.Agregar(parrafoSiguiente.bufferTexto);
             ConectarDespues(parrafoSiguiente.Siguiente);
+            if (_Formato != null || parrafoSiguiente._Formato != null)
+            {
+                _Formato = Formato.Fusionar(parrafoSiguiente.Formato);
+            }
         }
 
         internal int ObtenerLongitud()
@@ -83,12 +109,14 @@ namespace SistemaWP.Dominio
         internal Parrafo DividirParrafo(int idnuevo,int posicionDivision)
         {
             Parrafo nuevo = new Parrafo(_contenedor, idnuevo, this, Siguiente);
+            nuevo._Formato = _Formato;
             InsertarSiguiente(nuevo);
-            for (int i = posicionDivision; i < bufferTexto.Length; i++)
+            nuevo.bufferTexto=bufferTexto.Dividir(posicionDivision);
+            /*for (int i = posicionDivision; i < bufferTexto.Length; i++)
             {
                 nuevo.bufferTexto.Append(bufferTexto[i]);
             }
-            bufferTexto.Remove(posicionDivision, bufferTexto.Length-posicionDivision);
+            bufferTexto.Remove(posicionDivision, bufferTexto.Length-posicionDivision);*/
             return nuevo;
         }
 
@@ -195,6 +223,53 @@ namespace SistemaWP.Dominio
             }
             
             return 0;
+        }
+#if FORMATO
+        internal void CambiarFormato(Formato formato, int posicionInicio, int cantidad)
+        {
+            bufferTexto.AplicarFormato(formato, posicionInicio, cantidad);
+        }
+        internal Formato ObtenerFormatoComun(int posicionInicio, int cantidad)
+        {
+            return bufferTexto.ObtenerFormatoComun(posicionInicio, cantidad);
+        }
+        public void SimplificarFormato()
+        {
+            bufferTexto.SimplificarFormato();
+        }
+        public IEnumerable<Bloque> ObtenerBloques()
+        {
+            for (int i = 0; i < bufferTexto.ObtenerNumBloques(); i++)
+            {
+                yield return bufferTexto.ObtenerBloque(i);
+            }
+        }
+#endif
+
+        public void AlinearIzquierda()
+        {
+            Formato = Formato.Fusionar(FormatoParrafo.CrearAlineacionIzquierda());
+        }
+        public void AlinearDerecha()
+        {
+            Formato = Formato.Fusionar(FormatoParrafo.CrearAlineacionDerecha());
+            
+        }
+        public void AlinearCentro()
+        {
+            Formato = Formato.Fusionar(FormatoParrafo.CrearAlineacionCentro());
+        }
+
+        internal void AumentarInterlineado()
+        {
+            Formato = Formato.Fusionar(FormatoParrafo.CrearEspacioInterlineal(Formato.ObtenerEspaciadoInterlineal() + 0.5m));
+        }
+
+        internal void DisminuirInterlineado()
+        {
+            decimal valor = Formato.ObtenerEspaciadoInterlineal()-0.5m;
+            if (valor < 1) valor = 1;
+            Formato = Formato.Fusionar(FormatoParrafo.CrearEspacioInterlineal(valor));
         }
     }
 }

@@ -9,6 +9,9 @@ namespace SistemaWP.IU.Graficos
     {
         public string Familia { get; set; }
         public Medicion Tamaño { get; set; }
+        public bool Negrilla { get; set; }
+        public bool Cursiva { get; set; }
+        public bool Subrayado { get; set; }
         public Letra()
         {
             Familia = "Arial";
@@ -16,7 +19,7 @@ namespace SistemaWP.IU.Graficos
         }
         public override int GetHashCode()
         {
-            return Familia.GetHashCode() ^ Tamaño.GetHashCode();
+            return (Familia??string.Empty).GetHashCode() ^ Tamaño.GetHashCode()^(Negrilla?256:0)^(Cursiva?65000:0)^(Subrayado?10000000:0);
         }
         public override bool Equals(object obj)
         {

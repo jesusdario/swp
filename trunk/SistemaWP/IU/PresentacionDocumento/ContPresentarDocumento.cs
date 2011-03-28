@@ -6,6 +6,7 @@ using SistemaWP.Aplicacion;
 using System.Windows.Forms;
 using SistemaWP.Dominio;
 using SistemaWP.IU.Graficos;
+using SistemaWP.Dominio.TextoFormato;
 
 namespace SistemaWP.IU.PresentacionDocumento
 {
@@ -64,6 +65,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             lock (this)
             {
                 conttexto.InsertarTexto(cadena);
+                EnActualizarPresentacion(true);
             }
         }
         public void Copiar()
@@ -268,6 +270,94 @@ namespace SistemaWP.IU.PresentacionDocumento
             {
                 return conttexto.ObtenerTexto();
             }
+        }
+
+        internal void CambiarLetraNegrilla()
+        {
+            conttexto.AplicarNegrilla();
+            EnActualizarPresentacion(true);
+        }
+
+        internal void CambiarLetraCursiva()
+        {
+            conttexto.AplicarCursiva();
+            EnActualizarPresentacion(true);
+        }
+
+        internal void CambiarLetraSubrayado()
+        {
+            conttexto.AplicarSubrayado();
+            EnActualizarPresentacion(true);
+        }
+
+        internal void AgrandarLetra()
+        {
+            conttexto.AgrandarLetra();
+            EnActualizarPresentacion(true);
+        }
+
+        internal void ReducirLetra()
+        {
+            conttexto.ReducirLetra();
+            EnActualizarPresentacion(true);
+        }
+
+        internal void QuitarSeleccion()
+        {
+            Seleccion s=conttexto.ObtenerSeleccion();
+            conttexto.IndicarPosicion(s.ObtenerParrafoInicial().ID,s.ObtenerPosicionInicial(), false);
+            EnActualizarPresentacion(false);
+        }
+        public void CambiarColorLetra(ColorDocumento color)
+        {
+            conttexto.CambiarColorLetra(color);
+            EnActualizarPresentacion(false);
+        }
+        public void CambiarColorFondo(ColorDocumento color)
+        {
+            conttexto.CambiarColorFondo(color);
+            EnActualizarPresentacion(false);
+        }
+
+        public void CambiarLetra(string familia, Medicion tamLetra)
+        {
+            conttexto.CambiarLetra(familia, tamLetra);
+            EnActualizarPresentacion(true);
+        }
+
+        public void CambiarTamLetra(Medicion medicion)
+        {
+            conttexto.CambiarTamLetra(medicion);
+            EnActualizarPresentacion(true);
+        }
+
+        public void AlinearIzquierda()
+        {
+            conttexto.AlinearIzquierda();
+            EnActualizarPresentacion(false);
+        }
+
+        public void AlinearCentro()
+        {
+            conttexto.AlinearCentro();
+            EnActualizarPresentacion(false);
+        }
+
+        public void AlinearDerecha()
+        {
+            conttexto.AlinearDerecha();
+            EnActualizarPresentacion(false);
+        }
+
+        public void AumentarInterlineado()
+        {
+            conttexto.AumentarInterlineado();
+            EnActualizarPresentacion(true);
+        }
+        public void DisminuirInterlineado()
+        {
+            conttexto.DisminuirInterlineado();
+            EnActualizarPresentacion(true);
         }
     }
 }

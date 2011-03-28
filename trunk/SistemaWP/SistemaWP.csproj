@@ -39,7 +39,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;FORMATO</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -72,13 +72,20 @@
     </Compile>
     <Compile Include="Dominio\Documento.cs" />
     <Compile Include="Dominio\Parrafo.cs" />
+    <Compile Include="Dominio\TextoFormato\Bloque.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Dominio\TextoFormato\Formato.cs" />
+    <Compile Include="Dominio\TextoFormato\FormatoParrafo.cs" />
+    <Compile Include="Dominio\TextoFormato\Texto.cs" />
     <Compile Include="Dominio\Unidad.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IU\Graficos\Lapiz.cs" />
+    <Compile Include="IU\PresentacionDocumento\AvanceBloques.cs" />
     <Compile Include="IU\PresentacionDocumento\ContPresentarDocumento.cs" />
     <Compile Include="IU\Graficos\Brocha.cs" />
-    <Compile Include="IU\Graficos\ColorDocumento.cs" />
+    <Compile Include="Dominio\TextoFormato\ColorDocumento.cs" />
     <Compile Include="IU\Graficos\IGraficador.cs" />
     <Compile Include="IU\Graficos\Letra.cs" />
     <Compile Include="IU\PresentacionDocumento\Posicion.cs" />
@@ -90,7 +97,6 @@
     <Compile Include="IU\PresentadorDocumento.Designer.cs">
       <DependentUpon>PresentadorDocumento.cs</DependentUpon>
     </Compile>
-    <Compile Include="IU\PresentacionDocumento\Bloque.cs" />
     <Compile Include="IU\PresentacionDocumento\Estilo.cs" />
     <Compile Include="IU\PresentacionDocumento\Linea.cs" />
     <Compile Include="IU\PresentacionDocumento\Pagina.cs" />
@@ -129,6 +135,21 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="IU\Imagenes\Agrandar.png" />
+    <Content Include="IU\Imagenes\AlineacionCentro.png" />
+    <Content Include="IU\Imagenes\AlineacionDerecha.png" />
+    <Content Include="IU\Imagenes\AlineacionIzquierda.png" />
+    <Content Include="IU\Imagenes\AumentarInterlineado.png" />
+    <Content Include="IU\Imagenes\CambioLetra.png" />
+    <Content Include="IU\Imagenes\ColorFondoLetra.png" />
+    <Content Include="IU\Imagenes\ColorLetra.png" />
+    <Content Include="IU\Imagenes\Cursiva.png" />
+    <Content Include="IU\Imagenes\Disminuir.png" />
+    <Content Include="IU\Imagenes\DisminuirInterlineado.png" />
+    <Content Include="IU\Imagenes\Negrilla.png" />
+    <Content Include="IU\Imagenes\Subrayado.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ServTec\" />

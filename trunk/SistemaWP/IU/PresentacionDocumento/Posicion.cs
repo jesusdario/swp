@@ -49,10 +49,14 @@ namespace SistemaWP.IU.PresentacionDocumento
         /// </summary>
         public Medicion PosicionPixelX { get { return PosicionPagina.X; } }
         bool _ConPosicionPixels = false;
+        Medicion _AltoLinea;
         /// <summary>
         /// Alto de la línea
         /// </summary>
-        public Medicion AltoLinea { get; set; }
+        public Medicion AltoLinea { get { 
+            CompletarPosicion(); 
+            return _AltoLinea; }
+            set { _AltoLinea = value; } }
         public Medicion? ReferenciaX { get; set; }
         public Posicion(DocumentoImpreso documento)
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics;
 
 namespace SistemaWP.Dominio
 {
@@ -13,6 +14,10 @@ namespace SistemaWP.Dominio
         {
             Valor = valor;
             Unidad = Unidad.Milimetros;
+        }
+        public Medicion Redondear(int numdecimales)
+        {
+            return new Medicion(Math.Round(Valor, numdecimales), Unidad);
         }
         public override int GetHashCode()
         {
@@ -31,9 +36,12 @@ namespace SistemaWP.Dominio
         {
             Valor = valor;
             Unidad = unidad;
+            Debug.Assert(unidad != null);
         }
         public Medicion ConvertirA(Unidad unidad2)
         {
+            Debug.Assert(unidad2 != null);
+            Debug.Assert(Unidad != null);
             Unidad act = Unidad;
             double factor = 1;
             do
@@ -48,7 +56,7 @@ namespace SistemaWP.Dominio
                 factor2 *= act.FactorConversion;
                 act = act.UnidadRelativa;
             } while (act != null);
-            return new Medicion((Valor / factor2) * factor,unidad2);
+            return new Medicion(Valor * factor / factor2,unidad2);
         }
       
         public static Medicion operator + (Medicion a,Medicion b) {
@@ -98,15 +106,15 @@ namespace SistemaWP.Dominio
         {
             return b <= a;
         }
-        public static Medicion operator *(Medicion a, float escalar)
+        public static Medicion operator *(Medicion a, double escalar)
         {
             return new Medicion(a.Valor * escalar, a.Unidad);            
         }
-        public static Medicion operator *(float escalar,Medicion a)
+        public static Medicion operator *(double escalar,Medicion a)
         {
             return new Medicion(a.Valor * escalar, a.Unidad);
         }
-        public static Medicion operator /(Medicion a,float escalar)
+        public static Medicion operator /(Medicion a,double escalar)
         {
             return new Medicion(a.Valor / escalar, a.Unidad);
         }
