@@ -6,10 +6,9 @@ using SistemaWP.IU.Graficos;
 using System.Drawing;
 using SistemaWP.Dominio;
 using System.Diagnostics;
-using System.Linq;
 using SistemaWP.Dominio.TextoFormato;
 
-namespace SistemaWP.IU.VistaDocumento
+namespace SistemaWP.IU.Graficadores
 {
     class Stock<K,T>
     {
@@ -35,6 +34,11 @@ namespace SistemaWP.IU.VistaDocumento
         Stock<Brocha, SolidBrush> _brochas;
         Stock<Lapiz, Pen> _lapices;
         Stock<Letra, Font> _letras;
+        static GraficadorGDI _GraficadorConsultas;
+        public static GraficadorGDI ObtenerGraficadorConsultas()
+        {
+            return _GraficadorConsultas;
+        }
         static System.Drawing.Color ObtenerColor(ColorDocumento color)
         {
             return System.Drawing.Color.FromArgb(color.A,color.R, color.G, color.B);
@@ -73,9 +77,16 @@ namespace SistemaWP.IU.VistaDocumento
             unidaddispositivoy = new Unidad("UnidadDispositivoY", "dpiy", 1 / dpiy, Unidad.Pulgadas);
             intermedia = new Unidad("UnidadDispositivoXY", "dpixy", 2 / (dpix + dpiy), Unidad.Pulgadas);
             Medicion a = new Medicion(96, unidaddispositivox).ConvertirA(Unidad.Pulgadas);
+            familias = new Dictionary<string, FontFamily>();
+            foreach (FontFamily f in FontFamily.Families)
+            {
+                familias.Add(f.Name, f);
+            }
         }
+        Dictionary<string, FontFamily> familias;
         public GraficadorGDI(System.Drawing.Graphics graficos)
         {
+
             CambiarResolucion(graficos.DpiX, graficos.DpiY);
             graficos.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             g = graficos;
@@ -93,7 +104,8 @@ namespace SistemaWP.IU.VistaDocumento
             _letras=new Stock<Letra,Font>(delegate(Letra letra) {
                 Medicion med=letra.Tamaño.ConvertirA(Unidad.Puntos);
                 bool negrilla = false, cursiva = false, subrayado = false,normal=false;
-                FontFamily f = FontFamily.Families.Where(x => x.Name.EndsWith(letra.Familia, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+                FontFamily f=familias[letra.Familia];
+                
                 FontStyle estilo;
                 if (f != null)
                 {
@@ -147,26 +159,12 @@ namespace SistemaWP.IU.VistaDocumento
         static StringFormat FormatoMedicion;
         static GraficadorGDI()
         {
-            //Formato=StringFormat.GenericTypographic;
-            //Formato = new StringFormat(StringFormat.GenericTypographic);
-            //Formato.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-            //FormatoPresentacion = StringFormat.GenericDefault;
+            Bitmap bmp = new Bitmap(1, 1, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+            bmp.SetResolution(10000, 10000);
+            _GraficadorConsultas = new GraficadorGDI(Graphics.FromImage(bmp));
             FormatoMedicion = new StringFormat(StringFormat.GenericTypographic);
             FormatoMedicion.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
             FormatoPresentacion = FormatoMedicion;
-
-            //Formato.FormatFlags |= StringFormatFlags.DisplayFormatControl;
-            //Formato.FormatFlags &= ~StringFormatFlags.FitBlackBox;
-            /*Formato.Trimming = StringTrimming.None;
-            Formato.FormatFlags = StringFormat.GenericTypographic.FormatFlags;
-            Formato.LineAlignment = StringAlignment.Near;
-            Formato.Trimming = StringTrimming.None;
-            //Formato.DigitSubstitutionMethod = StringDigitSubstitute.None;
-            Formato.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-            Formato.FormatFlags |= StringFormatFlags.NoClip;
-            Formato.FormatFlags |= StringFormatFlags.NoWrap;*/
-
-            //Formato.FormatFlags |= StringFormatFlags.FitBlackBox;
         }
         public TamBloque MedirTexto(Letra letra, string texto)
         {
@@ -205,8 +203,9 @@ namespace SistemaWP.IU.VistaDocumento
             return new Medicion(f.FontFamily.GetCellDescent(f.Style) * factor, Unidad.Puntos);
         }
 
+        
 
-        internal Medicion MedirAltoTexto(Letra letra)
+        public Medicion MedirAltoTexto(Letra letra)
         {
             Font f = _letras.Obtener(letra);
             
@@ -214,7 +213,7 @@ namespace SistemaWP.IU.VistaDocumento
             return new Medicion(f.FontFamily.GetCellAscent(f.Style) * factor,Unidad.Puntos);
         }
 
-        internal Medicion MedirEspacioLineas(Letra letra)
+        public Medicion MedirEspacioLineas(Letra letra)
         {
             Font f = _letras.Obtener(letra);
             float factor = f.SizeInPoints / (float)f.FontFamily.GetEmHeight(f.Style);

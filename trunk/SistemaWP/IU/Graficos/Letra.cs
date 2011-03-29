@@ -19,14 +19,17 @@ namespace SistemaWP.IU.Graficos
         }
         public override int GetHashCode()
         {
-            return (Familia??string.Empty).GetHashCode() ^ Tamaño.GetHashCode()^(Negrilla?256:0)^(Cursiva?65000:0)^(Subrayado?10000000:0);
+            return (Familia??string.Empty).GetHashCode() ^ Tamaño.GetHashCode()^ 
+                (Negrilla?256:0)^(Cursiva?65000:0)^(Subrayado?10000000:0);
         }
         public override bool Equals(object obj)
         {
             Letra l = (Letra)obj;
-            return Familia == l.Familia && 
-                Tamaño.Valor==l.Tamaño.Valor &&
-                Tamaño.Unidad==l.Tamaño.Unidad;
+            return Familia == l.Familia &&
+                Negrilla == l.Negrilla &&
+                Cursiva == l.Cursiva &&
+                Subrayado == l.Subrayado &&
+                Tamaño.Equals(l.Tamaño);
         }
     }
 }
