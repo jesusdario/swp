@@ -168,29 +168,51 @@ namespace SWPEditor.Dominio
         {
             return ++indentificadorActual;
         }
-  
-        public override string ToString()
+        public string ObtenerTexto()
+        {
+            return ObtenerTexto(new Texto.EscritorTexto(), ObtenerPrimerParrafo(), 0, null, 0);
+        }
+        public string ObtenerHTML()
+        {
+            return ObtenerTexto(new Html.EscritorHtml(), ObtenerPrimerParrafo(), 0, null, 0);
+        }
+        public string ObtenerTexto(IEscritor escritor, Parrafo inicio,int posicionInicio, Parrafo fin,int posicionFin)
         {
             lock (m_Parrafos)
             {
-                Parrafo p = ObtenerPrimerParrafo();
-                while (p != null)
+                IEscritor esc = escritor;
+                esc.IniciarDocumento();
+                if (inicio == fin)
                 {
-                    if (p.Anterior != null)
+                    if (inicio == null)
                     {
-                        p = p.Anterior;
+                        return ObtenerTexto(escritor, ObtenerPrimerParrafo(), 0, null, 0);
                     }
-                    else
-                        break;
+                    inicio.Escribir(esc, posicionInicio, posicionFin - posicionInicio);
                 }
-                StringBuilder st = new StringBuilder();
-                while (p != null)
+                else
                 {
-                    st.AppendLine(p.ToString());
-                    p = p.Siguiente;
+                    inicio.Escribir(esc, posicionInicio, inicio.ObtenerLongitud() - posicionInicio);
+                    Parrafo p = inicio.Siguiente;
+                    while (p != null)
+                    {
+                        if (p == fin) break;
+                        p.Escribir(esc, 0, p.ObtenerLongitud());
+                        p = p.Siguiente;
+                    }
+                    if (fin != null)
+                    {
+                        fin.Escribir(esc, 0, posicionFin);
+                    }
                 }
-                return st.ToString();
+                esc.TerminarDocumento();
+                return esc.ObtenerTexto();
             }
+        }
+        public override string ToString()
+        {
+            return ObtenerTexto();
+            
         }
         public Parrafo ObtenerPrimerParrafo() {
             lock (m_Parrafos)

@@ -77,6 +77,7 @@ namespace SWPEditor.IU.PresentacionDocumento
                     cad = string.Empty;
                 else
                     cad = sel.ObtenerTexto();
+                Clipboard.SetText(cad, TextDataFormat.Html);
                 Clipboard.SetText(cad, TextDataFormat.UnicodeText);
             }
         }
