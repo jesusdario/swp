@@ -21,9 +21,11 @@ namespace SistemaWP.IU.PresentacionDocumento
         public int Cantidad { get; private set; }
         public Medicion AltoLinea { get; private set; }
         public Medicion AltoBase { get; private set; }
-        private Linea(Parrafo parrafo, int inicio, int cantidad, Medicion altoLinea, Medicion altoBase)
+        public Medicion AnchoLinea { get; private set; }
+        private Linea(Parrafo parrafo, int inicio, int cantidad, Medicion altoLinea, Medicion altoBase,Medicion anchoLinea)
         {
             Parrafo = parrafo; Inicio = inicio; Cantidad = cantidad; AltoLinea = altoLinea; AltoBase = altoBase;
+            AnchoLinea = anchoLinea;
         }
         private void Normalizar(ref int posicion)
         {
@@ -33,8 +35,8 @@ namespace SistemaWP.IU.PresentacionDocumento
                 posicion = 0;
             
         }
-       
-        public void Completar(List<Linea> lineas,Posicion posicionLinea,Medicion anchoLinea,int numCaracter)
+
+        public void Completar(ListaLineas lineas, Posicion posicionLinea, Medicion anchoLinea, int numCaracter)
         {
             Normalizar(ref numCaracter);
             if (posicionLinea.ReferenciaX.HasValue)
@@ -44,12 +46,12 @@ namespace SistemaWP.IU.PresentacionDocumento
             posicionLinea.PosicionCaracter = numCaracter;
            
         }
-        public void CompletarPosicionPixels(List<Linea> lineas, Posicion posicionLinea,Medicion anchoLinea,bool incluirEspacioAnterior,bool incluirEspacioPosterior)
+        public void CompletarPosicionPixels(ListaLineas lineas, Posicion posicionLinea, Medicion anchoLinea, bool incluirEspacioAnterior, bool incluirEspacioPosterior)
         {
             Medicion suma = new Medicion(0);
             for (int i = posicionLinea.Pagina.LineaInicio; i < posicionLinea.IndiceLinea; i++)
             {
-                suma += lineas[i].AltoLinea;
+                suma += lineas.Obtener(i).AltoLinea;
             }
             Medicion deltaAnterior=(incluirEspacioAnterior && EsPrimeraLineaParrafo ? Parrafo.Formato.ObtenerEspacioAnterior() : Medicion.Cero);
             Medicion deltaSiguiente = (incluirEspacioPosterior && EsUltimaLineaParrafo ? Parrafo.Formato.ObtenerEspacioPosterior() : Medicion.Cero);
@@ -345,7 +347,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                     alto += parrafo.Formato.ObtenerEspacioPosterior();
                 }
                 ;
-                return new Linea(parrafo,caracterinicio,0,alto,estparrafo.MedirBase());/*
+                return new Linea(parrafo,caracterinicio,0,alto,estparrafo.MedirBase(),ancho);/*
                 {   Inicio = caracterinicio, 
                     Cantidad = 0, 
                     Parrafo = parrafo, 
@@ -353,7 +355,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                     AltoBase = estparrafo.MedirAlto()
                 };*/
             }
-            Linea actual=new Linea(parrafo,caracterinicio,0,Medicion.Cero,Medicion.Cero);
+            Linea actual=new Linea(parrafo,caracterinicio,0,Medicion.Cero,Medicion.Cero,ancho);
 /*                Parrafo = parrafo, 
                 Cantidad = 0, 
                 Inicio = caracterinicio, 
@@ -390,6 +392,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             actual.AltoBase = mbase;
             actual.Cantidad = numcaracteres;
             actual.AltoLinea = bloque.Alto;
+            actual.AnchoLinea = ancho;
             if (parrafo.Formato.ObtenerEspaciadoInterlineal() != 1)
             {
                 actual.AltoLinea = actual.AltoLinea*(float)parrafo.Formato.ObtenerEspaciadoInterlineal();

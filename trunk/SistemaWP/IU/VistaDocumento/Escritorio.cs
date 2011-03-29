@@ -32,9 +32,9 @@ namespace SistemaWP.IU.VistaDocumento
             AsegurarVisibilidad(pos);
             Medicion inicio = EsquinaSuperior.Y;
             Medicion derecha = EsquinaSuperior.X;
-            for (int i = PaginaSuperior; i < Documento.ObtenerNumPaginas(); i++)
-            {
-                Pagina p = Documento.ObtenerPagina(i);
+            int i=PaginaSuperior;
+            IEnumerable<Pagina> pags=Documento.ObtenerDesde(PaginaSuperior);
+            foreach (Pagina p in pags) {
                 LienzoPagina l = new LienzoPagina(i,new Punto(derecha,inicio));
                 l.Dibujar(graficador, Documento, pos, seleccion);
                 if (Medicion.Cero-inicio > Dimensiones.Alto+EsquinaSuperior.Y)
@@ -42,6 +42,7 @@ namespace SistemaWP.IU.VistaDocumento
                     return;
                 }
                 inicio -= p.Dimensiones.Alto + EspacioEntrePaginas;
+                i++;
             }
         }
         
@@ -121,24 +122,19 @@ namespace SistemaWP.IU.VistaDocumento
         internal void RegistrarPosicion(Punto punto, bool ampliarSeleccion)
         {
             Punto pt2 = punto + EsquinaSuperior;
-
-            Pagina pag = Documento.ObtenerPagina(PaginaSuperior);
             int pagsig = PaginaSuperior;
-            while (pt2.Y>pag.Dimensiones.Alto)
+            int indice = PaginaSuperior;
+            foreach (Pagina pag in Documento.ObtenerDesde(PaginaSuperior))
             {
-                pt2.Y -= pag.Dimensiones.Alto;
-                pagsig++;
-                if (pagsig >= Documento.ObtenerNumPaginas())
+                if (pt2.Y > pag.Dimensiones.Alto)
                 {
-                    pagsig--;
-                    break;
+                    pt2.Y -= pag.Dimensiones.Alto;
                 }
                 else
-                {
-                    pag = Documento.ObtenerPagina(pagsig);
-                }
+                    break;
+                indice++;
             }
-            Controlador.RegistrarPosicion(pagsig, pt2, ampliarSeleccion);
+            Controlador.RegistrarPosicion(indice, pt2, ampliarSeleccion);
         }
     }
 }

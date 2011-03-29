@@ -27,9 +27,8 @@ namespace SistemaWP.IU.VistaDocumento
         }
         public void Dibujar(IGraficador graf,DocumentoImpreso documento,Posicion posicion,Seleccion seleccion)
         {
-            if (IDPagina>=documento.ObtenerNumPaginas()) 
-                return;
             Pagina p=documento.ObtenerPagina(IDPagina);
+            if (p == null) return;
             graf.RellenarRectangulo(BrochaSolida.Blanco, new Punto(Medicion.Cero, Medicion.Cero)-PosicionInicioDibujo, p.Dimensiones);
             graf.DibujarRectangulo(Lapiz.Negro, new Punto(Medicion.Cero, Medicion.Cero) - PosicionInicioDibujo, p.Dimensiones);
             documento.DibujarPagina(graf, new Punto(Medicion.Cero, Medicion.Cero) - PosicionInicioDibujo, IDPagina, seleccion);

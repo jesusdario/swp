@@ -248,13 +248,14 @@ namespace SistemaWP.IU
             contpresentacion.Pegar();            
         }
         int? numpagina;
+        
         void docimpr_QueryPageSettings(object sender, QueryPageSettingsEventArgs e)
         {
             if (!numpagina.HasValue)
             {
                 numpagina = 0;
             }
-            int lim = escritorio.Controlador.Documento.ObtenerNumPaginas();
+            //int lim = escritorio.Controlador.Documento.ObtenerNumPaginas();
             Pagina pag = escritorio.Controlador.Documento.ObtenerPagina(numpagina.Value);
 
             e.PageSettings.PaperSize = new PaperSize("Personalizado",
@@ -266,8 +267,7 @@ namespace SistemaWP.IU
             if (!numpagina.HasValue) {
                 numpagina=0;
             }
-            if (numpagina == escritorio.Controlador.Documento.ObtenerNumPaginas()-1)
-            {
+            if (escritorio.Controlador.Documento.EsUltimaPagina(numpagina.Value)) {
                 e.HasMorePages = false;
             }
             Graficador g=new Graficador(e.Graphics);

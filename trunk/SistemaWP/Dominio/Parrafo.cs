@@ -42,19 +42,19 @@ namespace SistemaWP.Dominio
             }
             Anterior = parrafo;
         }
-        public Parrafo(Documento contenedor,int id,Parrafo anterior,Parrafo siguiente)
+        public Parrafo(Documento documento,int id,Parrafo anterior,Parrafo siguiente)
         {
+            _contenedor = documento;
             ID = id;
-            _contenedor = contenedor;
             Posicion = 1;
             Anterior = anterior;
             Siguiente = siguiente;
             bufferTexto.Iniciar();
         }
-        public Parrafo(Documento contenedor, int id, Parrafo anterior, Parrafo siguiente,Parrafo formatoBase)
+        public Parrafo(Documento _documento,int id, Parrafo anterior, Parrafo siguiente,Parrafo formatoBase)
         {
+            _contenedor = _documento;
             ID = id;
-            _contenedor = contenedor;
             _Formato = formatoBase._Formato==null?null:formatoBase.Formato.Clonar();
             Posicion = 1;
             Anterior = anterior;
@@ -68,26 +68,32 @@ namespace SistemaWP.Dominio
         public void AgregarCadena(string cad)
         {
             bufferTexto.Append(cad);
+            _contenedor.NotificarCambio(this);
         }
 
         public void AgregarCaracter(int posicionInsercion, char caracter)
         {
             bufferTexto.Insert(posicionInsercion, caracter);
+            _contenedor.NotificarCambio(this);
         }
         public override string ToString()
         {
             return bufferTexto.ToString();
         }
 
-        public void BorrarCaracter(int posicion)
+        public bool BorrarCaracter(int posicion)
         {
             if (posicion==bufferTexto.Length)
             {
                 _contenedor.FusionarSiguiente(this);
+                _contenedor.NotificarCambio(this);
+                return true;
             }
             else
             {
                 bufferTexto.Remove(posicion, 1);
+                _contenedor.NotificarCambio(this);
+                return false;
             }
         }
 
@@ -99,16 +105,17 @@ namespace SistemaWP.Dominio
             {
                 _Formato = Formato.Fusionar(parrafoSiguiente.Formato);
             }
+            _contenedor.NotificarCambio(this);
         }
 
-        internal int ObtenerLongitud()
+        public int ObtenerLongitud()
         {
             return bufferTexto.Length;
         }
 
         internal Parrafo DividirParrafo(int idnuevo,int posicionDivision)
         {
-            Parrafo nuevo = new Parrafo(_contenedor, idnuevo, this, Siguiente);
+            Parrafo nuevo = new Parrafo(_contenedor,idnuevo, this, Siguiente);
             nuevo._Formato = _Formato;
             InsertarSiguiente(nuevo);
             nuevo.bufferTexto=bufferTexto.Dividir(posicionDivision);
@@ -249,20 +256,23 @@ namespace SistemaWP.Dominio
         public void AlinearIzquierda()
         {
             Formato = Formato.Fusionar(FormatoParrafo.CrearAlineacionIzquierda());
+            _contenedor.NotificarCambio(this);
         }
         public void AlinearDerecha()
         {
             Formato = Formato.Fusionar(FormatoParrafo.CrearAlineacionDerecha());
-            
+            _contenedor.NotificarCambio(this);
         }
         public void AlinearCentro()
         {
             Formato = Formato.Fusionar(FormatoParrafo.CrearAlineacionCentro());
+            _contenedor.NotificarCambio(this);
         }
 
         internal void AumentarInterlineado()
         {
             Formato = Formato.Fusionar(FormatoParrafo.CrearEspacioInterlineal(Formato.ObtenerEspaciadoInterlineal() + 0.5m));
+            _contenedor.NotificarCambio(this);
         }
 
         internal void DisminuirInterlineado()
@@ -270,6 +280,14 @@ namespace SistemaWP.Dominio
             decimal valor = Formato.ObtenerEspaciadoInterlineal()-0.5m;
             if (valor < 1) valor = 1;
             Formato = Formato.Fusionar(FormatoParrafo.CrearEspacioInterlineal(valor));
+            _contenedor.NotificarCambio(this);
+        }
+
+        internal void InsertarCadena(int posicionInsercion, string cadena)
+        {
+            Debug.Assert(posicionInsercion >= 0 && posicionInsercion <= ObtenerLongitud());
+            bufferTexto.Insert(posicionInsercion, cadena);
+            _contenedor.NotificarCambio(this);
         }
     }
 }
