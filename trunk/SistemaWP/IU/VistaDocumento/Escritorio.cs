@@ -8,7 +8,7 @@ using SistemaWP.Aplicacion;
 
 namespace SistemaWP.IU.VistaDocumento
 {
-    class Escritorio
+    public class Escritorio
     {
         public List<LienzoPagina> _Lienzos = new List<LienzoPagina>();
         public TamBloque Dimensiones { get; set; }
