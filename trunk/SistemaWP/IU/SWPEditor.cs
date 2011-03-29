@@ -17,18 +17,21 @@ namespace SistemaWP.IU
 {
     public partial class SWPEditor : Control
     {
-        private Documento _documento;
-        private ContPresentarDocumento contpresentacion;
-        
         Escritorio escritorio;
+        private ContPresentarDocumento _ControlDocumento
+        {
+            get
+            {
+                return escritorio.ControlDocumento;
+            }
+        }
         public SWPEditor():base()
         {
             DoubleBuffered = true;
-            _documento = new Documento();
-            contpresentacion = new ContPresentarDocumento(_documento);
-            escritorio = new Escritorio(contpresentacion);
-            contpresentacion.ActualizarPresentacion += new EventHandler(contpresentacion_ActualizarPresentacion);
-            escritorio.Dimensiones = new TamBloque(new Medicion(50, Unidad.Milimetros), new Medicion(50, Unidad.Milimetros));
+            Documento _documento = new Documento();
+            escritorio = new Escritorio(_documento);
+            escritorio.ActualizarPresentacion += new EventHandler(contpresentacion_ActualizarPresentacion);
+            escritorio.Dimensiones=new TamBloque(new Medicion(50, Unidad.Milimetros), new Medicion(50, Unidad.Milimetros));
             this.SetStyle(ControlStyles.Selectable, true);
             Enabled = true;
             Visible = true;
@@ -50,7 +53,7 @@ namespace SistemaWP.IU
         {
             using (Graphics graf = Graphics.FromHwnd(Handle))
             {
-                Graficador g = new Graficador(graf);
+                GraficadorGDI g = new GraficadorGDI(graf);
                 escritorio.Dimensiones = g.Traducir(new SizeF(Width, Height));
             }
             base.OnResize(e);
@@ -58,7 +61,7 @@ namespace SistemaWP.IU
         
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
-            contpresentacion.TeclaPulsada(e.KeyChar);
+            _ControlDocumento.TeclaPulsada(e.KeyChar);
             e.Handled = true;
             base.OnKeyPress(e);
         }
@@ -168,84 +171,84 @@ namespace SistemaWP.IU
         
         public void InsertText(string text)
         {
-            contpresentacion.InsertarTexto(text);
+            _ControlDocumento.InsertarTexto(text);
         }
         public string GetText() {
-            return contpresentacion.ObtenerTexto();
+            return _ControlDocumento.ObtenerTexto();
         }
         public void SetText(string value) {
-            contpresentacion.SeleccionarTodo();
-            contpresentacion.InsertarTexto(value);        
+            _ControlDocumento.SeleccionarTodo();
+            _ControlDocumento.InsertarTexto(value);        
         }
         public void SelectAll()
         {
-            contpresentacion.SeleccionarTodo();
+            _ControlDocumento.SeleccionarTodo();
         }
 
         public void GotoDown(bool select)
         {
-            contpresentacion.IrLineaInferior(select);
+            _ControlDocumento.IrLineaInferior(select);
         }
 
         public void GotoUp(bool select)
         {
-            contpresentacion.IrLineaSuperior(select);
+            _ControlDocumento.IrLineaSuperior(select);
         }
 
         public void InsertParagraph(bool select)
         {
-            contpresentacion.InsertarParrafo(select);
+            _ControlDocumento.InsertarParrafo(select);
 
         }
 
         public void GotoRight(bool select, bool advanceByWord)
         {
-            contpresentacion.IrSiguienteCaracter(select, advanceByWord ? TipoAvance.AvanzarPorPalabras : TipoAvance.AvanzarPorCaracteres);
+            _ControlDocumento.IrSiguienteCaracter(select, advanceByWord ? TipoAvance.AvanzarPorPalabras : TipoAvance.AvanzarPorCaracteres);
         }
 
         public void GotoLeft(bool select, bool advanceByWord)
         {
-            contpresentacion.IrAnteriorCaracter(select, advanceByWord ? TipoAvance.AvanzarPorPalabras : TipoAvance.AvanzarPorCaracteres);
+            _ControlDocumento.IrAnteriorCaracter(select, advanceByWord ? TipoAvance.AvanzarPorPalabras : TipoAvance.AvanzarPorCaracteres);
         }
 
         public void GotoLineEnd(bool select)
         {
-            contpresentacion.IrSiguienteCaracter(select, TipoAvance.AvanzarPorLineas);
+            _ControlDocumento.IrSiguienteCaracter(select, TipoAvance.AvanzarPorLineas);
         }
 
         public void GotoLineStart(bool select)
         {
-            contpresentacion.IrAnteriorCaracter(select, TipoAvance.AvanzarPorLineas);
+            _ControlDocumento.IrAnteriorCaracter(select, TipoAvance.AvanzarPorLineas);
         }
 
         public void GotoNextPage(bool select)
         {
-            contpresentacion.IrSiguienteCaracter(select, TipoAvance.AvanzarPorPaginas);
+            _ControlDocumento.IrSiguienteCaracter(select, TipoAvance.AvanzarPorPaginas);
         }
         public void GotoPreviousPage(bool select)
         {
-            contpresentacion.IrAnteriorCaracter(select, TipoAvance.AvanzarPorPaginas);                    
+            _ControlDocumento.IrAnteriorCaracter(select, TipoAvance.AvanzarPorPaginas);                    
         }
         public void DeletePreviousCharacter()
         {
-            contpresentacion.BorrarCaracterAnterior();            
+            _ControlDocumento.BorrarCaracterAnterior();            
         }
         public void DeleteCharacter()
         {
-            contpresentacion.BorrarCaracter();                    
+            _ControlDocumento.BorrarCaracter();                    
         }
         public void Cut()
         {
-            contpresentacion.Cortar();
+            _ControlDocumento.Cortar();
         }
         public void Copy()
         {
-            contpresentacion.Copiar();
+            _ControlDocumento.Copiar();
         }
 
         public void Paste()
         {
-            contpresentacion.Pegar();            
+            _ControlDocumento.Pegar();            
         }
         int? numpagina;
         
@@ -256,7 +259,7 @@ namespace SistemaWP.IU
                 numpagina = 0;
             }
             //int lim = escritorio.Controlador.Documento.ObtenerNumPaginas();
-            Pagina pag = escritorio.Controlador.Documento.ObtenerPagina(numpagina.Value);
+            Pagina pag = escritorio.ControlDocumento.Documento.ObtenerPagina(numpagina.Value);
 
             e.PageSettings.PaperSize = new PaperSize("Personalizado",
                 (int)pag.Dimensiones.Ancho.ConvertirA(CentesimaPulgada).Valor,
@@ -267,16 +270,16 @@ namespace SistemaWP.IU
             if (!numpagina.HasValue) {
                 numpagina=0;
             }
-            if (escritorio.Controlador.Documento.EsUltimaPagina(numpagina.Value)) {
+            if (escritorio.ControlDocumento.Documento.EsUltimaPagina(numpagina.Value)) {
                 e.HasMorePages = false;
             }
-            Graficador g=new Graficador(e.Graphics);
+            GraficadorGDI g=new GraficadorGDI(e.Graphics);
             e.Graphics.ResetTransform();
             e.Graphics.PageUnit = GraphicsUnit.Display;
             g.CambiarResolucion(96, 96);//Utilizar resolucion pantalla
             
             //g.CambiarResolucion(e.PageSettings.PrinterResolution.X, e.PageSettings.PrinterResolution.Y);
-            escritorio.Controlador.Documento.DibujarPagina(g, new Punto(Medicion.Cero, Medicion.Cero), numpagina.Value, null);
+            escritorio.ControlDocumento.Documento.DibujarPagina(g, new Punto(Medicion.Cero, Medicion.Cero), numpagina.Value, null);
             numpagina++;
         }
         const int deltax = 0;
@@ -286,8 +289,8 @@ namespace SistemaWP.IU
             base.OnPaint(e);
             try
             {
-                IGraficador graf = new Graficador(e.Graphics);
-                escritorio.Dibujar(graf, contpresentacion.ObtenerSeleccion());
+                IGraficador graf = new GraficadorGDI(e.Graphics);
+                escritorio.Dibujar(graf, _ControlDocumento.ObtenerSeleccion());
             }
             catch (Exception ex)
             {
@@ -304,7 +307,7 @@ namespace SistemaWP.IU
             {
                 float posx = x - deltax;
                 float posy = y - deltay;
-                Graficador graf = new Graficador(g);
+                GraficadorGDI graf = new GraficadorGDI(g);
                 escritorio.RegistrarPosicion(graf.Traducir(new PointF(posx, posy)), ampliarSeleccion);
             }
         }
@@ -333,11 +336,11 @@ namespace SistemaWP.IU
                 RegistrarPosicion(e.X, e.Y, true);
                 Capture = false;
                 EnCaptura = false;
-                Seleccion s = contpresentacion.ObtenerSeleccion();
+                Seleccion s = _ControlDocumento.ObtenerSeleccion();
                 if (s != null && s.ObtenerPosicionInicial() == s.ObtenerPosicionFinal() &&
                     s.ObtenerParrafoInicial() == s.ObtenerParrafoFinal())
                 {
-                    contpresentacion.QuitarSeleccion();
+                    _ControlDocumento.QuitarSeleccion();
                 }
             }
             base.OnMouseUp(e);
@@ -354,70 +357,70 @@ namespace SistemaWP.IU
 
         public void ChangeFontColor(System.Drawing.Color color)
         {
-            contpresentacion.CambiarColorLetra(new SistemaWP.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
+            _ControlDocumento.CambiarColorLetra(new SistemaWP.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
         }
         public void ChangeFontBackground(System.Drawing.Color color)
         {
-            contpresentacion.CambiarColorFondo(new SistemaWP.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
+            _ControlDocumento.CambiarColorFondo(new SistemaWP.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
         }
         public void ChangeFontBold()
         {
-            contpresentacion.CambiarLetraNegrilla();
+            _ControlDocumento.CambiarLetraNegrilla();
         }
 
         public void ChangeFontItalic()
         {
-            contpresentacion.CambiarLetraCursiva();
+            _ControlDocumento.CambiarLetraCursiva();
         }
 
         public void ChangeFontUnderlined()
         {
-            contpresentacion.CambiarLetraSubrayado();
+            _ControlDocumento.CambiarLetraSubrayado();
         }
 
         public void IncreaseFontSize()
         {
-            contpresentacion.AgrandarLetra();
+            _ControlDocumento.AgrandarLetra();
         }
 
         public void ReduceFontSize()
         {
-            contpresentacion.ReducirLetra();
+            _ControlDocumento.ReducirLetra();
         }
 
         internal void ChangeFont(Font font)
         {
-            contpresentacion.CambiarLetra(font.FontFamily.Name,new Medicion(font.SizeInPoints,Unidad.Puntos));
+            _ControlDocumento.CambiarLetra(font.FontFamily.Name,new Medicion(font.SizeInPoints,Unidad.Puntos));
         }
 
         internal void SetFontSizeInPoints(decimal valor)
         {
-            contpresentacion.CambiarTamLetra(new Medicion((float)valor, Unidad.Puntos));
+            _ControlDocumento.CambiarTamLetra(new Medicion((float)valor, Unidad.Puntos));
         }
 
         internal void AlignLeft()
         {
-            contpresentacion.AlinearIzquierda();
+            _ControlDocumento.AlinearIzquierda();
         }
 
         internal void AlignCenter()
         {
-            contpresentacion.AlinearCentro();
+            _ControlDocumento.AlinearCentro();
         }
 
         internal void AlignRight()
         {
-            contpresentacion.AlinearDerecha();
+            _ControlDocumento.AlinearDerecha();
         }
 
         internal void IncreaseLineSpace()
         {
-            contpresentacion.AumentarInterlineado();
+            _ControlDocumento.AumentarInterlineado();
         }
 
         internal void DecreaseLineSpace()
         {
-            contpresentacion.DisminuirInterlineado();
+            _ControlDocumento.DisminuirInterlineado();
         }
     }
 }

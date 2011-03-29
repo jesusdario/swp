@@ -63,12 +63,12 @@ namespace SistemaWP.IU.PresentacionDocumento
             return new Punto(posicionbase.X+b.Ancho,posicionbase.Y);
         }
         
-        static Graficador grafpantalla;
+        static GraficadorGDI grafpantalla;
         static Estilo()
         {
             Bitmap bmp = new Bitmap(1, 1, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
             bmp.SetResolution(10000, 10000);
-            grafpantalla=new Graficador(Graphics.FromImage(bmp));
+            grafpantalla=new GraficadorGDI(Graphics.FromImage(bmp));
         }
         public TamBloque Medir(string texto)
         {

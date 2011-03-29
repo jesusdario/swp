@@ -13,22 +13,32 @@ namespace SistemaWP.IU.VistaDocumento
     {
         public List<LienzoPagina> _Lienzos = new List<LienzoPagina>();
         public TamBloque Dimensiones { get; set; }
-        public DocumentoImpreso Documento { get { return Controlador.Documento; } }
-        public Punto EsquinaSuperior { get; set; }
-        public int PaginaSuperior { get; set; }
+        public DocumentoImpreso Documento { get { return ControlDocumento.Documento; } }
+        private Punto EsquinaSuperior { get; set; }
+        private int PaginaSuperior { get; set; }
         private int LineaAnterior { get; set; }
-        public Medicion EspacioEntrePaginas { get; set; }
-        public ContPresentarDocumento Controlador { get; set; }
-        
-        public Escritorio(ContPresentarDocumento controlador)
+        private Medicion EspacioEntrePaginas { get; set; }
+        public ContPresentarDocumento ControlDocumento { get; private set; }
+        public event EventHandler ActualizarPresentacion
         {
+            add
+            {
+                ControlDocumento.ActualizarPresentacion += value;
+            }
+            remove {
+                ControlDocumento.ActualizarPresentacion -= value;
+            }
+        }
+        public Escritorio(Documento _documento)
+        {
+            ContPresentarDocumento controlador = new ContPresentarDocumento(_documento);
             EspacioEntrePaginas = new Medicion(10,Unidad.Milimetros);
-            Controlador = controlador;
+            ControlDocumento = controlador;
             EsquinaSuperior = new Punto(Medicion.Cero, Medicion.Cero);
         }
         public void Dibujar(IGraficador graficador,Seleccion seleccion)
         {
-            Posicion pos = Controlador.ObtenerPosicion();
+            Posicion pos = ControlDocumento.ObtenerPosicion();
             AsegurarVisibilidad(pos);
             Medicion inicio = EsquinaSuperior.Y;
             Medicion derecha = EsquinaSuperior.X;
@@ -126,15 +136,20 @@ namespace SistemaWP.IU.VistaDocumento
             int indice = PaginaSuperior;
             foreach (Pagina pag in Documento.ObtenerDesde(PaginaSuperior))
             {
-                if (pt2.Y > pag.Dimensiones.Alto)
+                if (pt2.Y > pag.Dimensiones.Alto + EspacioEntrePaginas)
                 {
-                    pt2.Y -= pag.Dimensiones.Alto;
+                    pt2.Y -= pag.Dimensiones.Alto + EspacioEntrePaginas;
                 }
                 else
                     break;
                 indice++;
             }
-            Controlador.RegistrarPosicion(indice, pt2, ampliarSeleccion);
+            ControlDocumento.RegistrarPosicion(indice, pt2, ampliarSeleccion);
+        }
+
+        internal void CambiarDimensiones(TamBloque tamBloque)
+        {
+            throw new NotImplementedException();
         }
     }
 }
