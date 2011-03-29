@@ -5,13 +5,13 @@ using SWPEditor.Dominio.TextoFormato;
 
 namespace SWPEditor.Dominio.Html
 {
-    class EscritorHtml:IEscritor 
+    class EscritorHTML:IEscritor 
     {
         StringBuilder _html = new StringBuilder();
         StringBuilder _estilos=new StringBuilder();
         Dictionary<Formato, int> cadestilos=new Dictionary<Formato,int>();
         int estiloactual;
-        public EscritorHtml()
+        public EscritorHTML()
         {
             
 
