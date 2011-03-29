@@ -49,12 +49,13 @@ namespace SistemaWP.IU.PresentacionDocumento
             Pagina act = _Paginas[_Paginas.Count - 1];
             if (numlinea < act.LineaInicio)
             {
-                for (int i = _Paginas.Count - 2; i >= 0; i++)
+                for (int i = _Paginas.Count - 2; i >= 0; i--)
                 {
                     if (_Paginas[i].ContieneLinea(numlinea))
                     {
                         return _Paginas[i].ObtenerAnchoLinea(numlinea);
                     }
+                    
                 }
             }
             return act.ObtenerAnchoLinea(numlinea);
@@ -66,43 +67,21 @@ namespace SistemaWP.IU.PresentacionDocumento
                 if (indiceSolicitado >= _Paginas.Count - 1)
                 {
                     Pagina actual = _Paginas[_Paginas.Count - 1];
-                    if (!actual.Completa)
+                    while (_Paginas.Count <= indiceSolicitado)
                     {
-                        Medicion inicio = actual.AltoActual;
-                        Medicion altoPagina = actual.ObtenerAltoLineas();
-                        int indice = actual.LineaInicio + actual.Cantidad;
-                        IEnumerable<Linea> lista = _Lineas.ObtenerDesde(indice);
-                        bool existente = true;
-                        foreach (Linea l in lista)
+                        if (indiceSolicitado < _Paginas.Count) break;
+                        Pagina p = new Pagina(actual.LineaInicio + actual.Cantidad, this, _Lineas);
+                        if (p.Cantidad != 0)
                         {
-                            if (indiceSolicitado>_Paginas.Count-1)
-                            {
-                                break;
-                            }
-                            Medicion anterior = inicio;
-                            inicio = inicio + l.AltoLinea;
-                            if (inicio > altoPagina)
-                            {
-                                Pagina nueva = new Pagina();
-                                nueva.LineaInicio = actual.LineaInicio + actual.Cantidad;
-                                if (!existente)
-                                    _Paginas.Add(nueva);
-                                existente = false;
-                                actual.Completa = true;
-                                actual = nueva;
-                                nueva.AltoActual = Medicion.Cero;
-                                inicio = l.AltoLinea;
-                            }
-                            actual.AltoActual += l.AltoLinea;
-                            actual.Cantidad++;
+                            _Paginas.Add(p);
+                            actual = p;
                         }
-                        if (!existente)
+                        else
                         {
-                            _Paginas.Add(actual);
+                            _listaCompleta = true;
+                            break;
                         }
-                        actual.Completa = true;
-                        _listaCompleta = true;
-                    }
+                    }                    
                 }
             }
         }
@@ -111,6 +90,9 @@ namespace SistemaWP.IU.PresentacionDocumento
             if (_listaCompleta && indice >= _Paginas.Count)
                 return null;
             AsegurarExistencia(indice);
+            if (_listaCompleta && indice >= _Paginas.Count)
+                return null;
+            
             return _Paginas[indice];
         }
         public ListaPaginas(Documento documento, DocumentoImpreso docimpreso)
@@ -118,13 +100,14 @@ namespace SistemaWP.IU.PresentacionDocumento
             _docimpreso = docimpreso;
             _documento = documento;
             _Paginas = new List<Pagina>();
-            Pagina p = new Pagina();
-            _Paginas.Add(p);
             _documento.AgregarObservador(this);
         }
         public void Iniciar(ListaLineas listalineas)
         {
             _Lineas = listalineas;
+            Pagina p = new Pagina(0,this,_Lineas);
+            _Paginas.Add(p);
+            
         }
         public Medicion ObtenerAncho(int numlinea)
         {
@@ -141,14 +124,15 @@ namespace SistemaWP.IU.PresentacionDocumento
             Pagina ultimapag = _Paginas[_Paginas.Count - 1];
             return ultimapag.ObtenerAnchoLinea(numlinea);
         }
-        public void CalcularSiguiente()
+        /*
+        private void CalcularSiguiente()
         {
             int ultimapagina = _Paginas.Count;
             Pagina anterior = _Paginas[_Paginas.Count - 1];
-            Pagina nueva = new Pagina();
-        }
+            
+        }*/
 
-        internal Pagina Obtener(int indicePagina)
+        public Pagina Obtener(int indicePagina)
         {
             AsegurarExistencia(indicePagina);
             if (_listaCompleta && indicePagina >= _Paginas.Count)
@@ -161,7 +145,7 @@ namespace SistemaWP.IU.PresentacionDocumento
         {
             Pagina pag = _Paginas[_Paginas.Count - 1];
             Linea inicial = _Lineas.Obtener(pag.LineaInicio);
-            if (inicial.Parrafo.EsSiguiente(parrafoBuscado))
+            if (inicial.Parrafo==parrafoBuscado||inicial.Parrafo.EsSiguiente(parrafoBuscado))
             {
                 int indice = _Paginas.Count - 1;
                 int lineabusqueda = -1;
@@ -253,7 +237,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             return _Lineas.BuscarInicialDeParrafo(lineaInicio, p);
         }
 
-        internal bool EsUltimaPagina(int indicePagina)
+        public bool EsUltimaPagina(int indicePagina)
         {
             if (indicePagina < _Paginas.Count - 1)
             {
@@ -274,20 +258,36 @@ namespace SistemaWP.IU.PresentacionDocumento
         private void Recalcular(Parrafo p)
         {
             Parrafo busq = p;
-            Posicion pos = BuscarParrafo(busq);
-            _Paginas.RemoveRange(pos.IndicePagina+1, _Paginas.Count - pos.IndicePagina-1);            
-            Pagina act = _Paginas[_Paginas.Count - 1];
-            act.Cantidad = pos.IndiceLinea-act.LineaInicio-1;
-            act.AltoActual=Medicion.Cero;
-            if (act.Cantidad < 0) act.Cantidad = 0;
-            int lim = act.LineaInicio + act.Cantidad;
-            for (int i = act.LineaInicio; i < lim; i++)
+            int indicelinea = 0;
+            int indicepagina = 0;
+            Pagina act = _Paginas[0];
+            bool recalculado = false;
+            _Lineas.Recalcular(indicelinea, p);
+            IEnumerable<Linea> lista = _Lineas.ObtenerDesde(0);
+            foreach (Linea l in lista)
             {
-                act.AltoActual += _Lineas.Obtener(i).AltoLinea;
-            }
-            act.Completa = false;
-            _listaCompleta = false;
-            _Lineas.Recalcular(pos.IndiceLinea, p);
+                
+                if (act.LineaInicio >= indicelinea)
+                {
+                    if (act.Recalcular(indicelinea))
+                    {
+                        //Desde esta página hacia adelante debe quitarse de la lista
+                        _Paginas.RemoveRange(indicepagina + 1, _Paginas.Count - indicepagina - 1);
+                        _listaCompleta = false;
+                        break;
+                    }
+                }
+                if (indicepagina < _Paginas.Count - 1)
+                {
+                    act = _Paginas[indicepagina];
+                }
+                else
+                {
+                    break;
+                }                
+                indicelinea++;
+            }            
+            
         }
         public void ParrafoAgregado(Parrafo p)
         {

@@ -22,6 +22,10 @@ namespace SistemaWP.IU.PresentacionDocumento
             numcaracterActual = 0;
             _listaPaginas = listaPaginas;
         }
+        public void Recalcular(Parrafo inicio, Parrafo fin)
+        {
+            
+        }
         internal void Recalcular(int indiceLinea,Parrafo actual)
         {
             parrafoActual = actual;
@@ -29,7 +33,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             completo = false;
             _lineas.RemoveRange(indiceLinea, _lineas.Count - indiceLinea);
         }
-        internal IEnumerable<Linea> ObtenerDesde(int indice)
+        public IEnumerable<Linea> ObtenerDesde(int indice)
         {
             AsegurarHasta(indice);
             while (true)
@@ -73,6 +77,7 @@ namespace SistemaWP.IU.PresentacionDocumento
        
         public int BuscarInicialDeParrafo(int lineainicio, Parrafo p)
         {
+            AsegurarHasta(lineainicio);
             if (_lineas[lineainicio].Parrafo.EsSiguiente(p))
             {
                 for (int i = lineainicio + 1; i < _lineas.Count; i++)
