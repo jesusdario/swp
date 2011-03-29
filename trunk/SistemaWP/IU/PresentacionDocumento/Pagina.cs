@@ -13,18 +13,83 @@ namespace SistemaWP.IU.PresentacionDocumento
         public TamBloque Dimensiones { get; set; }
         public Margen Margen { get; set; }
         public int LineaInicio { get; set; }
-        public int Cantidad { get; set; }
-        public bool Completa { get; set; }
-        public Medicion AltoActual { get; set; }
-        public Pagina()
+        private int _Cantidad;
+        public int Cantidad
         {
+            get
+            {
+                CompletarLineas();
+                return _Cantidad;
+            }
+            
+        }
+        private bool Completa { get; set; }
+        private Medicion AltoActual { get; set; }
+        ListaPaginas _paginas;
+        ListaLineas _lineas;
+        public Pagina(int lineaInicio,ListaPaginas paginas,ListaLineas lineas)
+        {
+            _lineas = lineas;
+            _paginas = paginas;
+            LineaInicio = lineaInicio;
             Dimensiones = new TamBloque(new Medicion(210, Unidad.Milimetros), new Medicion(270, Unidad.Milimetros));
             Margen = new Margen() { Derecho = new Medicion(10, Unidad.Milimetros), Izquierdo = new Medicion(10, Unidad.Milimetros), Superior = new Medicion(10, Unidad.Milimetros), Inferior = new Medicion(10, Unidad.Milimetros) };
             AltoActual = Medicion.Cero;
         }
+        public bool Recalcular(int indice)
+        {
+            if (Completa && indice >= LineaInicio && indice <= LineaInicio + _Cantidad)
+            {
+                _Cantidad = indice - LineaInicio-1;
+                if (_Cantidad < 0) _Cantidad = 0;
+                int lim=LineaInicio+_Cantidad;
+                AltoActual = Medicion.Cero;
+                for (int i = LineaInicio; i < lim; i++)
+                {
+                    AltoActual += _lineas.Obtener(i).AltoLinea;
+                }
+                Completa = false;
+                return true;
+            }
+            else
+            {
+                AsegurarLinea(indice);
+                if (indice <= LineaInicio + _Cantidad)
+                    return true;
+            }
+            return false;
+        }
+        private void CompletarLineas()
+        {
+            AsegurarLinea(int.MaxValue);                
+            
+        }
+        private void AsegurarLinea(int numlinea)
+        {
+            if (!Completa&&numlinea >= LineaInicio + _Cantidad)
+            {
+                IEnumerable<Linea> lin = _lineas.ObtenerDesde(LineaInicio+_Cantidad);
+                Medicion altomax = ObtenerAltoLineas();
+                int indice = LineaInicio + _Cantidad;
+                foreach (Linea l in lin)
+                {
+                    if (l.AltoLinea + AltoActual > altomax) 
+                        break;
+                    AltoActual += l.AltoLinea;
+                    _Cantidad++;
+                    if (indice >= numlinea)
+                    {
+                        return;
+                    }
+                    indice++;
+                }
+                Completa = true;
+            }
+        }
         public bool ContieneLinea(int numlinea)
         {
-            return numlinea >= LineaInicio && numlinea < LineaInicio + Cantidad;
+            AsegurarLinea(numlinea);
+            return numlinea >= LineaInicio && numlinea < LineaInicio + _Cantidad;
         }
         public void Completar(ListaLineas lineas,Posicion posicion,int lineaPagina,int numCaracter)
         {
@@ -39,6 +104,7 @@ namespace SistemaWP.IU.PresentacionDocumento
         }
         public void Dibujar(IGraficador g, Punto esquinaSuperior, ListaLineas _Lineas, Seleccion seleccion,AvanceBloques avance)
         {
+            CompletarLineas();
             Punto pt = esquinaSuperior;
             pt.X += Margen.Izquierdo;
             pt.Y += Margen.Superior;
@@ -60,37 +126,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             }
             return suma;
         }
-        //public void Paginar(ListaLineas _Lineas, Parrafo ParrafoInicial, int CaracterInicial,out Parrafo ParrafoFinal, out int CaracterSiguiente)
-        //{
-        //    Parrafo p = ParrafoInicial;
-        //    Medicion ancho=Dimensiones.Ancho-Margen.Derecho-Margen.Izquierdo;
-        //    Medicion alto=Dimensiones.Alto-Margen.Superior-Margen.Inferior;
-        //    int caracterinicio=CaracterInicial;
-        //    Medicion altoactual = Medicion.Cero;
-        //    bool primeralinea = true;
-        //    while (p != null)
-        //    {
-        //        Linea l=Linea.ObtenerSiguienteLinea(p, caracterinicio, ancho,true,true);                
-        //        if (!primeralinea&&altoactual+l.AltoLinea > alto) //la línea pasa el fin de página.
-        //        {
-        //            ParrafoFinal = p;
-        //            CaracterSiguiente = caracterinicio;
-        //            return;
-        //        }
-        //        primeralinea = false;
-        //        //SIEMPRE INCLUIR LA PRIMERA LINEA AUNQUE SALGA DE LA PAGINA
-        //        altoactual = altoactual + l.AltoLinea;
-        //        _Lineas.Add(l);
-        //        caracterinicio = l.Inicio + l.Cantidad;
-        //        if (l.Inicio + l.Cantidad == p.ObtenerLongitud())
-        //        {
-        //            p = p.Siguiente;
-        //            caracterinicio = 0;
-        //        }
-        //    }
-        //    ParrafoFinal = null;
-        //    CaracterSiguiente = 0;
-        //}
+        
 
         internal void CompletarPixels(ListaLineas _Lineas, Posicion posicion)
         {
