@@ -262,11 +262,10 @@ namespace SistemaWP.IU.PresentacionDocumento
             int indicepagina = 0;
             Pagina act = _Paginas[0];
             bool recalculado = false;
-            _Lineas.Recalcular(indicelinea, p);
+            _Lineas.Recalcular(p,p);
             IEnumerable<Linea> lista = _Lineas.ObtenerDesde(0);
             foreach (Linea l in lista)
-            {
-                
+            {                
                 if (act.LineaInicio >= indicelinea)
                 {
                     if (act.Recalcular(indicelinea))

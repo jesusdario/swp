@@ -12,6 +12,7 @@ namespace SistemaWP.IU.PresentacionDocumento
         Parrafo parrafoActual;
         int numcaracterActual;
         bool completo;
+        bool _enIteracionLineas;
         ListaPaginas _listaPaginas;
         Documento _documento;
         public ListaLineas(Documento documento,ListaPaginas listaPaginas)
@@ -24,28 +25,56 @@ namespace SistemaWP.IU.PresentacionDocumento
         }
         public void Recalcular(Parrafo inicio, Parrafo fin)
         {
+            if (!_enIteracionLineas)
+            {
+                int a = BuscarInt(0, inicio);
+                if (a != -1)
+                {
+                    Recalcular(a, inicio);
+                }
+            }
+            else
+            {
+                throw new Exception("No se puede recalcular mientras se itera por las lineas");
+            }
             
         }
-        internal void Recalcular(int indiceLinea,Parrafo actual)
+        private void Recalcular(int indiceLinea, Parrafo actual)
         {
-            if (indiceLinea < _lineas.Count)
+            if (!_enIteracionLineas)
             {
-                parrafoActual = actual;
-                numcaracterActual = 0;
-                completo = false;
-                _lineas.RemoveRange(indiceLinea, _lineas.Count - indiceLinea);
+                if (indiceLinea < _lineas.Count)
+                {
+                    parrafoActual = actual;
+                    numcaracterActual = 0;
+                    completo = false;
+                    _lineas.RemoveRange(indiceLinea, _lineas.Count - indiceLinea);
+                }
+            }
+            else
+            {
+                throw new Exception("No se puede recalcular mientras se itera por las lineas");
             }
         }
         public IEnumerable<Linea> ObtenerDesde(int indice)
         {
-            AsegurarHasta(indice);
-            while (true)
+            try
             {
-                if (completo && indice >= _lineas.Count) 
-                    yield break;
-                yield return _lineas[indice];
-                indice++;
+                _enIteracionLineas = true;
                 AsegurarHasta(indice);
+
+                while (true)
+                {
+                    if (completo && indice >= _lineas.Count)
+                        yield break;
+                    yield return _lineas[indice];
+                    indice++;
+                    AsegurarHasta(indice);
+                }
+            }
+            finally
+            {
+                _enIteracionLineas = false;
             }
         }
         private void CalcularSiguiente()
@@ -76,11 +105,9 @@ namespace SistemaWP.IU.PresentacionDocumento
             AsegurarHasta(indice);
             return _lineas[indice];
         }
-       
-       
-        public int BuscarInicialDeParrafo(int lineainicio, Parrafo p)
+
+        private int BuscarInt(int lineainicio, Parrafo p)
         {
-            AsegurarHasta(lineainicio);
             if (_lineas[lineainicio].Parrafo.EsSiguiente(p))
             {
                 for (int i = lineainicio + 1; i < _lineas.Count; i++)
@@ -102,7 +129,14 @@ namespace SistemaWP.IU.PresentacionDocumento
                     }
                 }
             }
-            throw new Exception("Linea no encontrada");
+            return -1;
+        }
+        public int BuscarInicialDeParrafo(int lineainicio, Parrafo p)
+        {
+            AsegurarHasta(lineainicio);
+            int res = BuscarInt(lineainicio, p);
+            if (res==-1) throw new Exception("Linea no encontrada");
+            return res;
         }
 
         #region Miembros de IEnumerable<Linea>
@@ -148,7 +182,9 @@ namespace SistemaWP.IU.PresentacionDocumento
                 return false;
             }
         }
-                
+
+
+        
     }
 }
 
