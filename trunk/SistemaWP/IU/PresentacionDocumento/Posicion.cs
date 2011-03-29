@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using SistemaWP.Dominio;
+using System.Diagnostics;
 
 namespace SistemaWP.IU.PresentacionDocumento
 {
@@ -19,10 +20,11 @@ namespace SistemaWP.IU.PresentacionDocumento
         /// Página
         /// </summary>
         public Pagina Pagina { get; set; }
+        private Linea _linea;
         /// <summary>
         /// Línea
         /// </summary>
-        public Linea Linea { get; set; }
+        public Linea Linea { get { Debug.Assert(_linea != null); return _linea; } set { _linea = value; Debug.Assert(value != null); } }
         /// <summary>
         /// Número de línea en el documento
         /// </summary>
@@ -67,15 +69,8 @@ namespace SistemaWP.IU.PresentacionDocumento
         {
             if (!_ConPosicionPixels)
             {
-                try
-                {
-                    _ConPosicionPixels = true;
-                    VDocumento.CompletarPixels(this);
-                }
-                catch
-                {
-                    _ConPosicionPixels = false;
-                }
+                _ConPosicionPixels = true;
+                VDocumento.CompletarPixels(this);
             }
         }
         public Posicion ObtenerInicioLinea()
@@ -97,11 +92,12 @@ namespace SistemaWP.IU.PresentacionDocumento
                 Posicion p = new Posicion(VDocumento);
                 p.ReferenciaX = ReferenciaX;
                 VDocumento.Completar(p, IndicePagina, IndiceLinea - 1, PosicionCaracter);
+                Debug.Assert(p.Linea != null);
                 return p;
             }
             else
             {
-                return (Posicion)this.MemberwiseClone();
+                return ObtenerCopia();
             }
            
         }
@@ -117,6 +113,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                 Posicion p = new Posicion(VDocumento);
                 p.ReferenciaX = ReferenciaX;
                 VDocumento.Completar(p, IndicePagina, IndiceLinea + 1, PosicionCaracter);
+                Debug.Assert(p.Linea != null);
                 return p;
             }
             else
@@ -162,6 +159,7 @@ namespace SistemaWP.IU.PresentacionDocumento
         }        
         internal void Avanzar(int posicion)
         {
+            Debug.Assert(Linea != null);
             ReferenciaX = null;
             int indicelinea;
             while (posicion > Linea.Cantidad)

@@ -55,6 +55,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             if (_Paginas.Obtener(paginaInicioBusqueda).ContieneLinea(indiceLinea))
             {
                 Completar2(posicion, paginaInicioBusqueda, indiceLinea, numCaracter);
+                return;
             }
             else if (_Paginas.Obtener(paginaInicioBusqueda).LineaInicio < indiceLinea)
             {
@@ -82,6 +83,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                     }
                 }
             }
+            throw new Exception("No se pudo completar linea");
         }
 
         private void Completar2(Posicion posicion, int indicePagina, int indiceLinea, int numCaracter)
@@ -125,7 +127,8 @@ namespace SistemaWP.IU.PresentacionDocumento
         public int ObtenerNumPaginaConLinea(int numlinea)
         {
             int indice = 0;
-            foreach (Pagina p in _Paginas.ObtenerDesde(0))
+            IEnumerable<Pagina> pag=_Paginas.ObtenerDesde(0);
+            foreach (Pagina p in pag)
             {
                 if (p.ContieneLinea(numlinea))
                 {
@@ -219,7 +222,8 @@ namespace SistemaWP.IU.PresentacionDocumento
         }
         public IEnumerable<Pagina> ObtenerDesde(int indicePagina)
         {
-            foreach (Pagina p in _Paginas.ObtenerDesde(indicePagina))
+            IEnumerable<Pagina> pags=_Paginas.ObtenerDesde(indicePagina);
+            foreach (Pagina p in pags)
             {
                 yield return p;
             }
