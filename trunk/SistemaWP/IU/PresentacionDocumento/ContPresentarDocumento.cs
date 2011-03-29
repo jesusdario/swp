@@ -9,7 +9,7 @@ using SistemaWP.Dominio.TextoFormato;
 
 namespace SistemaWP.IU.PresentacionDocumento
 {
-    class ContPresentarDocumento
+    public class ContPresentarDocumento
     {
         ContEditarTexto conttexto;
         PresentacionDocumento.DocumentoImpreso _documento;

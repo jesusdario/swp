@@ -7,7 +7,7 @@ using SistemaWP.Dominio.TextoFormato;
 
 namespace SistemaWP.Aplicacion
 {
-    enum TipoAvance
+    public enum TipoAvance
     {
         AvanzarPorCaracteres,
         AvanzarPorPalabras,
