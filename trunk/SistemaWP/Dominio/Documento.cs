@@ -59,13 +59,11 @@ namespace SistemaWP.Dominio
         private void AgregarParrafo(Parrafo p)
         {
             m_Parrafos.Add(p.ID, p);
-            EnAdicionParrafo(p);
         }
         private void EliminarParrafo(int id)
         {
             Parrafo elim = m_Parrafos[id];
             m_Parrafos.Remove(id);
-            EnEliminacionParrafo(elim);
         }
         
         public Documento()
@@ -119,6 +117,11 @@ namespace SistemaWP.Dominio
                 {
                     parrafo.FusionarCon(parrafoSiguiente);
                     EliminarParrafo(parrafoSiguiente.ID);
+                    EnParrafosCambiados(parrafo, parrafoSiguiente);
+                }
+                else
+                {
+                    EnCambioParrafo(parrafo);
                 }
             }
             
@@ -135,8 +138,8 @@ namespace SistemaWP.Dominio
                         parrafoSeleccionado.Anterior,
                         parrafoSeleccionado, parrafoSeleccionado);
                     parrafoSeleccionado.InsertarAnterior(p);
-
                     AgregarParrafo(p);
+                    EnParrafosCambiados(p, parrafoSeleccionado);
                     return parrafoSeleccionado;
                 }
                 else if (posicionInsercion == parrafoSeleccionado.ObtenerLongitud())
@@ -145,6 +148,7 @@ namespace SistemaWP.Dominio
                     Parrafo p = new Parrafo(this, idnuevo, parrafoSeleccionado, parrafoSeleccionado.Siguiente, parrafoSeleccionado);
                     parrafoSeleccionado.InsertarSiguiente(p);
                     AgregarParrafo(p);
+                    EnParrafosCambiados(parrafoSeleccionado, p);
                     return p;
                 }
                 else
@@ -152,6 +156,7 @@ namespace SistemaWP.Dominio
                     int idnuevo = CrearNuevoID(parrafoSeleccionado.ID + 1);
                     Parrafo parrafoNuevo = parrafoSeleccionado.DividirParrafo(idnuevo, posicionInsercion);
                     AgregarParrafo(parrafoNuevo);
+                    EnParrafosCambiados(parrafoSeleccionado, parrafoNuevo);
                     return parrafoNuevo;
                 }
             }
@@ -276,7 +281,7 @@ namespace SistemaWP.Dominio
                     }
                     parrafoInicio.CambiarFormato(formato, posicionInicio, parrafoInicio.ObtenerLongitud() - posicionInicio);
                     parrafoFin.CambiarFormato(formato, 0, posicionFin);
-                    EnEliminacionParrafo(parrafoInicio);
+                    EnParrafosCambiados(parrafoInicio, parrafoFin);
                 }
             }
         }

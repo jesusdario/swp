@@ -86,7 +86,6 @@ namespace SistemaWP.Dominio
             if (posicion==bufferTexto.Length)
             {
                 _contenedor.FusionarSiguiente(this);
-                _contenedor.NotificarCambio(this);
                 return true;
             }
             else
@@ -118,12 +117,7 @@ namespace SistemaWP.Dominio
             Parrafo nuevo = new Parrafo(_contenedor,idnuevo, this, Siguiente);
             nuevo._Formato = _Formato;
             InsertarSiguiente(nuevo);
-            nuevo.bufferTexto=bufferTexto.Dividir(posicionDivision);
-            /*for (int i = posicionDivision; i < bufferTexto.Length; i++)
-            {
-                nuevo.bufferTexto.Append(bufferTexto[i]);
-            }
-            bufferTexto.Remove(posicionDivision, bufferTexto.Length-posicionDivision);*/
+            nuevo.bufferTexto=bufferTexto.Dividir(posicionDivision);          
             return nuevo;
         }
 

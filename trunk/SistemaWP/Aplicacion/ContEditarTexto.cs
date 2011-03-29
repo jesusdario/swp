@@ -218,8 +218,9 @@ namespace SistemaWP.Aplicacion
             int cantidad = 0;
             int poscadena = 0;
             
-            foreach (char c in cadena)
+            for (int i=0;i<cadena.Length;i++)
             {
+                char c = cadena[i];
                 if (c >= 32)
                 {
                     cantidad++;
@@ -231,12 +232,14 @@ namespace SistemaWP.Aplicacion
                         parrafoSeleccionado.InsertarCadena(posicionInsercion, cadena.Substring(inicio, cantidad));
                         _estadisticas.RegistrarInsercion(parrafoSeleccionado, posicionInsercion, cantidad);
                         posicionInsercion = posicionInsercion + cantidad;
-                        inicio = poscadena + 1;
+                        inicio = i+1;
                         cantidad = 0;
                     }
                     if (c == '\n')
                     {
                         InsertarParrafo();
+                        inicio = i + 1;
+                        cantidad = 0;
                     }
                 }
                 poscadena++;
