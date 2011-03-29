@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SistemaWP.Dominio;
+using SWPEditor.Dominio;
 using System.Drawing;
-using SistemaWP.Aplicacion;
-using SistemaWP.IU.Graficos;
+using SWPEditor.Aplicacion;
+using SWPEditor.IU.Graficos;
 using System.Diagnostics;
 
-namespace SistemaWP.IU.PresentacionDocumento
+namespace SWPEditor.IU.PresentacionDocumento
 {
     public class DocumentoImpreso
     {
@@ -141,76 +141,7 @@ namespace SistemaWP.IU.PresentacionDocumento
         }
         public void Repaginar(int lineainicio)
         {
-            //_Paginas = new ListaPaginas(_documento, this);
-            //_Lineas = new ListaLineas(_documento, _Paginas);
-            //_Paginas.Iniciar(_Lineas);
-
-
-
-
-
-            //Parrafo p=null;
-            //Pagina actual=null;
-            //Medicion posicionbase;
-            //if (lineainicio == -1)
-            //{
-            //    lineainicio = 0;
-            //    _Lineas.Limpiar();
-            //    _Paginas.Clear();
-            //    actual = new Pagina() { Cantidad = 0 };
-            //    posicionbase = Medicion.Cero;
-            //    p = _documento.ObtenerPrimerParrafo();
-            //}
-            //else
-            //{
-            //    if (_Paginas.Count > 0)
-            //    {
-
-            //        while (_Lineas.Obtener(lineainicio).Inicio != 0)
-            //        {
-            //            lineainicio--;
-            //        }
-
-            //        int indice = ObtenerNumPaginaConLinea(lineainicio);
-            //        Pagina pag = ObtenerPagina(indice);
-            //        _Paginas.RemoveRange(indice, _Paginas.Count - indice);
-            //        _Lineas.RemoverDesde(lineainicio);
-
-            //        pag.Cantidad = lineainicio - pag.LineaInicio;
-            //        posicionbase = pag.ObtenerAltoLineas(_Lineas);
-            //        actual = pag;
-            //        if (_Lineas.Count > 0)
-            //        {
-            //            int idanterior = _Lineas[_Lineas.Count - 1].Parrafo.ID;
-            //            p = _documento.ObtenerParrafo(idanterior).Siguiente;
-            //        }
-            //        else
-            //        {
-            //            p = _documento.ObtenerPrimerParrafo();
-            //        }
-            //    }
-            //    else
-            //    {
-            //        actual = new Pagina() { Cantidad = 0 };
-            //        posicionbase = Medicion.Cero;
-            //        p = _documento.ObtenerPrimerParrafo();
-            //    }
-            //}
-            //Parrafo siguiente;
-            //int caractersiguiente;
-            //int caracterinicio = 0;
-            //do
-            //{
-            //    actual.Paginar(_Lineas, p, caracterinicio, out siguiente, out caractersiguiente);
-            //    actual.Cantidad = _Lineas.Count-actual.LineaInicio;
-            //    _Paginas.Add(actual);
-            //    if (siguiente != null)
-            //    {
-            //        actual = new Pagina() { LineaInicio=_Lineas.Count, Cantidad = 0 };
-            //    }
-            //    p = siguiente;
-            //    caracterinicio = caractersiguiente;
-            //} while (siguiente != null);            
+            
         }
         internal Posicion ObtenerPosicionPixels(int numpagina, Punto punto)
         {
@@ -228,7 +159,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                 yield return p;
             }
         }
-        internal Pagina ObtenerPagina(int indicePagina)
+        public Pagina ObtenerPagina(int indicePagina)
         {
             return _Paginas.Obtener(indicePagina);
         }
@@ -239,19 +170,13 @@ namespace SistemaWP.IU.PresentacionDocumento
         {
             return _Lineas.Obtener(indiceLinea);
         }
-        //internal int ObtenerNumLineas()
-        //{
-        //    return _Lineas.Count;
-        //}
-
-
-
+        
         internal bool EsUltimaLinea(int indiceLinea)
         {
             return _Lineas.EsUltimaLinea(indiceLinea);
         }
 
-        internal bool EsUltimaPagina(int indicePagina)
+        public bool EsUltimaPagina(int indicePagina)
         {
             return _Paginas.EsUltimaPagina(indicePagina);
         }

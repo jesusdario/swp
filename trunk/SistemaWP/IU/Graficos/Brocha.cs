@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SistemaWP.Dominio.TextoFormato;
+using SWPEditor.Dominio.TextoFormato;
 
-namespace SistemaWP.IU.Graficos
+namespace SWPEditor.IU.Graficos
 {
     public class Brocha
     {

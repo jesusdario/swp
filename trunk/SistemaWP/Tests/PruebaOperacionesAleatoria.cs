@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SistemaWP.Tests
+namespace SWPEditor.Tests
 {
     class PruebaOperaciones
     {

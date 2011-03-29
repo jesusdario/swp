@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SistemaWP.Dominio
+namespace SWPEditor.Dominio
 {
     public class Unidad
     {

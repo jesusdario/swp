@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 
-namespace SistemaWP.Dominio.TextoFormato
+namespace SWPEditor.Dominio.TextoFormato
 {
     public class Bloque
     {

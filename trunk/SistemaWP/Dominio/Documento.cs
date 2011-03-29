@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 using System.Text;
 using System.Diagnostics;
-using SistemaWP.Dominio.TextoFormato;
+using SWPEditor.Dominio.TextoFormato;
 using System.Collections;
 
-namespace SistemaWP.Dominio
+namespace SWPEditor.Dominio
 {
-    public interface IObservadorDocumento
+    interface IObservadorDocumento
     {
         void ParrafoAgregado(Parrafo p);
         void ParrafoCambiado(Parrafo p);
@@ -20,11 +20,11 @@ namespace SistemaWP.Dominio
         Dictionary<int, Parrafo> m_Parrafos = new Dictionary<int, Parrafo>();
         List<IObservadorDocumento> m_Observadores = new List<IObservadorDocumento>();
         public object ObjetoLock { get { return m_Parrafos; } }
-        public void AgregarObservador(IObservadorDocumento observador)
+        internal void AgregarObservador(IObservadorDocumento observador)
         {
             m_Observadores.Add(observador);
         }
-        public void QuitarObservador(IObservadorDocumento observador)
+        internal void QuitarObservador(IObservadorDocumento observador)
         {
             m_Observadores.Remove(observador);
         }

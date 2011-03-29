@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SistemaWP.Dominio;
+using SWPEditor.Dominio;
 using System.Drawing;
-using SistemaWP.Aplicacion;
-using SistemaWP.IU.Graficos;
-using SistemaWP.Dominio.TextoFormato;
-namespace SistemaWP.IU.PresentacionDocumento
+using SWPEditor.Aplicacion;
+using SWPEditor.IU.Graficos;
+using SWPEditor.Dominio.TextoFormato;
+namespace SWPEditor.IU.PresentacionDocumento
 {
     public class Pagina
     {
         public TamBloque Dimensiones { get; set; }
         public Margen Margen { get; set; }
-        public int LineaInicio { get; set; }
+        public int LineaInicio { get; private set; }
         private int _Cantidad;
         public int Cantidad
         {
@@ -20,8 +20,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             {
                 CompletarLineas();
                 return _Cantidad;
-            }
-            
+            }            
         }
         private bool Completa { get; set; }
         private Medicion AltoActual { get; set; }

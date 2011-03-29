@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
-using SistemaWP.Dominio;
-using SistemaWP.IU.Graficos;
-using SistemaWP.IU.VistaDocumento;
-using SistemaWP.Dominio.TextoFormato;
+using SWPEditor.Dominio;
+using SWPEditor.IU.Graficos;
+using SWPEditor.IU.VistaDocumento;
+using SWPEditor.Dominio.TextoFormato;
 using System.Diagnostics;
 
-namespace SistemaWP.IU.PresentacionDocumento
+namespace SWPEditor.IU.PresentacionDocumento
 {
     class Estilo
     {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SistemaWP.Dominio;
+using SWPEditor.Dominio;
 using System.Diagnostics;
 
-namespace SistemaWP.Tests
+namespace SWPEditor.Tests
 {
     class PruebaParrafo
     {

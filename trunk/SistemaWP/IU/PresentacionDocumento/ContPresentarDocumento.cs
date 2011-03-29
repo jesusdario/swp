@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SistemaWP.Aplicacion;
+using SWPEditor.Aplicacion;
 using System.Windows.Forms;
-using SistemaWP.Dominio;
-using SistemaWP.IU.Graficos;
-using SistemaWP.Dominio.TextoFormato;
+using SWPEditor.Dominio;
+using SWPEditor.IU.Graficos;
+using SWPEditor.Dominio.TextoFormato;
 
-namespace SistemaWP.IU.PresentacionDocumento
+namespace SWPEditor.IU.PresentacionDocumento
 {
     public class ContPresentarDocumento
     {
@@ -19,7 +19,7 @@ namespace SistemaWP.IU.PresentacionDocumento
         {
             conttexto = new ContEditarTexto(documento);
             conttexto.IndicarPosicion(1, 0, false);
-            _documento = new SistemaWP.IU.PresentacionDocumento.DocumentoImpreso(documento);
+            _documento = new SWPEditor.IU.PresentacionDocumento.DocumentoImpreso(documento);
             _documento.Repaginar(0);
         }
         
@@ -158,7 +158,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                 conttexto.IndicarPosicion(nuevaPosicion.Linea.Parrafo.ID, nuevaPosicion.Linea.Inicio + nuevaPosicion.PosicionCaracter, ampliarSeleccion);
             }
         }
-        internal void IrLineaSuperior(bool ampliarSeleccion)
+        public void IrLineaSuperior(bool ampliarSeleccion)
         {
             lock (this)
             {
@@ -169,7 +169,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             }
         }
 
-        internal void IrLineaInferior(bool ampliarSeleccion)
+        public void IrLineaInferior(bool ampliarSeleccion)
         {
             lock (this)
             {
@@ -179,7 +179,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                 EnActualizarPresentacion(false);
             }
         }
-        internal void IrPaginaAnterior(bool ampliarSeleccion)
+        public void IrPaginaAnterior(bool ampliarSeleccion)
         {
             lock (this)
             {
@@ -189,7 +189,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                 EnActualizarPresentacion(false);
             }
         }
-        internal void IrPaginaSiguiente(bool ampliarSeleccion)
+        public void IrPaginaSiguiente(bool ampliarSeleccion)
         {
             lock (this)
             {
@@ -238,7 +238,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             }
         }
 
-        internal Seleccion ObtenerSeleccion()
+        public Seleccion ObtenerSeleccion()
         {
             lock (this)
             {
@@ -246,7 +246,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             }
         }
 
-        internal Posicion ObtenerPosicion()
+        public Posicion ObtenerPosicion()
         {
             lock (this)
             {
@@ -254,7 +254,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             }
         }
 
-        internal void SeleccionarTodo()
+        public void SeleccionarTodo()
         {
             lock (this)
             {
@@ -263,7 +263,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             }
         }
 
-        internal string ObtenerTexto()
+        public string ObtenerTexto()
         {
             lock (this)
             {
@@ -271,37 +271,37 @@ namespace SistemaWP.IU.PresentacionDocumento
             }
         }
 
-        internal void CambiarLetraNegrilla()
+        public void CambiarLetraNegrilla()
         {
             conttexto.AplicarNegrilla();
             EnActualizarPresentacion(true);
         }
 
-        internal void CambiarLetraCursiva()
+        public void CambiarLetraCursiva()
         {
             conttexto.AplicarCursiva();
             EnActualizarPresentacion(true);
         }
 
-        internal void CambiarLetraSubrayado()
+        public void CambiarLetraSubrayado()
         {
             conttexto.AplicarSubrayado();
             EnActualizarPresentacion(true);
         }
 
-        internal void AgrandarLetra()
+        public void AgrandarLetra()
         {
             conttexto.AgrandarLetra();
             EnActualizarPresentacion(true);
         }
 
-        internal void ReducirLetra()
+        public void ReducirLetra()
         {
             conttexto.ReducirLetra();
             EnActualizarPresentacion(true);
         }
 
-        internal void QuitarSeleccion()
+        public void QuitarSeleccion()
         {
             Seleccion s=conttexto.ObtenerSeleccion();
             conttexto.IndicarPosicion(s.ObtenerParrafoInicial().ID,s.ObtenerPosicionInicial(), false);

@@ -1,6 +1,6 @@
-﻿namespace SistemaWP.IU
+﻿namespace SWPEditor.IU
 {
-    partial class PresentadorDocumento
+    partial class SWPEditorIU
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PresentadorDocumento));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SWPEditorIU));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.ediciónToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cortarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -61,7 +61,7 @@
             this.AlignRight = new System.Windows.Forms.ToolStripButton();
             this.FontColor = new System.Windows.Forms.ToolStripButton();
             this.BackgroundColor = new System.Windows.Forms.ToolStripButton();
-            this.swpEditor1 = new SistemaWP.IU.SWPEditor();
+            this.swpEditor1 = new SWPEditor.IU.SWPEditorControl();
             this.IncreaseLineSpace = new System.Windows.Forms.ToolStripButton();
             this.DecreaseLineSpace = new System.Windows.Forms.ToolStripButton();
             this.menuStrip1.SuspendLayout();
@@ -429,7 +429,7 @@
 
         #endregion
 
-        private SWPEditor swpEditor1;
+        private SWPEditorControl swpEditor1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem ediciónToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cortarToolStripMenuItem;

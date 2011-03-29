@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SWPEditor.Properties {
+namespace SWPEditor.IU.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
