@@ -112,7 +112,7 @@ namespace SistemaWP.IU.PresentacionDocumento
         
         public Posicion ObtenerLineaInferior()
         {
-            if (IndiceLinea != VDocumento.ObtenerNumLineas() - 1)
+            if (!VDocumento.EsUltimaLinea(IndiceLinea))
             {
                 Posicion p = new Posicion(VDocumento);
                 p.ReferenciaX = ReferenciaX;
@@ -141,7 +141,7 @@ namespace SistemaWP.IU.PresentacionDocumento
         }
         public Posicion ObtenerPaginaSiguiente()
         {
-            if (IndicePagina != VDocumento.ObtenerNumPaginas()-1)
+            if (!VDocumento.EsUltimaPagina(IndicePagina))
             {
                 Punto pt = PosicionPagina;
                 return VDocumento.ObtenerPosicionPixels(IndicePagina + 1, pt);

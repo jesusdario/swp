@@ -47,6 +47,116 @@ namespace SistemaWP.Aplicacion
         /// </summary>
         Documento _documentoEdicion;
         public Documento DocumentoEdicion { get { return _documentoEdicion; } }
+
+        struct EstadisticasCambios
+        {
+            Parrafo parrafoInicial;
+            Parrafo parrafoFinal;
+           
+            public Parrafo ObtenerParrafoInicial()
+            {
+                return parrafoInicial;
+            }
+            public Parrafo ObtenerParrafoFinal()
+            {
+                return parrafoFinal;
+            }
+            public void Reiniciar()
+            {
+                parrafoInicial = null;
+                parrafoFinal = null;
+            }
+            public void CambiarParrafoFin(Parrafo parrafo)
+            {
+                parrafoFinal = parrafo;
+            }
+            public void RegistrarCambios(Parrafo parrafo)
+            {
+                RegistrarCambios(parrafo, parrafo);
+            }
+            public void RegistrarCambios(Parrafo inicio, Parrafo fin)
+            {
+                if (parrafoInicial == null) 
+                    parrafoInicial = inicio;
+                else {
+                    if (inicio.EsSiguiente(parrafoInicial))
+                    {
+                        parrafoInicial = inicio;
+                    }
+                }
+                
+                if (parrafoFinal == null)
+                    parrafoFinal = fin;
+                else
+                {
+                    if (parrafoFinal.EsSiguiente(fin))
+                    {
+                        parrafoInicial = fin;
+                    }
+                }            
+            }
+            public void RegistrarInsercion(Parrafo parrafo, int posicion,int cantidad)
+            {
+                RegistrarCambios(parrafo);
+            }
+            public void RegistrarEliminacion(Parrafo parrafo, int posicion, int cantidad)
+            {
+                RegistrarCambios(parrafo);
+            }
+            public void RegistrarEliminacion(Parrafo parrafoInicio, int posicionInicio,Parrafo parrafoFin,int posicionfin)
+            {
+                if (parrafoInicio == parrafoFin)
+                {
+                    RegistrarCambios(parrafoInicio);
+                }
+                else
+                {
+                    if (parrafoInicial == parrafoFin)
+                    {
+                        parrafoInicial = parrafoInicio;
+                    }
+                    if (parrafoFinal == parrafoFin)
+                    {
+                        parrafoFinal = parrafoInicio;
+                    }
+                }
+            }
+
+            internal void RegistrarInsercionParrafo(Parrafo parrafoSeleccionado, int posicion, Parrafo nuevo)
+            {
+                if (parrafoSeleccionado.EsSiguiente(nuevo))
+                {
+                    RegistrarCambios(parrafoSeleccionado, nuevo);
+                }
+                else
+                {
+                    RegistrarCambios(nuevo,parrafoSeleccionado);
+                }
+            }
+
+            internal void RegistrarCambioFormato(Formato formato, Parrafo parrafoInicio, int p, Parrafo parrafoFin, int p_5)
+            {
+                RegistrarCambios(parrafoInicio,parrafoFin);
+            }
+
+            internal void RegistrarCambioFormatoParrafo(Parrafo parrafoSeleccionado)
+            {
+                RegistrarCambios(parrafoSeleccionado);
+            }
+        }
+        EstadisticasCambios _estadisticas = new EstadisticasCambios();
+        public Parrafo CambioInicio()
+        {
+            return _estadisticas.ObtenerParrafoInicial();
+        }
+        public Parrafo CambioFin()
+        {
+            return _estadisticas.ObtenerParrafoFinal();
+        }
+        public void CambioReiniciar()
+        {
+            _estadisticas.Reiniciar();
+        }
         public ContEditarTexto(Documento documento)
         {
             _documentoEdicion = documento;
@@ -104,24 +214,48 @@ namespace SistemaWP.Aplicacion
         public void InsertarTexto(string cadena)
         {
             ReemplazarSeleccion();
+            int inicio = 0;
+            int cantidad = 0;
+            int poscadena = 0;
+            
             foreach (char c in cadena)
             {
                 if (c >= 32)
                 {
-                    parrafoSeleccionado.AgregarCaracter(posicionInsercion, c);
-                    posicionInsercion = posicionInsercion + 1;
+                    cantidad++;
                 }
                 else
                 {
+                    if (cantidad > 0)
+                    {
+                        parrafoSeleccionado.InsertarCadena(posicionInsercion, cadena.Substring(inicio, cantidad));
+                        _estadisticas.RegistrarInsercion(parrafoSeleccionado, posicionInsercion, cantidad);
+                        posicionInsercion = posicionInsercion + cantidad;
+                        inicio = poscadena + 1;
+                        cantidad = 0;
+                    }
                     if (c == '\n')
+                    {
                         InsertarParrafo();
+                    }
                 }
+                poscadena++;
             }
+            if (cantidad > 0)
+            {
+                parrafoSeleccionado.InsertarCadena(posicionInsercion, cadena.Substring(inicio, cantidad));
+                _estadisticas.RegistrarInsercion(parrafoSeleccionado, posicionInsercion, cantidad);                        
+                posicionInsercion = posicionInsercion + cantidad;
+                inicio = poscadena + 1;
+                cantidad = 0;
+            }
+            
         }
         public void AgregarCaracter(char caracter)
         {
             ReemplazarSeleccion();
             parrafoSeleccionado.AgregarCaracter(posicionInsercion, caracter);
+            _estadisticas.RegistrarInsercion(parrafoSeleccionado, posicionInsercion, 1);
             posicionInsercion = posicionInsercion + 1;
         }
         public void BorrarCaracterAnterior()
@@ -136,6 +270,7 @@ namespace SistemaWP.Aplicacion
                 if (res)
                 {
                     parrafoSeleccionado.BorrarCaracter(posicionInsercion);
+                    _estadisticas.RegistrarEliminacion(parrafoSeleccionado, posicionInsercion, 1);
                 }
             }
         }
@@ -211,6 +346,7 @@ namespace SistemaWP.Aplicacion
             else
             {
                 parrafoSeleccionado.BorrarCaracter(posicionInsercion);
+                _estadisticas.RegistrarEliminacion(parrafoSeleccionado, posicionInsercion, 1);
             }
 
         }
@@ -222,18 +358,26 @@ namespace SistemaWP.Aplicacion
                 Parrafo parrafofin = s.ObtenerParrafoFinal();
                 int inicio=s.ObtenerPosicionInicial();
                 int fin=s.ObtenerPosicionFinal();
+                _estadisticas.RegistrarEliminacion(parrafoinicio, inicio,parrafofin,fin);
                 Parrafo res = _documentoEdicion.BorrarRango(
                     parrafoinicio,inicio, 
                     parrafofin, fin);
+                //En este caso, el párrafo final se habrá fusionado con el anterior asi que cambiarlo
+                //por la selección actual
+                
                 parrafoSeleccionado = parrafoinicio;
                 posicionInsercion = inicio;
+                
                 LimpiarSeleccion();
             }
         }
         public void InsertarParrafo()
         {
             ReemplazarSeleccion();
-            parrafoSeleccionado=_documentoEdicion.InsertarParrafo(parrafoSeleccionado, posicionInsercion);
+            ;
+            Parrafo nuevo=_documentoEdicion.InsertarParrafo(parrafoSeleccionado, posicionInsercion);
+            _estadisticas.RegistrarInsercionParrafo(parrafoSeleccionado,posicionInsercion,nuevo);
+            parrafoSeleccionado=nuevo;            
             posicionInsercion = 0;
         }
 
@@ -287,10 +431,12 @@ namespace SistemaWP.Aplicacion
             if (s != null)
             {
                 _documentoEdicion.CambiarFormato(formato, s.ObtenerParrafoInicial(), s.ObtenerPosicionInicial(), s.ObtenerParrafoFinal(), s.ObtenerPosicionFinal());
+                _estadisticas.RegistrarCambioFormato(formato, s.ObtenerParrafoInicial(), s.ObtenerPosicionInicial(), s.ObtenerParrafoFinal(), s.ObtenerPosicionFinal());
             }
             else
             {
                 _documentoEdicion.CambiarFormato(formato, parrafoSeleccionado, posicionInsercion, parrafoSeleccionado, posicionInsercion);
+                _estadisticas.RegistrarCambioFormato(formato, parrafoSeleccionado, posicionInsercion, parrafoSeleccionado, posicionInsercion);
             }
         }
         public Formato ObtenerFormatoComunSeleccion()
@@ -384,23 +530,18 @@ namespace SistemaWP.Aplicacion
             if (s == null)
             {
                 accion(parrafoSeleccionado);
+                _estadisticas.RegistrarCambioFormatoParrafo(parrafoSeleccionado);
             }
             else
             {
                 _documentoEdicion.AplicarOperacionParrafos(s.ObtenerParrafoInicial(), s.ObtenerParrafoFinal(),
-                    accion);
+                    delegate(Parrafo p) {
+                        accion(p);
+                        _estadisticas.RegistrarCambioFormatoParrafo(p);
+                    });
             }
         }
-        //public void AlternarEspacioAnteriorParrafo()
-        //{
-        //    Medicion delta=new Medicion(6,Unidad.Puntos);
-        //    AplicarOperacionParrafos(x => x.CambiarFormatoParrafo(FormatoParrafo.CrearEspaciadoAnterior(delta)));
-        //}
-        //public void AlternarEspacioPosteriorParrafo()
-        //{
-        //    Medicion delta = new Medicion(6, Unidad.Puntos);
-        //    AplicarOperacionParrafos(x => x.IncrementarEspacioDespuesParrafo(delta));
-        //}
+        
         public void AlinearIzquierda()
         {
             AplicarOperacionParrafos(x => x.AlinearIzquierda());

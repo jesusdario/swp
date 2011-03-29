@@ -88,6 +88,8 @@
     <Compile Include="Dominio\TextoFormato\ColorDocumento.cs" />
     <Compile Include="IU\Graficos\IGraficador.cs" />
     <Compile Include="IU\Graficos\Letra.cs" />
+    <Compile Include="IU\PresentacionDocumento\ListaLineas.cs" />
+    <Compile Include="IU\PresentacionDocumento\ListaPaginas.cs" />
     <Compile Include="IU\PresentacionDocumento\Posicion.cs" />
     <Compile Include="IU\PresentacionDocumento\Punto.cs" />
     <Compile Include="IU\PresentacionDocumento\TamBloque.cs" />

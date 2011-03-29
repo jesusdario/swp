@@ -7,20 +7,71 @@ using SistemaWP.Dominio.TextoFormato;
 
 namespace SistemaWP.Dominio
 {
+    public interface IObservadorDocumento
+    {
+        void ParrafoAgregado(Parrafo p);
+        void ParrafoCambiado(Parrafo p);
+        void ParrafoEliminado(Parrafo p);
+        void ParrafosCambiados(Parrafo parrafoInicio, Parrafo parrafoFin);
+    }
     public class Documento
     {
-      
         Dictionary<int, Parrafo> m_Parrafos = new Dictionary<int, Parrafo>();
+        List<IObservadorDocumento> m_Observadores = new List<IObservadorDocumento>();
+        public object ObjetoLock { get { return m_Parrafos; } }
+        public void AgregarObservador(IObservadorDocumento observador)
+        {
+            m_Observadores.Add(observador);
+        }
+        public void QuitarObservador(IObservadorDocumento observador)
+        {
+            m_Observadores.Remove(observador);
+        }
+        private void EnAdicionParrafo(Parrafo p)
+        {
+            foreach (IObservadorDocumento obs in m_Observadores)
+            {
+                obs.ParrafoAgregado(p);
+            }
+        }
+        private void EnEliminacionParrafo(Parrafo p)
+        {
+            foreach (IObservadorDocumento obs in m_Observadores)
+            {
+                obs.ParrafoEliminado(p);
+            }
+        }
+        private void EnCambioParrafo(Parrafo p)
+        {
+            foreach (IObservadorDocumento obs in m_Observadores)
+            {
+                obs.ParrafoCambiado(p);
+            }
+        }
+        private void EnParrafosCambiados(Parrafo inicio,Parrafo fin)
+        {
+            foreach (IObservadorDocumento obs in m_Observadores)
+            {
+                obs.ParrafosCambiados(inicio,fin);
+            }
+        }
         int indentificadorActual;
-        
+        private void AgregarParrafo(Parrafo p)
+        {
+            m_Parrafos.Add(p.ID, p);
+            EnAdicionParrafo(p);
+        }
+        private void EliminarParrafo(int id)
+        {
+            Parrafo elim = m_Parrafos[id];
+            m_Parrafos.Remove(id);
+            EnEliminacionParrafo(elim);
+        }
         
         public Documento()
         {
             indentificadorActual = 1;
             m_Parrafos.Add(1, new Parrafo(this,1,null,null));
-            //formatoBase.Negrilla = false;
-            //formatoBase.Cursiva = false;
-            //formatoBase.Subrayado = false;
         }
 
         public Parrafo ObtenerParrafo(int idparrafo)
@@ -38,60 +89,71 @@ namespace SistemaWP.Dominio
         public void AplicarOperacionParrafos(Parrafo parrafoInicial, Parrafo parrafoFinal,
             Action<Parrafo> accion)
         {
-            if (parrafoInicial == parrafoFinal)
+            lock (m_Parrafos)
             {
-                accion(parrafoInicial);
-            }
-            else
-            {
-                Debug.Assert(parrafoInicial.EsSiguiente(parrafoFinal));
-                Parrafo p = parrafoInicial;
-                while (p != null && p != parrafoFinal)
+                if (parrafoInicial == parrafoFinal)
                 {
-                    accion(p);
-                    p = p.Siguiente;
+                    accion(parrafoInicial);
+                    EnCambioParrafo(parrafoInicial);
                 }
-                accion(parrafoFinal);
+                else
+                {
+                    Debug.Assert(parrafoInicial.EsSiguiente(parrafoFinal));
+                    Parrafo p = parrafoInicial;
+                    while (p != null && p != parrafoFinal)
+                    {
+                        accion(p);
+                        p = p.Siguiente;
+                    }
+                    accion(parrafoFinal);
+                    EnParrafosCambiados(parrafoInicial,parrafoInicial);
+                }
             }
         }
-        public void FusionarSiguiente(Parrafo parrafo)
+        internal void FusionarSiguiente(Parrafo parrafo)
         {
-            Parrafo parrafoSiguiente = parrafo.Siguiente;
-            if (parrafoSiguiente != null)
+            lock (m_Parrafos)
             {
-                parrafo.FusionarCon(parrafoSiguiente);
-                m_Parrafos.Remove(parrafoSiguiente.ID);
+                Parrafo parrafoSiguiente = parrafo.Siguiente;
+                if (parrafoSiguiente != null)
+                {
+                    parrafo.FusionarCon(parrafoSiguiente);
+                    EliminarParrafo(parrafoSiguiente.ID);
+                }
             }
             
         }
 
         internal Parrafo InsertarParrafo(Parrafo parrafoSeleccionado, int posicionInsercion)
         {
-            if (posicionInsercion == 0)
+            lock (m_Parrafos)
             {
-                int idnuevo = CrearNuevoID(parrafoSeleccionado.ID);
-                Parrafo p = new Parrafo(this, idnuevo,
-                    parrafoSeleccionado.Anterior,
-                    parrafoSeleccionado,parrafoSeleccionado);
-                parrafoSeleccionado.InsertarAnterior(p);   
-                
-                m_Parrafos.Add(idnuevo, p);
-                return parrafoSeleccionado;
-            }
-            else if (posicionInsercion == parrafoSeleccionado.ObtenerLongitud())
-            {
-                int idnuevo = CrearNuevoID(parrafoSeleccionado.ID+1);
-                Parrafo p = new Parrafo(this, idnuevo, parrafoSeleccionado, parrafoSeleccionado.Siguiente, parrafoSeleccionado);
-                parrafoSeleccionado.InsertarSiguiente(p);
-                m_Parrafos.Add(idnuevo, p);
-                return p;
-            }
-            else
-            {
-                int idnuevo = CrearNuevoID(parrafoSeleccionado.ID + 1);
-                Parrafo parrafoNuevo = parrafoSeleccionado.DividirParrafo(idnuevo, posicionInsercion);
-                m_Parrafos.Add(idnuevo, parrafoNuevo);
-                return parrafoNuevo;
+                if (posicionInsercion == 0)
+                {
+                    int idnuevo = CrearNuevoID(parrafoSeleccionado.ID);
+                    Parrafo p = new Parrafo(this,idnuevo,
+                        parrafoSeleccionado.Anterior,
+                        parrafoSeleccionado, parrafoSeleccionado);
+                    parrafoSeleccionado.InsertarAnterior(p);
+
+                    AgregarParrafo(p);
+                    return parrafoSeleccionado;
+                }
+                else if (posicionInsercion == parrafoSeleccionado.ObtenerLongitud())
+                {
+                    int idnuevo = CrearNuevoID(parrafoSeleccionado.ID + 1);
+                    Parrafo p = new Parrafo(this, idnuevo, parrafoSeleccionado, parrafoSeleccionado.Siguiente, parrafoSeleccionado);
+                    parrafoSeleccionado.InsertarSiguiente(p);
+                    AgregarParrafo(p);
+                    return p;
+                }
+                else
+                {
+                    int idnuevo = CrearNuevoID(parrafoSeleccionado.ID + 1);
+                    Parrafo parrafoNuevo = parrafoSeleccionado.DividirParrafo(idnuevo, posicionInsercion);
+                    AgregarParrafo(parrafoNuevo);
+                    return parrafoNuevo;
+                }
             }
             
         }
@@ -103,131 +165,151 @@ namespace SistemaWP.Dominio
   
         public override string ToString()
         {
-            Parrafo p = m_Parrafos.Values.FirstOrDefault();
-            while (p != null)
+            lock (m_Parrafos)
             {
-                if (p.Anterior != null)
+                Parrafo p = m_Parrafos.Values.FirstOrDefault();
+                while (p != null)
                 {
-                    p = p.Anterior;
+                    if (p.Anterior != null)
+                    {
+                        p = p.Anterior;
+                    }
+                    else
+                        break;
                 }
-                else
-                    break;
+                StringBuilder st = new StringBuilder();
+                while (p != null)
+                {
+                    st.AppendLine(p.ToString());
+                    p = p.Siguiente;
+                }
+                return st.ToString();
             }
-            StringBuilder st = new StringBuilder();
-            while (p != null)
-            {
-                st.AppendLine(p.ToString());
-                p = p.Siguiente;
-            }
-            return st.ToString();
         }
         public Parrafo ObtenerPrimerParrafo() {
-            Parrafo p = m_Parrafos.Values.FirstOrDefault();
-            while (p != null)
+            lock (m_Parrafos)
             {
-                if (p.Anterior != null)
+                Parrafo p = m_Parrafos.Values.FirstOrDefault();
+                while (p != null)
                 {
-                    p = p.Anterior;
+                    if (p.Anterior != null)
+                    {
+                        p = p.Anterior;
+                    }
+                    else
+                        break;
                 }
-                else
-                    break;
-            }
-            return p;
-        }
-        protected void AsegurarParrafo(Parrafo parrafo)
-        {
-            if (m_Parrafos.Count == 0)
-            {
-                m_Parrafos.Add(parrafo.ID, parrafo);
+                return p;
             }
         }
+        
         public Parrafo BorrarRango(
             Parrafo parrafoSeleccionado, int posicionInicio, 
             Parrafo parrafoFinRango,int posicionFinRango)
         {
-            if (parrafoSeleccionado == parrafoFinRango)
+            lock (m_Parrafos)
             {
-                parrafoSeleccionado.BorrarRangoCaracteres(posicionInicio, posicionFinRango);
-                return parrafoSeleccionado;
-            }
-            else
-            {
-                Debug.Assert(parrafoSeleccionado.EsSiguiente(parrafoFinRango));
-                parrafoSeleccionado.BorrarHastaFin(posicionInicio);
-                Parrafo s = parrafoSeleccionado.Siguiente;                
-                while (s != null)
+                if (parrafoSeleccionado == parrafoFinRango)
                 {
-                    if (s == parrafoFinRango)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        m_Parrafos.Remove(s.ID);
-                    }
-                    s = s.Siguiente;
+                    parrafoSeleccionado.BorrarRangoCaracteres(posicionInicio, posicionFinRango);
+                    EnCambioParrafo(parrafoSeleccionado);
+                    return parrafoSeleccionado;
                 }
-                parrafoFinRango.BorrarHastaInicio(posicionFinRango);
-                parrafoSeleccionado.ConectarDespues(parrafoFinRango);
-                FusionarSiguiente(parrafoFinRango);
-                AsegurarParrafo(parrafoSeleccionado);
-                return parrafoSeleccionado;
+                else
+                {
+                    Debug.Assert(parrafoSeleccionado.EsSiguiente(parrafoFinRango));
+                    parrafoSeleccionado.BorrarHastaFin(posicionInicio);
+                    Parrafo s = parrafoSeleccionado.Siguiente;
+                    while (s != null)
+                    {
+                        if (s == parrafoFinRango)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            EliminarParrafo(s.ID);
+                        }
+                        s = s.Siguiente;
+                    }
+                    parrafoFinRango.BorrarHastaInicio(posicionFinRango);
+                    parrafoSeleccionado.ConectarDespues(parrafoFinRango);
+                    FusionarSiguiente(parrafoFinRango);
+                    EnParrafosCambiados(parrafoSeleccionado,parrafoSeleccionado.Siguiente);
+                    return parrafoSeleccionado;
+                }
             }
         }
 
         internal Parrafo ObtenerUltimoParrafo()
         {
-            Parrafo p=m_Parrafos.Values.LastOrDefault();
-            do
+            lock (m_Parrafos)
             {
-                if (p.Siguiente != null)  
-                    p = p.Siguiente;
-            } while (p.Siguiente != null);
-            return p;            
+                Parrafo p = m_Parrafos.Values.LastOrDefault();
+                do
+                {
+                    if (p.Siguiente != null)
+                        p = p.Siguiente;
+                } while (p.Siguiente != null);
+                return p;
+            }
         }
 
         internal void CambiarFormato(Formato formato, 
             Parrafo parrafoInicio, int posicionInicio, 
             Parrafo parrafoFin, int posicionFin)
         {
-            if (parrafoInicio == parrafoFin)
+            lock (m_Parrafos)
             {
-                parrafoInicio.CambiarFormato(formato, posicionInicio, posicionFin - posicionInicio);
-            }
-            else
-            {
-                Parrafo p = parrafoInicio.Siguiente;
-                while (p != parrafoFin)
+                if (parrafoInicio == parrafoFin)
                 {
-                    p.CambiarFormato(formato, 0, p.ObtenerLongitud());
-                    p = p.Siguiente;
+                    parrafoInicio.CambiarFormato(formato, posicionInicio, posicionFin - posicionInicio);
+                    EnCambioParrafo(parrafoInicio);
                 }
-                parrafoInicio.CambiarFormato(formato, posicionInicio, parrafoInicio.ObtenerLongitud() - posicionInicio);
-                parrafoFin.CambiarFormato(formato, 0, posicionFin);
+                else
+                {
+                    Parrafo p = parrafoInicio.Siguiente;
+                    while (p != parrafoFin)
+                    {
+                        p.CambiarFormato(formato, 0, p.ObtenerLongitud());
+                        p = p.Siguiente;
+                    }
+                    parrafoInicio.CambiarFormato(formato, posicionInicio, parrafoInicio.ObtenerLongitud() - posicionInicio);
+                    parrafoFin.CambiarFormato(formato, 0, posicionFin);
+                    EnEliminacionParrafo(parrafoInicio);
+                }
             }
         }
        
         internal Formato ObtenerFormatoComun(Parrafo parrafoInicio, int posicionInicio,
             Parrafo parrafoFin, int posicionFin)
         {
-            if (parrafoInicio == parrafoFin)
+            lock (m_Parrafos)
             {
-                return parrafoInicio.ObtenerFormatoComun(posicionInicio, posicionFin - posicionInicio);
-            }
-            else
-            {
-                Formato f = Formato.ObtenerPredefinido().Clonar();
-                Parrafo p = parrafoInicio;
-                int inicio = posicionInicio;
-                while (p != parrafoFin)
+                if (parrafoInicio == parrafoFin)
                 {
-                    f=f.ObtenerInterseccion(p.ObtenerFormatoComun(inicio, p.ObtenerLongitud() - inicio));
-                    p = p.Siguiente;
-                    inicio = 0;
+                    return parrafoInicio.ObtenerFormatoComun(posicionInicio, posicionFin - posicionInicio);
                 }
-                f = f.ObtenerInterseccion(parrafoFin.ObtenerFormatoComun(0, posicionFin));
-                return f;
+                else
+                {
+                    Formato f = Formato.ObtenerPredefinido().Clonar();
+                    Parrafo p = parrafoInicio;
+                    int inicio = posicionInicio;
+                    while (p != parrafoFin)
+                    {
+                        f = f.ObtenerInterseccion(p.ObtenerFormatoComun(inicio, p.ObtenerLongitud() - inicio));
+                        p = p.Siguiente;
+                        inicio = 0;
+                    }
+                    f = f.ObtenerInterseccion(parrafoFin.ObtenerFormatoComun(0, posicionFin));
+                    return f;
+                }
             }
+        }
+
+        internal void NotificarCambio(Parrafo parrafo)
+        {
+            EnCambioParrafo(parrafo);
         }
     }
 }

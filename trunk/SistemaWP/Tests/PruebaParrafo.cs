@@ -31,9 +31,9 @@ namespace SistemaWP.Tests
             p.AgregarCaracter(0, 'h');
             p.BorrarCaracter(0);
             Debug.Assert("h" == p.ToString());
-            p.BorrarCaracter(0);
+            p.BorrarCaracter( 0);
             Debug.Assert("" == p.ToString());
-            p.BorrarCaracter(0);
+            p.BorrarCaracter( 0);
         }
         public static void PruebaDividirParrafo()
         {
