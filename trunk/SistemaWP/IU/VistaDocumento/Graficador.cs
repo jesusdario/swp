@@ -29,7 +29,7 @@ namespace SistemaWP.IU.VistaDocumento
             return _datos[llave];
         }
     }
-    class Graficador : IGraficador
+    class GraficadorGDI : IGraficador
     {
         System.Drawing.Graphics g;
         Stock<Brocha, SolidBrush> _brochas;
@@ -74,7 +74,7 @@ namespace SistemaWP.IU.VistaDocumento
             intermedia = new Unidad("UnidadDispositivoXY", "dpixy", 2 / (dpix + dpiy), Unidad.Pulgadas);
             Medicion a = new Medicion(96, unidaddispositivox).ConvertirA(Unidad.Pulgadas);
         }
-        public Graficador(System.Drawing.Graphics graficos)
+        public GraficadorGDI(System.Drawing.Graphics graficos)
         {
             CambiarResolucion(graficos.DpiX, graficos.DpiY);
             graficos.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
@@ -145,7 +145,7 @@ namespace SistemaWP.IU.VistaDocumento
         }
         static StringFormat FormatoPresentacion;
         static StringFormat FormatoMedicion;
-        static Graficador()
+        static GraficadorGDI()
         {
             //Formato=StringFormat.GenericTypographic;
             //Formato = new StringFormat(StringFormat.GenericTypographic);
