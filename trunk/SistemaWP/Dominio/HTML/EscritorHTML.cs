@@ -5,7 +5,7 @@ using SWPEditor.Dominio.TextoFormato;
 
 namespace SWPEditor.Dominio.Html
 {
-    class EscritorHtml:IEscritor
+    class EscritorHtml:IEscritor 
     {
         StringBuilder _html = new StringBuilder();
         StringBuilder _estilos=new StringBuilder();
