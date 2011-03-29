@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SistemaWP.Dominio.TextoFormato
+namespace SWPEditor.Dominio.TextoFormato
 {
     public struct ColorDocumento
     {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SistemaWP.Dominio;
-using SistemaWP.Dominio.TextoFormato;
+using SWPEditor.Dominio;
+using SWPEditor.Dominio.TextoFormato;
 
-namespace SistemaWP.IU.PresentacionDocumento
+namespace SWPEditor.IU.PresentacionDocumento
 {
     public class AvanceBloques
     {

@@ -5,18 +5,18 @@ using System.Drawing;
 using System.Data;
 using System.Text;
 using System.Windows.Forms;
-using SistemaWP.IU.PresentacionDocumento;
-using SistemaWP.IU.VistaDocumento;
-using SistemaWP.Dominio;
+using SWPEditor.IU.PresentacionDocumento;
+using SWPEditor.IU.VistaDocumento;
+using SWPEditor.Dominio;
 using System.Threading;
 using System.Drawing.Printing;
-using SistemaWP.Aplicacion;
-using SistemaWP.IU.Graficos;
-using SistemaWP.IU.Graficadores;
+using SWPEditor.Aplicacion;
+using SWPEditor.IU.Graficos;
+using SWPEditor.IU.Graficadores;
 
-namespace SistemaWP.IU
+namespace SWPEditor.IU
 {
-    public partial class SWPEditor : Control
+    public partial class SWPEditorControl : Control
     {
         Escritorio escritorio;
         private ContPresentarDocumento _ControlDocumento
@@ -26,7 +26,8 @@ namespace SistemaWP.IU
                 return escritorio.ControlDocumento;
             }
         }
-        public SWPEditor():base()
+        public SWPEditorControl()
+            : base()
         {
             DoubleBuffered = true;
             Documento _documento = new Documento();
@@ -358,11 +359,11 @@ namespace SistemaWP.IU
 
         public void ChangeFontColor(System.Drawing.Color color)
         {
-            _ControlDocumento.CambiarColorLetra(new SistemaWP.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
+            _ControlDocumento.CambiarColorLetra(new SWPEditor.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
         }
         public void ChangeFontBackground(System.Drawing.Color color)
         {
-            _ControlDocumento.CambiarColorFondo(new SistemaWP.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
+            _ControlDocumento.CambiarColorFondo(new SWPEditor.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
         }
         public void ChangeFontBold()
         {

@@ -5,20 +5,20 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using SistemaWP.Dominio;
-using SistemaWP.Aplicacion;
-using SistemaWP.IU.PresentacionDocumento;
-using SistemaWP.IU.VistaDocumento;
-using SistemaWP.IU.Graficos;
+using SWPEditor.Dominio;
+using SWPEditor.Aplicacion;
+using SWPEditor.IU.PresentacionDocumento;
+using SWPEditor.IU.VistaDocumento;
+using SWPEditor.IU.Graficos;
 using System.Threading;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 
-namespace SistemaWP.IU
+namespace SWPEditor.IU
 {
-    public partial class PresentadorDocumento : Form
+    public partial class SWPEditorIU : Form
     {
-        public PresentadorDocumento()
+        public SWPEditorIU()
         {
             InitializeComponent();
             

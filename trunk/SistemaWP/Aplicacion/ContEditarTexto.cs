@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SistemaWP.Dominio;
+using SWPEditor.Dominio;
 using System.Diagnostics;
-using SistemaWP.Dominio.TextoFormato;
+using SWPEditor.Dominio.TextoFormato;
 
-namespace SistemaWP.Aplicacion
+namespace SWPEditor.Aplicacion
 {
     public enum TipoAvance
     {

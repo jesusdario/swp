@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SistemaWP.IU.Graficos;
-using SistemaWP.Dominio;
-using SistemaWP.IU.PresentacionDocumento;
-using SistemaWP.Aplicacion;
-using SistemaWP.Dominio.TextoFormato;
+using SWPEditor.IU.Graficos;
+using SWPEditor.Dominio;
+using SWPEditor.IU.PresentacionDocumento;
+using SWPEditor.Aplicacion;
+using SWPEditor.Dominio.TextoFormato;
 
-namespace SistemaWP.IU.VistaDocumento
+namespace SWPEditor.IU.VistaDocumento
 {
     public class LienzoPagina
     {

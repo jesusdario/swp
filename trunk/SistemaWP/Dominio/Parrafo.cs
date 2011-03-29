@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-using SistemaWP.Dominio.TextoFormato;
+using SWPEditor.Dominio.TextoFormato;
 
-namespace SistemaWP.Dominio
+namespace SWPEditor.Dominio
 {
     public class Parrafo
     {

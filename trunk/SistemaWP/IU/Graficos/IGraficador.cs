@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SistemaWP.Dominio;
+using SWPEditor.Dominio;
 
-namespace SistemaWP.IU.Graficos
+namespace SWPEditor.IU.Graficos
 {
     public interface IGraficador
     {
-        void DibujarLinea(SistemaWP.IU.Graficos.Lapiz lapiz, SistemaWP.IU.PresentacionDocumento.Punto inicio, SistemaWP.IU.PresentacionDocumento.Punto fin);
-        void DibujarRectangulo(SistemaWP.IU.Graficos.Lapiz lapiz, SistemaWP.IU.PresentacionDocumento.Punto inicio, SistemaWP.IU.PresentacionDocumento.TamBloque bloque);
-        void DibujarTexto(SistemaWP.IU.PresentacionDocumento.Punto posicion, SistemaWP.IU.Graficos.Letra letra, SistemaWP.IU.Graficos.Brocha brocha, string texto);
-        SistemaWP.IU.PresentacionDocumento.TamBloque MedirTexto(SistemaWP.IU.Graficos.Letra letra, string texto);
-        void RellenarRectangulo(SistemaWP.IU.Graficos.Brocha brocha, SistemaWP.IU.PresentacionDocumento.Punto inicio, SistemaWP.IU.PresentacionDocumento.TamBloque bloque);
+        void DibujarLinea(SWPEditor.IU.Graficos.Lapiz lapiz, SWPEditor.IU.PresentacionDocumento.Punto inicio, SWPEditor.IU.PresentacionDocumento.Punto fin);
+        void DibujarRectangulo(SWPEditor.IU.Graficos.Lapiz lapiz, SWPEditor.IU.PresentacionDocumento.Punto inicio, SWPEditor.IU.PresentacionDocumento.TamBloque bloque);
+        void DibujarTexto(SWPEditor.IU.PresentacionDocumento.Punto posicion, SWPEditor.IU.Graficos.Letra letra, SWPEditor.IU.Graficos.Brocha brocha, string texto);
+        SWPEditor.IU.PresentacionDocumento.TamBloque MedirTexto(SWPEditor.IU.Graficos.Letra letra, string texto);
+        void RellenarRectangulo(SWPEditor.IU.Graficos.Brocha brocha, SWPEditor.IU.PresentacionDocumento.Punto inicio, SWPEditor.IU.PresentacionDocumento.TamBloque bloque);
         Medicion MedirUnion(Letra letra, string a, string b);
-        void TrasladarOrigen(SistemaWP.IU.PresentacionDocumento.Punto Punto);
+        void TrasladarOrigen(SWPEditor.IU.PresentacionDocumento.Punto Punto);
         Medicion MedirBaseTexto(Letra letra);
         Medicion MedirAltoTexto(Letra letra);
         Medicion MedirEspacioLineas(Letra letra);

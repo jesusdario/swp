@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SistemaWP.IU.PresentacionDocumento;
-using SistemaWP.IU.Graficos;
+using SWPEditor.IU.PresentacionDocumento;
+using SWPEditor.IU.Graficos;
 using System.Drawing;
-using SistemaWP.Dominio;
+using SWPEditor.Dominio;
 using System.Diagnostics;
-using SistemaWP.Dominio.TextoFormato;
+using SWPEditor.Dominio.TextoFormato;
 
-namespace SistemaWP.IU.Graficadores
+namespace SWPEditor.IU.Graficadores
 {
+    
     class Stock<K,T>
     {
         Dictionary<K, T> _datos = new Dictionary<K, T>();
-        Func<K, T> _constructor;
-        public Stock(Func<K,T> constructor) {
+        Constructor _constructor;
+        public delegate T Constructor(K objeto);
+        public Stock(Constructor constructor)
+        {
             _constructor = constructor;
         }
         public T Obtener(K llave)
@@ -190,7 +193,7 @@ namespace SistemaWP.IU.Graficadores
             }
             return Medicion.Cero;
         }
-        public void TrasladarOrigen(SistemaWP.IU.PresentacionDocumento.Punto Punto)
+        public void TrasladarOrigen(SWPEditor.IU.PresentacionDocumento.Punto Punto)
         {
             PointF p=Traducir(Punto);
             g.TranslateTransform(p.X, p.Y);

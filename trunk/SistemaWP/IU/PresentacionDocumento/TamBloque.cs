@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SistemaWP.Dominio;
+using SWPEditor.Dominio;
 
-namespace SistemaWP.IU.PresentacionDocumento
+namespace SWPEditor.IU.PresentacionDocumento
 {
     public struct TamBloque
     {

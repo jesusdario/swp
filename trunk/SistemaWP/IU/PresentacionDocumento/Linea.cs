@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SistemaWP.Dominio;
+using SWPEditor.Dominio;
 using System.Drawing;
-using SistemaWP.Aplicacion;
+using SWPEditor.Aplicacion;
 using System.Windows.Forms;
-using SistemaWP.IU.Graficos;
-using SistemaWP.Dominio.TextoFormato;
+using SWPEditor.IU.Graficos;
+using SWPEditor.Dominio.TextoFormato;
 using System.Diagnostics;
-using System.Linq;
-using SistemaWP.Dominio.TextoFormato;
+using SWPEditor.Dominio.TextoFormato;
 
-namespace SistemaWP.IU.PresentacionDocumento
+namespace SWPEditor.IU.PresentacionDocumento
 {
     public  class Linea
     {
@@ -175,7 +174,7 @@ namespace SistemaWP.IU.PresentacionDocumento
         }
         public Punto Dibujar(IGraficador g, Punto posicionInicial, Seleccion seleccion, AvanceBloques avance,Medicion anchoLinea,bool incluirEspacioAnterior,bool incluirEspacioPosterior)
         {
-            Bloque[] lista=avance.ObtenerBloquesDe(this).ToArray();
+            List<Bloque> lista = new List<Bloque>(avance.ObtenerBloquesDe(this));
             bool esultimalinea=EsUltimaLineaParrafo;
             Medicion espacioanterior = EsPrimeraLineaParrafo?(incluirEspacioAnterior ? (Parrafo.Formato.ObtenerEspacioAnterior()) : Medicion.Cero):Medicion.Cero;
             Medicion espacioposterior= EsUltimaLineaParrafo?(incluirEspacioPosterior?(Parrafo.Formato.ObtenerEspacioPosterior()):Medicion.Cero):Medicion.Cero;
