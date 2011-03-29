@@ -38,6 +38,80 @@ namespace SWPEditor.Dominio.TextoFormato
             }
             return _bloques[indice];
         }
+        public IEnumerable<Bloque> ObtenerRangoBloques(int inicio, int cantidad)
+        {
+            if (_bloques == null && inicio == 0&&cantidad==st.Length)
+            {
+                if (st.Length == 0)
+                {
+                    yield return _BloqueVacio;
+                }
+                else
+                {
+                    yield return new Bloque(st.Length, null);
+                }
+            }
+            else
+            {
+                if (_bloques.Count == 1)
+                {
+                    yield return _bloques[0];
+                    yield break;
+                }
+                int inicioBloque = 0;
+                int finSeleccion=inicio+cantidad;
+                int finBloque = 0;
+                for (int i = 0; i < _bloques.Count; i++)
+                {
+                    Bloque actual=_bloques[i];
+                    finBloque = inicioBloque + actual.Cantidad ;
+                    if (inicio == inicioBloque&&finSeleccion == finBloque)
+                    {
+                        yield return actual;
+                    }
+                    else
+                    {
+                        bool inicioAnteriorBloque=inicio < inicioBloque;
+                        bool finPosteriorBloque=finSeleccion > finBloque;
+                        bool inicioEnBloque = inicio >= inicioBloque && inicio < finBloque;
+                        bool finEnBloque = finSeleccion >= inicioBloque && finSeleccion <= finBloque;
+                        if (inicioAnteriorBloque&&finPosteriorBloque)
+                        {
+                            yield return actual;
+                        }                           
+                        else
+                        {
+                            if (inicioEnBloque)
+                            {
+                                if (finEnBloque)
+                                {
+                                    Bloque b = actual.Clonar();
+                                    b.CambiarCantidad(finSeleccion - inicio);
+                                    yield return b;
+                                }
+                                else
+                                {
+                                    Bloque b = actual.Clonar();
+                                    b.CambiarCantidad(finBloque - inicio);
+                                    yield return b;
+                                }
+                            }
+                            else
+                            {
+                                if (finEnBloque)
+                                {
+                                    Bloque b = actual.Clonar();
+                                    b.CambiarCantidad(finSeleccion - inicioBloque);
+                                    yield return b;
+                                    yield break;
+                                }
+                            }
+                        }
+                    }
+                    inicioBloque += actual.Cantidad;
+                }
+            }
+        }
         internal string ToString(int inicio, int cantidad)
         {
             Debug.Assert(inicio >= 0 && inicio + cantidad >= 0 && inicio+cantidad <= Length&&cantidad>=0);

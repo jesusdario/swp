@@ -61,7 +61,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aplicacion\ContEditarTexto.cs" />
-    <Compile Include="Dominio\Html\EscritorHtml.cs" />
     <Compile Include="Dominio\IEscritor.cs" />
     <Compile Include="Dominio\Medicion.cs">
       <SubType>Code</SubType>
@@ -74,6 +73,7 @@
     <Compile Include="Dominio\TextoFormato\Formato.cs" />
     <Compile Include="Dominio\TextoFormato\FormatoParrafo.cs" />
     <Compile Include="Dominio\TextoFormato\Texto.cs" />
+    <Compile Include="Dominio\TextoHTML\EscritorHTML.cs" />
     <Compile Include="Dominio\Texto\EscritorTexto.cs" />
     <Compile Include="Dominio\Unidad.cs">
       <SubType>Code</SubType>

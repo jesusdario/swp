@@ -180,6 +180,12 @@ namespace SWPEditor.Dominio
         {
             lock (m_Parrafos)
             {
+                if (inicio == null)
+                {
+                    inicio = ObtenerPrimerParrafo();
+                    posicionInicio = 0;
+                }
+
                 IEscritor esc = escritor;
                 esc.IniciarDocumento();
                 if (inicio == fin)

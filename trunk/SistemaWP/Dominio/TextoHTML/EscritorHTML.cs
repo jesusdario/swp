@@ -10,6 +10,7 @@ namespace SWPEditor.Dominio.Html
         StringBuilder _html = new StringBuilder();
         StringBuilder _estilos=new StringBuilder();
         Dictionary<Formato, int> cadestilos=new Dictionary<Formato,int>();
+        Dictionary<Formato, string> estiloslin = new Dictionary<Formato, string>();
         int estiloactual;
         public EscritorHTML()
         {
@@ -26,13 +27,13 @@ namespace SWPEditor.Dominio.Html
             _html.AppendLine("</head>");
             Formato f = Formato.ObtenerPredefinido();
             string familiadefecto = f.ObtenerFamiliaLetra();
-            _html.AppendLine("<body style='"+ObtenerEstilo(f)+"'>");
+            _html.AppendLine("<body class='e"+AgregarEstilo(f)+"'>");
         }
         public void TerminarDocumento()
         {
             _html.AppendLine("</body>");
             _html.AppendLine("</html>");
-            _html.Insert(posinsestilos, cadestilos);
+            _html.Insert(posinsestilos, "<style type='text/css'>"+_estilos+"</style>");
         }
         public void IniciarParrafo()
         {
@@ -41,9 +42,13 @@ namespace SWPEditor.Dominio.Html
         private int AgregarEstilo(Formato formato)
         {
             _estilos.Append(".e" + estiloactual + " {");   
-            _estilos.Append(ObtenerEstilo(formato));
+            string estilo=ObtenerEstilo(formato).ToString();
+            _estilos.Append(estilo);
             _estilos.AppendLine("}");
-            return estiloactual++;
+            int numestilo = estiloactual++;
+            estiloslin.Add(formato, estilo);
+            cadestilos.Add(formato, numestilo);
+            return numestilo;
         }
         private StringBuilder ObtenerEstilo(Formato formato)
         {
@@ -56,7 +61,7 @@ namespace SWPEditor.Dominio.Html
             {
                 st2.Append("font-style:italic;");
             }
-            if (formato.ObtenerFamiliaLetra() != null)
+            if (formato.FamiliaLetra != null)
             {
                 st2.Append("font-family:" + formato.ObtenerFamiliaLetra() + ";");
             }
@@ -64,7 +69,32 @@ namespace SWPEditor.Dominio.Html
             {
                 st2.Append("text-decoration:underline;");
             }
+            if (formato.TamLetra != null)
+            {
+                st2.Append("font-size:");
+                st2.Append(formato.TamLetra.Value.ConvertirA(Unidad.Puntos).Valor.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                st2.Append("pt;");
+            }
+            if (formato.ColorLetra.HasValue)
+            {
+                st2.Append("color:");
+                st2.Append(ObtenerColorHTML(formato.ColorLetra.Value));
+                st2.Append(";");
+            }
+            if (formato.ColorFondo.HasValue)
+            {
+                st2.Append("background-color:");
+                st2.Append(ObtenerColorHTML(formato.ColorFondo.Value));
+                st2.Append(";");
+            }
             return st2;
+        }
+        private string ObtenerColorHTML(ColorDocumento color)
+        {
+            return "#" + 
+                color.R.ToString("x").PadLeft(2, '0') + 
+                color.G.ToString("x").PadLeft(2, '0') + 
+                color.B.ToString("x").PadLeft(2, '0');
         }
         public void EscribirTexto(string texto, SWPEditor.Dominio.TextoFormato.Formato formato)
         {
@@ -72,16 +102,26 @@ namespace SWPEditor.Dominio.Html
             if (!formato.Equals(Formato.ObtenerPredefinido()))
             {
                 _html.Append("<span ");
-                int numestilo = 0;
-                if (cadestilos.ContainsKey(formato))
-                {
-                    numestilo = cadestilos[formato];
-                }
+                _html.Append(" style=\"");
+                if (estiloslin.ContainsKey(formato))
+                    _html.Append(estiloslin[formato]);
                 else
                 {
-                    numestilo = AgregarEstilo(formato);
+                    AgregarEstilo(formato);
+                    _html.Append(estiloslin[formato]);
                 }
-                _html.Append(" class='e" + numestilo + "'");
+                _html.Append("\"");
+                //int numestilo = 0;
+                //if (cadestilos.ContainsKey(formato))
+                //{
+                //    numestilo = cadestilos[formato];
+                //}
+                //else
+                //{
+                //    numestilo = AgregarEstilo(formato);
+                    
+                //}
+                //_html.Append(" class=\"e" + numestilo + "\"");
                 _html.Append(">");
             }
             else

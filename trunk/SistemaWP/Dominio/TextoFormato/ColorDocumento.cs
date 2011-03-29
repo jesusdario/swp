@@ -37,7 +37,7 @@ namespace SWPEditor.Dominio.TextoFormato
             G = g;
             B = b;
         }
-        public static readonly ColorDocumento Transparente = new ColorDocumento(0,0, 0, 0);
+        public static readonly ColorDocumento Transparente = new ColorDocumento(0,255, 255, 255);
         public static readonly ColorDocumento Negro = new ColorDocumento(0, 0, 0);
         public static readonly ColorDocumento Rojo = new ColorDocumento(255, 0, 0);
         public static readonly ColorDocumento Amarillo = new ColorDocumento(255, 255, 0);

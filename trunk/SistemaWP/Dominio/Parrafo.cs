@@ -286,32 +286,14 @@ namespace SWPEditor.Dominio
         public void Escribir(SWPEditor.Dominio.IEscritor esc,int inicio,int cantidad)
         {
             esc.IniciarParrafo();
-            int contador = 0;
-            int suma = 0;
-            int limite = inicio + cantidad;
-            foreach (Bloque b in ObtenerBloques())
+            int inicioBloque = 0;
+            int finSeleccion = inicio + cantidad;
+            IEnumerable<Bloque> bloques=bufferTexto.ObtenerRangoBloques(inicio,cantidad);
+            inicioBloque = inicio;
+            foreach (Bloque b in bloques)
             {
-                suma = suma + cantidad;
-                if (inicio<suma)
-                {
-                    if (limite < suma)
-                    {
-                        esc.EscribirTexto(ObtenerSubCadena(inicio, cantidad),b.Formato);
-                        break;
-                    } else {
-                        esc.EscribirTexto(ObtenerSubCadena(inicio-contador,suma-inicio),b.Formato);
-                    }
-                }
-                else
-                {
-                    if (limite < suma)
-                    {
-                        esc.EscribirTexto(ObtenerSubCadena(contador, suma - limite), b.Formato);
-                        break;
-                    }
-                }
-                
-                contador += b.Cantidad;
+                esc.EscribirTexto(ObtenerSubCadena(inicioBloque, b.Cantidad), b.Formato);
+                inicioBloque += b.Cantidad;
             }
             esc.TerminarParrafo();
         }
