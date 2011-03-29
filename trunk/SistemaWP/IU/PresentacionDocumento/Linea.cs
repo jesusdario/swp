@@ -338,10 +338,15 @@ namespace SistemaWP.IU.PresentacionDocumento
             {
                 Estilo estparrafo=new Estilo(new Bloque(0,null));
                 Medicion alto = estparrafo.Medir(string.Empty).Alto;//e.Medir(string.Empty).Alto;
+                if (parrafo.Formato.ObtenerEspaciadoInterlineal() != 1)
+                {
+                    alto = alto * (float)parrafo.Formato.ObtenerEspaciadoInterlineal();
+                }
                 if (incluirAltoParrafo)
                 {
                     alto += parrafo.Formato.ObtenerEspacioAnterior();
                 }
+                
                 if (incluirBaseParrafo)
                 {
                     alto += parrafo.Formato.ObtenerEspacioPosterior();

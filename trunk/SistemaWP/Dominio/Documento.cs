@@ -71,7 +71,7 @@ namespace SistemaWP.Dominio
         public Documento()
         {
             indentificadorActual = 1;
-            m_Parrafos.Add(1, new Parrafo(this,1,null,null));
+            AgregarParrafo(new Parrafo(this,1,null,null));
         }
 
         public Parrafo ObtenerParrafo(int idparrafo)

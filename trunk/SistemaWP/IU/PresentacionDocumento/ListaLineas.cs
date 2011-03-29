@@ -70,11 +70,7 @@ namespace SistemaWP.IU.PresentacionDocumento
             return _lineas[indice];
         }
        
-        public IEnumerable<Linea> ObtenerLineas(int inicio, int cantidad)
-        {
-            foreach (Linea l in _lineas)
-                yield return l;
-        }
+       
         public int BuscarInicialDeParrafo(int lineainicio, Parrafo p)
         {
             if (_lineas[lineainicio].Parrafo.EsSiguiente(p))
@@ -134,7 +130,15 @@ namespace SistemaWP.IU.PresentacionDocumento
 
         internal bool EsUltimaLinea(int indiceLinea)
         {
-            return indiceLinea== _lineas.Count - 1;
+            if (completo)
+                return indiceLinea == _lineas.Count - 1;
+            else
+            {
+                AsegurarHasta(indiceLinea);
+                if (completo && indiceLinea == _lineas.Count - 1)
+                    return true;
+                return false;
+            }
         }
                 
     }

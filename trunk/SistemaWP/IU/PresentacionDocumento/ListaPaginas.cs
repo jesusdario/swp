@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SistemaWP.Dominio;
+using System.Diagnostics;
 
 namespace SistemaWP.IU.PresentacionDocumento
 {
@@ -71,11 +72,12 @@ namespace SistemaWP.IU.PresentacionDocumento
                         Medicion altoPagina = actual.ObtenerAltoLineas();
                         int indice = actual.LineaInicio + actual.Cantidad;
                         IEnumerable<Linea> lista = _Lineas.ObtenerDesde(indice);
+                        bool existente = true;
                         foreach (Linea l in lista)
                         {
-                            if (indiceSolicitado < _Paginas.Count - 1)
+                            if (indiceSolicitado>_Paginas.Count-1)
                             {
-                                return;
+                                break;
                             }
                             Medicion anterior = inicio;
                             inicio = inicio + l.AltoLinea;
@@ -83,13 +85,20 @@ namespace SistemaWP.IU.PresentacionDocumento
                             {
                                 Pagina nueva = new Pagina();
                                 nueva.LineaInicio = actual.LineaInicio + actual.Cantidad;
-                                _Paginas.Add(nueva);
+                                if (!existente)
+                                    _Paginas.Add(nueva);
+                                existente = false;
                                 actual.Completa = true;
                                 actual = nueva;
-                                inicio = Medicion.Cero;
+                                nueva.AltoActual = Medicion.Cero;
+                                inicio = l.AltoLinea;
                             }
                             actual.AltoActual += l.AltoLinea;
                             actual.Cantidad++;
+                        }
+                        if (!existente)
+                        {
+                            _Paginas.Add(actual);
                         }
                         actual.Completa = true;
                         _listaCompleta = true;
@@ -159,6 +168,7 @@ namespace SistemaWP.IU.PresentacionDocumento
 
                 //Hacer búsqueda lineal, puesto que aún no se ha calculado
                 IEnumerable<Pagina> pags = ObtenerDesde(_Paginas.Count - 1);
+                bool salirbucle=false;
                 foreach (Pagina p in pags)
                 {
                     int lim = p.LineaInicio + p.Cantidad;
@@ -168,6 +178,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                         if (l.Parrafo == parrafoBuscado)
                         {
                             lineabusqueda = p.LineaInicio;
+                            salirbucle = true;
                             break;
                         }
                         else if (l.Parrafo.EsSiguiente(parrafoBuscado))
@@ -177,20 +188,26 @@ namespace SistemaWP.IU.PresentacionDocumento
                         else
                         {
                             lineabusqueda = p.LineaInicio;
+                            salirbucle = true;
                             break;
                         }
                     }
+                    if (salirbucle) break;
                     indice++;
                 }
                 if (lineabusqueda == -1) throw new Exception("Párrafo no encontrado");
                 int linea = BuscarLineaInicioParrafo(lineabusqueda, parrafoBuscado);
                 Posicion pos = new Posicion(_docimpreso);
-                _docimpreso.Completar(pos, indice - 1, linea, 0);
+                
+                _docimpreso.Completar(pos, indice, linea, 0);
+                Debug.Assert(pos.Linea != null);
                 return pos;
             }
             else
             {
-                return BuscarParrafo(parrafoBuscado, 0, _Paginas.Count - 1);
+                Posicion pos= BuscarParrafo(parrafoBuscado, 0, _Paginas.Count - 1);
+                Debug.Assert(pos.Linea != null);
+                return pos;
             }
         }
         Posicion BuscarParrafo(Parrafo parrafoBuscado, int paginainicio, int paginafin)
@@ -258,10 +275,16 @@ namespace SistemaWP.IU.PresentacionDocumento
         {
             Parrafo busq = p;
             Posicion pos = BuscarParrafo(busq);
-            _Paginas.RemoveRange(pos.IndicePagina+1, _Paginas.Count - pos.IndicePagina-1);
+            _Paginas.RemoveRange(pos.IndicePagina+1, _Paginas.Count - pos.IndicePagina-1);            
             Pagina act = _Paginas[_Paginas.Count - 1];
             act.Cantidad = pos.IndiceLinea-act.LineaInicio-1;
+            act.AltoActual=Medicion.Cero;
             if (act.Cantidad < 0) act.Cantidad = 0;
+            int lim = act.LineaInicio + act.Cantidad;
+            for (int i = act.LineaInicio; i < lim; i++)
+            {
+                act.AltoActual += _Lineas.Obtener(i).AltoLinea;
+            }
             act.Completa = false;
             _listaCompleta = false;
             _Lineas.Recalcular(pos.IndiceLinea, p);
@@ -278,7 +301,7 @@ namespace SistemaWP.IU.PresentacionDocumento
 
         public void ParrafoEliminado(Parrafo p)
         {
-            Recalcular(p.Anterior ?? p.Siguiente);
+            //Recalcular(p.Anterior ?? p.Siguiente);
         }
 
         
