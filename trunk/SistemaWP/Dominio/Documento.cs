@@ -174,7 +174,7 @@ namespace SWPEditor.Dominio
         }
         public string ObtenerHTML()
         {
-            return ObtenerTexto(new Html.EscritorHtml(), ObtenerPrimerParrafo(), 0, null, 0);
+            return ObtenerTexto(new Html.EscritorHTML(), ObtenerPrimerParrafo(), 0, null, 0);
         }
         public string ObtenerTexto(IEscritor escritor, Parrafo inicio,int posicionInicio, Parrafo fin,int posicionFin)
         {
