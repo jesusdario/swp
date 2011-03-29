@@ -76,9 +76,27 @@ namespace SWPEditor.IU.PresentacionDocumento
                 if (sel == null)
                     cad = string.Empty;
                 else
-                    cad = sel.ObtenerTexto();
-                Clipboard.SetText(cad, TextDataFormat.Html);
-                Clipboard.SetText(cad, TextDataFormat.UnicodeText);
+                    cad = sel.ObtenerHtml();
+                string cadini="<body class='e0'>";
+                string cadini2 = "<!--StartFragment-->";
+                string cadfin="</body>";
+                string cadfin2 = "<!--EndFragment--></body>";
+                string cnueva=cad.Replace(cadini, cadini2).Replace(cadfin,cadfin2);
+                string cadbase = @"Version:1.0
+    StartHTML:-1
+    EndHTML:-1
+    StartFragment:AAAAAAAAAA
+    EndFragment:BBBBBBBBBB
+<!DOCUMENT>";
+                int indice1 = cnueva.IndexOf(cadini2)+cadbase.Length;
+                int indice2 = cnueva.IndexOf(cadfin2) + cadfin2.Length + cadbase.Length;
+                cadbase=cadbase
+                    .Replace("AAAAAAAAAA",indice1.ToString().PadLeft(10,'0'))
+                    .Replace("BBBBBBBBBB",indice2.ToString().PadLeft(10,'0'));
+                cnueva=cadbase+cnueva;
+                
+                Clipboard.SetText(cnueva, TextDataFormat.Html);
+                //Clipboard.SetText(cad, TextDataFormat.UnicodeText);
             }
         }
         
