@@ -32,6 +32,7 @@ namespace SWPEditor.Dominio.Html
         {
             _html.AppendLine("</body>");
             _html.AppendLine("</html>");
+            _html.Insert(posinsestilos, cadestilos);
         }
         public void IniciarParrafo()
         {
