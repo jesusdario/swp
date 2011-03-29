@@ -387,13 +387,11 @@ namespace SWPEditor.Aplicacion
         {
             if (ExisteSeleccion)
             {
-                return new Seleccion()
-                {
-                    PosicionParrafoInicio = posicionInicioRango.Value,
-                    PosicionParrafoFin = posicionFinRango.Value,
-                    Inicio = parrafoInicioRango,
-                    Fin = parrafoFinRango
-                };
+                return new Seleccion(_documentoEdicion,
+                    parrafoInicioRango, 
+                    posicionInicioRango.Value,
+                    parrafoFinRango,
+                    posicionFinRango.Value);
             }
             else
             {

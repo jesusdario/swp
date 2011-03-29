@@ -2,16 +2,26 @@
 using System.Collections.Generic;
 using System.Text;
 using SWPEditor.Dominio;
+using SWPEditor.Dominio.Html;
+using SWPEditor.Dominio.Texto;
 
 namespace SWPEditor.Aplicacion
 {
     public class Seleccion
     {
-        public Parrafo Inicio { get; set; }
-        public int PosicionParrafoInicio { get; set; }
-        public Parrafo Fin { get; set; }
-        public int PosicionParrafoFin { get; set; }
-
+        public Documento Documento { get; private set; }
+        public Parrafo Inicio { get; private set; }
+        public int PosicionParrafoInicio { get; private set; }
+        public Parrafo Fin { get; private set; }
+        public int PosicionParrafoFin { get; private set; }
+        public Seleccion(Documento documento, Parrafo inicio, int posicionInicio, Parrafo fin, int posicionFin)
+        {
+            Documento = documento;
+            Inicio = inicio;
+            Fin = fin;
+            PosicionParrafoInicio = posicionInicio;
+            PosicionParrafoFin = posicionFin;
+        }
         public Parrafo ObtenerParrafoInicial()
         {
             if (Inicio.EsSiguiente(Fin))
@@ -48,32 +58,17 @@ namespace SWPEditor.Aplicacion
             else
                 return PosicionParrafoInicio;
         }
+        public string ObtenerHtml()
+        {
+            return ObtenerTexto(new EscritorHtml());
+        }
         public string ObtenerTexto()
         {
-            Parrafo a = ObtenerParrafoInicial();
-            int inicio = ObtenerPosicionInicial();
-            Parrafo b = ObtenerParrafoFinal();
-            int fin = ObtenerPosicionFinal();
-            if (a == b)
-            {
-                return a.ObtenerSubCadena(inicio, fin - inicio);
-            }
-            else
-            {
-                StringBuilder st = new StringBuilder();
-                st.Append(a.ObtenerSubCadena(inicio,a.ObtenerLongitud()-inicio));
-                Parrafo act = a.Siguiente;
-                while (act != b)
-                {
-                    st.Append("\r\n");
-                    st.Append(act.ToString());
-                    act = act.Siguiente;
-                }
-                st.Append("\r\n");
-                st.Append(b.ObtenerSubCadena(0,fin));
-                return st.ToString();
-            }
-
+            return ObtenerTexto(new EscritorTexto());
+        }
+        public string ObtenerTexto(IEscritor escritor)
+        {
+            return Documento.ObtenerTexto(escritor, ObtenerParrafoInicial(), ObtenerPosicionInicial(), ObtenerParrafoFinal(), ObtenerPosicionFinal());
         }
     }
 }
