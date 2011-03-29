@@ -60,7 +60,7 @@ namespace SWPEditor.Aplicacion
         }
         public string ObtenerHtml()
         {
-            return ObtenerTexto(new EscritorHtml());
+            return ObtenerTexto(new EscritorHTML());
         }
         public string ObtenerTexto()
         {
