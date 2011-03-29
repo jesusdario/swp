@@ -28,10 +28,13 @@ namespace SistemaWP.IU.PresentacionDocumento
         }
         internal void Recalcular(int indiceLinea,Parrafo actual)
         {
-            parrafoActual = actual;
-            numcaracterActual = 0;
-            completo = false;
-            _lineas.RemoveRange(indiceLinea, _lineas.Count - indiceLinea);
+            if (indiceLinea < _lineas.Count)
+            {
+                parrafoActual = actual;
+                numcaracterActual = 0;
+                completo = false;
+                _lineas.RemoveRange(indiceLinea, _lineas.Count - indiceLinea);
+            }
         }
         public IEnumerable<Linea> ObtenerDesde(int indice)
         {
