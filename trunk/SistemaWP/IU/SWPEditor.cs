@@ -12,6 +12,7 @@ using System.Threading;
 using System.Drawing.Printing;
 using SistemaWP.Aplicacion;
 using SistemaWP.IU.Graficos;
+using SistemaWP.IU.Graficadores;
 
 namespace SistemaWP.IU
 {
@@ -29,7 +30,7 @@ namespace SistemaWP.IU
         {
             DoubleBuffered = true;
             Documento _documento = new Documento();
-            escritorio = new Escritorio(_documento);
+            escritorio = new Escritorio(_documento,GraficadorGDI.ObtenerGraficadorConsultas());
             escritorio.ActualizarPresentacion += new EventHandler(contpresentacion_ActualizarPresentacion);
             escritorio.Dimensiones=new TamBloque(new Medicion(50, Unidad.Milimetros), new Medicion(50, Unidad.Milimetros));
             this.SetStyle(ControlStyles.Selectable, true);
@@ -308,7 +309,7 @@ namespace SistemaWP.IU
                 float posx = x - deltax;
                 float posy = y - deltay;
                 GraficadorGDI graf = new GraficadorGDI(g);
-                escritorio.RegistrarPosicion(graf.Traducir(new PointF(posx, posy)), ampliarSeleccion);
+                escritorio.IrAPosicion(graf.Traducir(new PointF(posx, posy)), ampliarSeleccion);
             }
         }
         protected void RegistrarPosicion(float x,float y,bool ampliarSeleccion) {

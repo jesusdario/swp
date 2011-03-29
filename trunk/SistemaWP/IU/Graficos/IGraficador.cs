@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using SistemaWP.Dominio;
 
@@ -16,5 +15,7 @@ namespace SistemaWP.IU.Graficos
         Medicion MedirUnion(Letra letra, string a, string b);
         void TrasladarOrigen(SistemaWP.IU.PresentacionDocumento.Punto Punto);
         Medicion MedirBaseTexto(Letra letra);
+        Medicion MedirAltoTexto(Letra letra);
+        Medicion MedirEspacioLineas(Letra letra);
     }
 }

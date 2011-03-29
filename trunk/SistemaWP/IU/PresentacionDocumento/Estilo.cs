@@ -30,11 +30,7 @@ namespace SistemaWP.IU.PresentacionDocumento
                 Subrayado = f.ObtenerSubrayado(),
                 Cursiva = f.ObtenerCursiva()
             };
-        }
-        //public void DibujarSinFondo(IGraficador graficos, Punto posicionbase, string texto)
-        //{
-        //    graficos.DibujarTexto(posicionbase, Letra, ColorLetra, texto);
-        //}
+        }       
         public void Dibujar(IGraficador graficos, Punto posicionbase, string texto)
         {
             //TamBloque b=Medir(texto);
@@ -45,7 +41,7 @@ namespace SistemaWP.IU.PresentacionDocumento
         {
             if (!string.IsNullOrEmpty(anteriortexto))
             {
-                posicionbase.X += grafpantalla.MedirUnion(Letra, anteriortexto, texto);
+                posicionbase.X += GraficadorConsultas.MedirUnion(Letra, anteriortexto, texto);
             }
             TamBloque b = Medir(texto);
             graficos.RellenarRectangulo(ColorFondo, posicionbase, b);
@@ -55,37 +51,46 @@ namespace SistemaWP.IU.PresentacionDocumento
         {
             if (!string.IsNullOrEmpty(anteriortexto))
             {
-                posicionbase.X += grafpantalla.MedirUnion(Letra, anteriortexto, texto);
+                posicionbase.X += GraficadorConsultas.MedirUnion(Letra, anteriortexto, texto);
             }
             TamBloque b = Medir(texto);
             //graficos.RellenarRectangulo(ColorFondo, posicionbase, b);
             graficos.DibujarTexto(posicionbase, Letra, ColorLetra, texto);
             return new Punto(posicionbase.X+b.Ancho,posicionbase.Y);
         }
-        
-        static GraficadorGDI grafpantalla;
+        [ThreadStatic]
+        static IGraficador _GraficadorConsultas;
+        public static IGraficador GraficadorConsultas
+        {
+            get
+            {
+                return _GraficadorConsultas;
+            }
+            set
+            {
+                _GraficadorConsultas = value;
+            }
+        }
         static Estilo()
         {
-            Bitmap bmp = new Bitmap(1, 1, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
-            bmp.SetResolution(10000, 10000);
-            grafpantalla=new GraficadorGDI(Graphics.FromImage(bmp));
+            
         }
         public TamBloque Medir(string texto)
         {
-            return grafpantalla.MedirTexto(Letra, texto);
+            return _GraficadorConsultas.MedirTexto(Letra, texto);
             
         }
         public Medicion MedirBase()
         {
-            return grafpantalla.MedirBaseTexto(Letra);
+            return _GraficadorConsultas.MedirBaseTexto(Letra);
         }
         public Medicion MedirAlto()
         {
-            return grafpantalla.MedirAltoTexto(Letra);
+            return _GraficadorConsultas.MedirAltoTexto(Letra);
         }
         public Medicion MedirEspacioLineas()
         {
-            return grafpantalla.MedirEspacioLineas(Letra);
+            return _GraficadorConsultas.MedirEspacioLineas(Letra);
         }
         internal Estilo Clonar()
         {

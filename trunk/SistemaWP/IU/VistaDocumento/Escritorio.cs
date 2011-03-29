@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using SistemaWP.IU.Graficos;
 using SistemaWP.Dominio;
@@ -13,12 +12,38 @@ namespace SistemaWP.IU.VistaDocumento
     {
         public List<LienzoPagina> _Lienzos = new List<LienzoPagina>();
         public TamBloque Dimensiones { get; set; }
-        public DocumentoImpreso Documento { get { return ControlDocumento.Documento; } }
+        private DocumentoImpreso _Documento
+        {
+            get
+            {
+                return _ControlDocumento.Documento;
+            }
+        }
+        public DocumentoImpreso Documento { 
+            get {
+                AsegurarGraficador();
+                return _ControlDocumento.Documento; 
+            } 
+        }
         private Punto EsquinaSuperior { get; set; }
         private int PaginaSuperior { get; set; }
         private int LineaAnterior { get; set; }
         private Medicion EspacioEntrePaginas { get; set; }
-        public ContPresentarDocumento ControlDocumento { get; private set; }
+        private ContPresentarDocumento _ControlDocumento;
+        public ContPresentarDocumento ControlDocumento { 
+            get {
+                AsegurarGraficador();
+                return _ControlDocumento; 
+            } 
+            private set { 
+                _ControlDocumento = value; 
+            } 
+        }
+        private void AsegurarGraficador()
+        {
+            if (Estilo.GraficadorConsultas != _graficadorConsultas)
+                Estilo.GraficadorConsultas = _graficadorConsultas;
+        }
         public event EventHandler ActualizarPresentacion
         {
             add
@@ -29,8 +54,13 @@ namespace SistemaWP.IU.VistaDocumento
                 ControlDocumento.ActualizarPresentacion -= value;
             }
         }
-        public Escritorio(Documento _documento)
+        private IGraficador _graficadorConsultas;
+        public Escritorio(Documento _documento,IGraficador graficadorConsultas)
         {
+            if (graficadorConsultas == null)
+                throw new Exception("Debe indicarse un objeto graficador para efectuar consultas");
+            _graficadorConsultas = graficadorConsultas;
+            AsegurarGraficador();
             ContPresentarDocumento controlador = new ContPresentarDocumento(_documento);
             EspacioEntrePaginas = new Medicion(10,Unidad.Milimetros);
             ControlDocumento = controlador;
@@ -38,15 +68,16 @@ namespace SistemaWP.IU.VistaDocumento
         }
         public void Dibujar(IGraficador graficador,Seleccion seleccion)
         {
+            AsegurarGraficador();
             Posicion pos = ControlDocumento.ObtenerPosicion();
             AsegurarVisibilidad(pos);
             Medicion inicio = EsquinaSuperior.Y;
             Medicion derecha = EsquinaSuperior.X;
             int i=PaginaSuperior;
-            IEnumerable<Pagina> pags=Documento.ObtenerDesde(PaginaSuperior);
+            IEnumerable<Pagina> pags = _Documento.ObtenerDesde(PaginaSuperior);
             foreach (Pagina p in pags) {
                 LienzoPagina l = new LienzoPagina(i,new Punto(derecha,inicio));
-                l.Dibujar(graficador, Documento, pos, seleccion);
+                l.Dibujar(graficador, _Documento, pos, seleccion);
                 if (Medicion.Cero-inicio > Dimensiones.Alto+EsquinaSuperior.Y)
                 {
                     return;
@@ -87,6 +118,7 @@ namespace SistemaWP.IU.VistaDocumento
         }
         public void AsegurarVisibilidadMargen(Posicion posicion)
         {
+            AsegurarGraficador();
             TamBloque margen = posicion.ObtenerMargenEdicion();
             Punto pt = posicion.PosicionPagina;
             Punto arribaizq = pt.Agregar(Medicion.Cero - margen.Ancho, Medicion.Cero - margen.Alto);
@@ -97,6 +129,7 @@ namespace SistemaWP.IU.VistaDocumento
         
         public void AsegurarVisibilidad(Posicion posicion)
         {
+            AsegurarGraficador();
             int numpagina = posicion.IndicePagina;
             Punto pt = posicion.PosicionPagina;
             
@@ -129,12 +162,14 @@ namespace SistemaWP.IU.VistaDocumento
             LineaAnterior = posicion.IndiceLinea;
         }
 
-        internal void RegistrarPosicion(Punto punto, bool ampliarSeleccion)
+        public void IrAPosicion(Punto punto, bool ampliarSeleccion)
         {
+            AsegurarGraficador();
             Punto pt2 = punto + EsquinaSuperior;
             int pagsig = PaginaSuperior;
             int indice = PaginaSuperior;
-            foreach (Pagina pag in Documento.ObtenerDesde(PaginaSuperior))
+            IEnumerable<Pagina> pags = _Documento.ObtenerDesde(PaginaSuperior);
+            foreach (Pagina pag in pags)
             {
                 if (pt2.Y > pag.Dimensiones.Alto + EspacioEntrePaginas)
                 {
@@ -145,11 +180,6 @@ namespace SistemaWP.IU.VistaDocumento
                 indice++;
             }
             ControlDocumento.RegistrarPosicion(indice, pt2, ampliarSeleccion);
-        }
-
-        internal void CambiarDimensiones(TamBloque tamBloque)
-        {
-            throw new NotImplementedException();
-        }
+        }       
     }
 }

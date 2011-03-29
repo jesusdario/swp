@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Diagnostics;
 
@@ -61,7 +60,7 @@ namespace SistemaWP.Dominio.TextoFormato
                 _bloques[_bloques.Count - 1].IncrementarCantidad(delta);
 #if DEBUG
 
-                Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
+                //Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
 #endif
 
             }
@@ -89,7 +88,7 @@ namespace SistemaWP.Dominio.TextoFormato
                 _bloques[_bloques.Count-1].IncrementarCantidad(delta);
 #if DEBUG
 
-                Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
+                //Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
 #endif
 
             }
@@ -102,7 +101,7 @@ namespace SistemaWP.Dominio.TextoFormato
 #if DEBUG
             if (_bloques != null)
             {
-                Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
+                //Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
             }
 #endif
 
@@ -114,7 +113,7 @@ namespace SistemaWP.Dominio.TextoFormato
 #if DEBUG
             if (_bloques != null)
             {
-                Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
+                //Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
             }
 #endif
 
@@ -127,7 +126,7 @@ namespace SistemaWP.Dominio.TextoFormato
 #if DEBUG
             if (_bloques != null)
             {
-                Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
+                //Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
             }
 #endif        
         }
@@ -142,7 +141,7 @@ namespace SistemaWP.Dominio.TextoFormato
             }
 #if DEBUG
 
-            Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
+            //Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
 #endif
 
         }
@@ -170,7 +169,7 @@ namespace SistemaWP.Dominio.TextoFormato
                     }
 #if DEBUG
 
-                    Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
+                    //Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
 #endif
                 }
             }
@@ -264,7 +263,7 @@ namespace SistemaWP.Dominio.TextoFormato
                
 #if DEBUG
             
-                Debug.Assert(_bloques.Sum(x=>x.Cantidad)==Length);;
+                //Debug.Assert(_bloques.Sum(x=>x.Cantidad)==Length);;
 #endif
             }
         }
@@ -300,7 +299,7 @@ namespace SistemaWP.Dominio.TextoFormato
 #if DEBUG
             if (_bloques != null)
             {
-                Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
+                //Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
             }
 #endif
         }
@@ -335,11 +334,13 @@ namespace SistemaWP.Dominio.TextoFormato
             texto2.Iniciar();
             texto2.st.Append(st.ToString(posicionDivision, st.Length - posicionDivision));
             st.Remove(posicionDivision, st.Length - posicionDivision);
+#if DEBUG
             if (_bloques != null)
             {
-                Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length);
-                Debug.Assert(texto2._bloques.Sum(x => x.Cantidad) == texto2.st.Length); 
+                //Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length);
+                //Debug.Assert(texto2._bloques.Sum(x => x.Cantidad) == texto2.st.Length); 
             }
+#endif
             return texto2;
         }
     }

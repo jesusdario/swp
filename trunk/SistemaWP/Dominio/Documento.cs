@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using System.Text;
 using System.Diagnostics;
 using SistemaWP.Dominio.TextoFormato;
+using System.Collections;
 
 namespace SistemaWP.Dominio
 {
@@ -172,7 +173,7 @@ namespace SistemaWP.Dominio
         {
             lock (m_Parrafos)
             {
-                Parrafo p = m_Parrafos.Values.FirstOrDefault();
+                Parrafo p = ObtenerPrimerParrafo();
                 while (p != null)
                 {
                     if (p.Anterior != null)
@@ -194,7 +195,9 @@ namespace SistemaWP.Dominio
         public Parrafo ObtenerPrimerParrafo() {
             lock (m_Parrafos)
             {
-                Parrafo p = m_Parrafos.Values.FirstOrDefault();
+                IEnumerator e=m_Parrafos.Values.GetEnumerator();
+                
+                Parrafo p = (Parrafo)(e.MoveNext()?e.Current:null);
                 while (p != null)
                 {
                     if (p.Anterior != null)
@@ -250,7 +253,7 @@ namespace SistemaWP.Dominio
         {
             lock (m_Parrafos)
             {
-                Parrafo p = m_Parrafos.Values.LastOrDefault();
+                Parrafo p = ObtenerPrimerParrafo();
                 do
                 {
                     if (p.Siguiente != null)
