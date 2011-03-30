@@ -297,5 +297,12 @@ namespace SWPEditor.Dominio
             }
             esc.TerminarParrafo();
         }
+        public Parrafo ObtenerSubParrafo(Documento contenedor,int inicio, int cantidad)
+        {
+            Parrafo p = new Parrafo(contenedor, 0, null, null);
+            p.bufferTexto = bufferTexto.ObtenerRangoTexto(inicio, cantidad);
+            p._Formato = _Formato;
+            return p;
+        }
     }
 }

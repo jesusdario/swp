@@ -347,5 +347,38 @@ namespace SWPEditor.Dominio
         {
             EnCambioParrafo(parrafo);
         }
+
+        public static Documento ObtenerSubdocumento(Parrafo parrafoInicial, int posicionInicial, Parrafo parrafoFinal, int posicionFinal)
+        {
+            Documento doc = new Documento();
+            doc.EliminarParrafo(doc.ObtenerPrimerParrafo().ID);
+            if (parrafoInicial == parrafoFinal)
+            {
+                Parrafo p = parrafoInicial.ObtenerSubParrafo(doc, posicionInicial, posicionFinal - posicionInicial);
+                p.CambiarID(doc.CrearNuevoID(1));
+                doc.AgregarParrafo(p);
+            }
+            else
+            {
+                Parrafo actual = parrafoInicial;
+                Parrafo p;
+                p = actual.ObtenerSubParrafo(doc, posicionInicial, actual.ObtenerLongitud() - posicionInicial);
+                doc.AgregarParrafo(p);
+                Parrafo anterior = p;
+                actual=p.Siguiente;
+                while (p != null)
+                {
+                    if (p == parrafoFinal)
+                        break;
+                    p=actual.ObtenerSubParrafo(doc,0,actual.ObtenerLongitud());
+                    anterior.ConectarDespues(p);
+                    anterior = p;
+                    actual = p.Siguiente;
+                }
+                p=parrafoFinal.ObtenerSubParrafo(doc, 0, posicionFinal);
+                anterior.ConectarDespues(p);
+            }
+            return doc;
+        }
     }
 }

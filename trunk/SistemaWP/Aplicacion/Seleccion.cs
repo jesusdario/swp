@@ -4,17 +4,18 @@ using System.Text;
 using SWPEditor.Dominio;
 using SWPEditor.Dominio.Html;
 using SWPEditor.Dominio.Texto;
+using SWPEditor.Dominio.TextoFormato;
 
 namespace SWPEditor.Aplicacion
 {
     public class Seleccion
     {
-        public Documento Documento { get; private set; }
-        public Parrafo Inicio { get; private set; }
-        public int PosicionParrafoInicio { get; private set; }
-        public Parrafo Fin { get; private set; }
-        public int PosicionParrafoFin { get; private set; }
-        public Seleccion(Documento documento, Parrafo inicio, int posicionInicio, Parrafo fin, int posicionFin)
+        internal Documento Documento { get; private set; }
+        internal Parrafo Inicio { get; private set; }
+        internal int PosicionParrafoInicio { get; private set; }
+        internal Parrafo Fin { get; private set; }
+        internal int PosicionParrafoFin { get; private set; }
+        internal Seleccion(Documento documento, Parrafo inicio, int posicionInicio, Parrafo fin, int posicionFin)
         {
             Documento = documento;
             Inicio = inicio;
@@ -22,21 +23,21 @@ namespace SWPEditor.Aplicacion
             PosicionParrafoInicio = posicionInicio;
             PosicionParrafoFin = posicionFin;
         }
-        public Parrafo ObtenerParrafoInicial()
+        internal Parrafo ObtenerParrafoInicial()
         {
             if (Inicio.EsSiguiente(Fin))
                 return Inicio;
             else
                 return Fin;
         }
-        public Parrafo ObtenerParrafoFinal()
+        internal Parrafo ObtenerParrafoFinal()
         {
             if (Inicio.EsSiguiente(Fin))
                 return Fin;
             else
                 return Inicio;
         }
-        public int ObtenerPosicionInicial()
+        internal int ObtenerPosicionInicial()
         {
             if (Inicio == Fin)
             {
@@ -47,7 +48,7 @@ namespace SWPEditor.Aplicacion
             else
                 return PosicionParrafoFin;
         }
-        public int ObtenerPosicionFinal()
+        internal int ObtenerPosicionFinal()
         {
             if (Inicio == Fin)
             {
@@ -57,6 +58,18 @@ namespace SWPEditor.Aplicacion
                 return PosicionParrafoFin;
             else
                 return PosicionParrafoInicio;
+        }
+        public bool EstaVacia
+        {
+            get
+            {
+                return ObtenerPosicionInicial() == ObtenerPosicionFinal() &&
+                    ObtenerParrafoInicial() == ObtenerParrafoFinal();
+            }
+        }
+        public Documento ObtenerDocumento()
+        {
+            return Documento.ObtenerSubdocumento(ObtenerParrafoInicial(), ObtenerPosicionInicial(), ObtenerParrafoFinal(), ObtenerPosicionFinal());
         }
         public string ObtenerHtml()
         {
