@@ -31,6 +31,21 @@ namespace SWPEditor.IU.PresentacionDocumento
                 {
                     Recalcular(a, inicio);
                 }
+                else
+                {
+                    if (inicio.Anterior != null)
+                    {
+                        a = BuscarInt(0,inicio.Anterior);
+                        if (a != -1)
+                        {
+                            Recalcular(a, inicio.Anterior);
+                        }
+                    }
+                    else
+                    {
+                        Recalcular(0, _documento.ObtenerPrimerParrafo());
+                    }
+                }
             }
             else
             {
@@ -111,9 +126,14 @@ namespace SWPEditor.IU.PresentacionDocumento
             {
                 for (int i = lineainicio + 1; i < _lineas.Count; i++)
                 {
+                    
                     if (_lineas[i].Parrafo == p)
                     {
                         return i;
+                    }
+                    if (!_lineas[i].Parrafo.EsSiguiente(p))
+                    {
+                        break;
                     }
                 }
             }
@@ -125,6 +145,10 @@ namespace SWPEditor.IU.PresentacionDocumento
                     if (act.Parrafo == p && act.Inicio == 0)
                     {
                         return i;
+                    }
+                    if (!p.EsSiguiente(_lineas[i].Parrafo))
+                    {
+                        break;
                     }
                 }
             }
