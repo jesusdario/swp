@@ -119,19 +119,32 @@ namespace SWPEditor.IU
         {
             if (seleccion != null)
             {
-                
-                seleccion.ObtenerDocumento();
+
+                Clipboard.SetDataObject(new DatosClipboard(seleccion.ObtenerDocumento()), false);
             }
         }
 
         void IClipboard.Copiar(SWPEditor.Aplicacion.Seleccion seleccion)
         {
-            throw new NotImplementedException();
+            if (seleccion != null)
+            {
+                Clipboard.SetDataObject(new DatosClipboard(seleccion.ObtenerDocumento()), false);
+            }
         }
 
         void IClipboard.Pegar(SWPEditor.IU.PresentacionDocumento.ContPresentarDocumento editor)
         {
-            throw new NotImplementedException();
+            
+            IDataObject obj=Clipboard.GetDataObject();
+            if (obj != null)
+            {
+                string cad = (string)obj.GetData(DataFormats.Text,true);
+                if (cad != null)
+                {
+                    editor.InsertarTexto(cad);
+                }
+            }
+        
         }
 
         #endregion

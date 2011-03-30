@@ -422,6 +422,7 @@ namespace SWPEditor.Dominio.TextoFormato
         internal Texto ObtenerRangoTexto(int inicio, int cantidad)
         {
             Texto t = new Texto();
+            t.Iniciar();
             IEnumerable<Bloque> bloques=ObtenerRangoBloques(inicio,cantidad);
             t.st.Append(st);
             t._bloques = new List<Bloque>();

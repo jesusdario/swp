@@ -366,7 +366,7 @@ namespace SWPEditor.Dominio
                 doc.AgregarParrafo(p);
                 Parrafo anterior = p;
                 actual=p.Siguiente;
-                while (p != null)
+                while (actual != null)
                 {
                     if (p == parrafoFinal)
                         break;
