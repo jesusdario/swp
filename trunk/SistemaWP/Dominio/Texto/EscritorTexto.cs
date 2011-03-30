@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SWPEditor.Dominio.TextoFormato;
 
 namespace SWPEditor.Dominio.Texto
 {
@@ -14,7 +15,7 @@ namespace SWPEditor.Dominio.Texto
             
         }
 
-        public void IniciarParrafo()
+        public void IniciarParrafo(FormatoParrafo formato)
         {
             
         }
