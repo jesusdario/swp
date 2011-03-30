@@ -47,16 +47,11 @@ namespace SWPEditor.IU.PresentacionDocumento
                 }
             }
         }
-        public void Pegar()
+        public void Pegar(IClipboard clipboard)
         {
             lock (this)
             {
-                string cad = Clipboard.GetText();
-                if (cad != null)
-                {
-                    conttexto.InsertarTexto(cad);
-                    EnActualizarPresentacion(true);
-                }
+                clipboard.Pegar(this);                
             }
         }
         public void InsertarTexto(string cadena)
@@ -67,36 +62,37 @@ namespace SWPEditor.IU.PresentacionDocumento
                 EnActualizarPresentacion(true);
             }
         }
-        public void Copiar()
+        public void Copiar(IClipboard clipboard)
         {
             lock (this)
             {
                 Seleccion sel = conttexto.ObtenerSeleccion();
-                string cad = null;
-                if (sel == null)
-                    cad = string.Empty;
-                else
-                    cad = sel.ObtenerHtml();
-                string cadini="<body class='e0'>";
-                string cadini2 = "<!--StartFragment-->";
-                string cadfin="</body>";
-                string cadfin2 = "<!--EndFragment--></body>";
-                string cnueva=cad.Replace(cadini, cadini2).Replace(cadfin,cadfin2);
-                string cadbase = @"Version:1.0
-    StartHTML:-1
-    EndHTML:-1
-    StartFragment:AAAAAAAAAA
-    EndFragment:BBBBBBBBBB
-<!DOCUMENT>";
-                int indice1 = cnueva.IndexOf(cadini2)+cadbase.Length;
-                int indice2 = cnueva.IndexOf(cadfin2) + cadfin2.Length + cadbase.Length;
-                cadbase=cadbase
-                    .Replace("AAAAAAAAAA",indice1.ToString().PadLeft(10,'0'))
-                    .Replace("BBBBBBBBBB",indice2.ToString().PadLeft(10,'0'));
-                cnueva=cadbase+cnueva;
+                clipboard.Copiar(sel);
+//                string cad = null;
+//                if (sel == null)
+//                    cad = string.Empty;
+//                else
+//                    cad = sel.ObtenerHtml();
+//                string cadini="<body class='e0'>";
+//                string cadini2 = "<!--StartFragment-->";
+//                string cadfin="</body>";
+//                string cadfin2 = "<!--EndFragment--></body>";
+//                string cnueva=cad.Replace(cadini, cadini2).Replace(cadfin,cadfin2);
+//                string cadbase = @"Version:1.0
+//    StartHTML:-1
+//    EndHTML:-1
+//    StartFragment:AAAAAAAAAA
+//    EndFragment:BBBBBBBBBB
+//<!DOCUMENT>";
+//                int indice1 = cnueva.IndexOf(cadini2)+cadbase.Length;
+//                int indice2 = cnueva.IndexOf(cadfin2) + cadfin2.Length + cadbase.Length;
+//                cadbase=cadbase
+//                    .Replace("AAAAAAAAAA",indice1.ToString().PadLeft(10,'0'))
+//                    .Replace("BBBBBBBBBB",indice2.ToString().PadLeft(10,'0'));
+//                cnueva=cadbase+cnueva;
                 
-                Clipboard.SetText(cnueva, TextDataFormat.Html);
-                //Clipboard.SetText(cad, TextDataFormat.UnicodeText);
+//                Clipboard.SetText(cnueva, TextDataFormat.Html);
+//                //Clipboard.SetText(cad, TextDataFormat.UnicodeText);
             }
         }
         
@@ -243,11 +239,13 @@ namespace SWPEditor.IU.PresentacionDocumento
             }
         }
 
-        public void Cortar()
+        public void Cortar(IClipboard clipboard)
         {
             lock (this)
             {
+                
                 Seleccion sel = conttexto.ObtenerSeleccion();
+                clipboard.Cortar(sel);
                 if (sel != null)
                 {
                     string cad = sel.ObtenerTexto();

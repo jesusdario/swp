@@ -40,7 +40,7 @@ namespace SWPEditor.Dominio.TextoFormato
         }
         public IEnumerable<Bloque> ObtenerRangoBloques(int inicio, int cantidad)
         {
-            if (_bloques == null && inicio == 0&&cantidad==st.Length)
+            if (_bloques == null)
             {
                 if (st.Length == 0)
                 {
@@ -48,7 +48,7 @@ namespace SWPEditor.Dominio.TextoFormato
                 }
                 else
                 {
-                    yield return new Bloque(st.Length, null);
+                    yield return new Bloque(cantidad, null);
                 }
             }
             else
@@ -206,6 +206,7 @@ namespace SWPEditor.Dominio.TextoFormato
         }
         internal void SimplificarFormato()
         {
+            if (_bloques == null) return;
             for (int i = _bloques.Count-1; i >= 0; i--)
             {
                 if (_bloques[i].Cantidad == 0)
@@ -416,6 +417,19 @@ namespace SWPEditor.Dominio.TextoFormato
             }
 #endif
             return texto2;
+        }
+
+        internal Texto ObtenerRangoTexto(int inicio, int cantidad)
+        {
+            Texto t = new Texto();
+            IEnumerable<Bloque> bloques=ObtenerRangoBloques(inicio,cantidad);
+            t.st.Append(st);
+            t._bloques = new List<Bloque>();
+            foreach (Bloque b in bloques)
+            {
+                t._bloques.Add(b.Clonar());
+            }
+            return t;
         }
     }
 }

@@ -241,16 +241,16 @@ namespace SWPEditor.IU
         }
         public void Cut()
         {
-            _ControlDocumento.Cortar();
+            _ControlDocumento.Cortar(new SWPClipboard());
         }
         public void Copy()
         {
-            _ControlDocumento.Copiar();
+            _ControlDocumento.Copiar(new SWPClipboard());
         }
 
         public void Paste()
         {
-            _ControlDocumento.Pegar();            
+            _ControlDocumento.Pegar(new SWPClipboard());            
         }
         int? numpagina;
         
@@ -339,8 +339,7 @@ namespace SWPEditor.IU
                 Capture = false;
                 EnCaptura = false;
                 Seleccion s = _ControlDocumento.ObtenerSeleccion();
-                if (s != null && s.ObtenerPosicionInicial() == s.ObtenerPosicionFinal() &&
-                    s.ObtenerParrafoInicial() == s.ObtenerParrafoFinal())
+                if (s != null && s.EstaVacia)
                 {
                     _ControlDocumento.QuitarSeleccion();
                 }

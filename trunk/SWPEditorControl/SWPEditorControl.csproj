@@ -8,7 +8,7 @@
     <ProjectGuid>{5C8F97E2-06CA-49F5-AF34-4B69ECF6C6C5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SWPEditor.IU</RootNamespace>
+    <RootNamespace>SWPEditor</RootNamespace>
     <AssemblyName>SWPEditor.Forms</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IU\Clipboard.cs" />
     <Compile Include="IU\Graficadores\Graficador.cs" />
     <Compile Include="IU\SWPEditorIU.cs">
       <SubType>Form</SubType>
