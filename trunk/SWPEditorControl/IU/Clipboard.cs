@@ -41,8 +41,8 @@ namespace SWPEditor.IU
                     StartFragment:AAAAAAAAAA
                     EndFragment:BBBBBBBBBB
                 <!DOCUMENT>";
-                int indice1 = cnueva.IndexOf(cadini2) + cadbase.Length;
-                int indice2 = cnueva.IndexOf(cadfin2) + cadfin2.Length + cadbase.Length;
+                int indice1 = cadbase.Length;//cnueva.IndexOf(cadini2) + cadbase.Length;
+                int indice2 = cnueva.Length + cadbase.Length;//cnueva.IndexOf(cadfin2) + cadfin2.Length + cadbase.Length;
                 cadbase = cadbase
                     .Replace("AAAAAAAAAA", indice1.ToString().PadLeft(10, '0'))
                     .Replace("BBBBBBBBBB", indice2.ToString().PadLeft(10, '0'));

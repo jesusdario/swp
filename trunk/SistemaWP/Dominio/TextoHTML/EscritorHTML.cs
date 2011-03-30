@@ -35,9 +35,15 @@ namespace SWPEditor.Dominio.Html
             _html.AppendLine("</html>");
             _html.Insert(posinsestilos, "<style type='text/css'>"+_estilos+"</style>");
         }
-        public void IniciarParrafo()
+        public void IniciarParrafo(FormatoParrafo formato)
         {
-            _html.Append("<p>");
+            Medicion medicionAnterior  = formato.ObtenerEspacioAnterior();
+            Medicion medicionPosterior = formato.ObtenerEspacioPosterior();
+            string estilos="";
+            estilos += "margin-top:"+medicionAnterior.ConvertirA(Unidad.Puntos)+"pt;";
+            estilos += "margin-bottom:" + medicionPosterior.ConvertirA(Unidad.Puntos) + "pt;";
+            estilos += "line-spacing:"+formato.ObtenerEspaciadoInterlineal()+"em;";
+            _html.Append("<p style='"+estilos+"'>");            
         }
         private int AgregarEstilo(Formato formato)
         {
@@ -61,20 +67,15 @@ namespace SWPEditor.Dominio.Html
             {
                 st2.Append("font-style:italic;");
             }
-            if (formato.FamiliaLetra != null)
-            {
-                st2.Append("font-family:" + formato.ObtenerFamiliaLetra() + ";");
-            }
+            st2.Append("font-family:" + formato.ObtenerFamiliaLetra() + ";");
             if (formato.ObtenerSubrayado())
             {
                 st2.Append("text-decoration:underline;");
             }
-            if (formato.TamLetra != null)
-            {
-                st2.Append("font-size:");
-                st2.Append(formato.TamLetra.Value.ConvertirA(Unidad.Puntos).Valor.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                st2.Append("pt;");
-            }
+            st2.Append("font-size:");
+            st2.Append(formato.ObtenerTamLetra().ConvertirA(Unidad.Puntos).Valor.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            st2.Append("pt;");
+        
             if (formato.ColorLetra.HasValue)
             {
                 st2.Append("color:");
@@ -99,8 +100,8 @@ namespace SWPEditor.Dominio.Html
         public void EscribirTexto(string texto, SWPEditor.Dominio.TextoFormato.Formato formato)
         {
             bool formatoigual = false;
-            if (!formato.Equals(Formato.ObtenerPredefinido()))
-            {
+            //if (!formato.Equals(Formato.ObtenerPredefinido()))
+            //{
                 _html.Append("<span ");
                 _html.Append(" style=\"");
                 if (estiloslin.ContainsKey(formato))
@@ -123,14 +124,14 @@ namespace SWPEditor.Dominio.Html
                 //}
                 //_html.Append(" class=\"e" + numestilo + "\"");
                 _html.Append(">");
-            }
-            else
+            //}
+            //else
                 formatoigual = true;
             _html.Append(texto);
-            if (!formatoigual)
-            {
+            //if (!formatoigual)
+            //{
                 _html.Append("</span>");
-            }
+            //}
         }
 
         public void TerminarParrafo()

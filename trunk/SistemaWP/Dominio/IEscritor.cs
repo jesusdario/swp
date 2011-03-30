@@ -8,7 +8,7 @@ namespace SWPEditor.Dominio
     public interface IEscritor
     {
         void IniciarDocumento();
-        void IniciarParrafo();
+        void IniciarParrafo(FormatoParrafo formato);
         void EscribirTexto(string texto, Formato formato);
         void TerminarParrafo();
         void TerminarDocumento();

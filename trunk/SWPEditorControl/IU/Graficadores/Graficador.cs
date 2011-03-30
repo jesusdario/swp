@@ -91,7 +91,7 @@ namespace SWPEditor.IU.Graficadores
         {
 
             CambiarResolucion(graficos.DpiX, graficos.DpiY);
-            graficos.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+            graficos.TextRenderingHint = presenttexto;
             g = graficos;
             
             _brochas = new Stock<Brocha, SolidBrush>(delegate(Brocha brocha) {
@@ -156,22 +156,40 @@ namespace SWPEditor.IU.Graficadores
         {
             Font f=_letras.Obtener(letra);
             Brush b=_brochas.Obtener(brocha);
+            //StringFormat st = new StringFormat(StringFormat.GenericTypographic);
+            //st.SetMeasurableCharacterRanges(new CharacterRange[]{new CharacterRange(0, texto.Length)});
+            //Region[] regs = g.MeasureCharacterRanges(texto, f, new RectangleF(Traducir(posicion), new SizeF(g.DpiX * 100, g.DpiY * 100)),st);
             g.DrawString(texto, f, b, Traducir(posicion),FormatoPresentacion);
         }
         static StringFormat FormatoPresentacion;
         static StringFormat FormatoMedicion;
+        System.Drawing.Text.TextRenderingHint presenttexto = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
         static GraficadorGDI()
         {
             Bitmap bmp = new Bitmap(1, 1, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
             bmp.SetResolution(10000, 10000);
             _GraficadorConsultas = new GraficadorGDI(Graphics.FromImage(bmp));
+            _GraficadorConsultas.g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
             FormatoMedicion = new StringFormat(StringFormat.GenericTypographic);
+            FormatoMedicion.FormatFlags = 0;
+            FormatoMedicion.FormatFlags = StringFormatFlags.FitBlackBox |
+                StringFormatFlags.MeasureTrailingSpaces;
+            //FormatoMedicion.FormatFlags|=StringFormatFlags.
+
             FormatoMedicion.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-            FormatoPresentacion = FormatoMedicion;
+            FormatoMedicion.Alignment = StringAlignment.Near;
+            FormatoMedicion.LineAlignment = StringAlignment.Near;
+            
+            FormatoPresentacion = (StringFormat)FormatoMedicion.Clone();
+
         }
         public TamBloque MedirTexto(Letra letra, string texto)
         {
+            
             Font f = _letras.Obtener(letra);
+            //RectangleF c=new RectangleF(0,0,1000000,1000000);
+            //Region[] regs=g.MeasureCharacterRanges(texto, f, c, FormatoMedicion);
+            //Region r = regs[0].GetBounds(g);
             if (texto.Length == 0)
             {
                 SizeF tam2 = g.MeasureString("M", f, new PointF(0, 0), FormatoMedicion);

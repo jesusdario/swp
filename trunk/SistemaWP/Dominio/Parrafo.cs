@@ -285,7 +285,7 @@ namespace SWPEditor.Dominio
 
         public void Escribir(SWPEditor.Dominio.IEscritor esc,int inicio,int cantidad)
         {
-            esc.IniciarParrafo();
+            esc.IniciarParrafo(Formato);
             int inicioBloque = 0;
             int finSeleccion = inicio + cantidad;
             IEnumerable<Bloque> bloques=bufferTexto.ObtenerRangoBloques(inicio,cantidad);
