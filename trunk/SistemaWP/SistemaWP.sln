@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SWPEditorControl", "..\SWPE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SWPEditor", "..\SWPEditor\SWPEditor.csproj", "{6B29DC50-B079-4D45-8BDA-967146F5A2D2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SWPEditorWPF", "..\SWPEditorWPF\SWPEditorWPF.csproj", "{F5430670-ADC9-4320-A690-501306F0F2EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,12 @@ Global
 		{6B29DC50-B079-4D45-8BDA-967146F5A2D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B29DC50-B079-4D45-8BDA-967146F5A2D2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6B29DC50-B079-4D45-8BDA-967146F5A2D2}.Release|x86.ActiveCfg = Release|Any CPU
+		{F5430670-ADC9-4320-A690-501306F0F2EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5430670-ADC9-4320-A690-501306F0F2EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5430670-ADC9-4320-A690-501306F0F2EB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F5430670-ADC9-4320-A690-501306F0F2EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5430670-ADC9-4320-A690-501306F0F2EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5430670-ADC9-4320-A690-501306F0F2EB}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
