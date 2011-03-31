@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace SWPEditor.Dominio.TextoFormato
 {
-    public class Bloque
+    public struct Bloque
     {
         public int Cantidad { get; private set; }
         Formato _Formato;
@@ -13,11 +13,15 @@ namespace SWPEditor.Dominio.TextoFormato
         {
             get
             {
-                if (_Formato == null) return Formato.ObtenerPredefinido();
                 return _Formato;
             }
+            internal set
+            {
+                _Formato = value;
+            }
         }
-        public Bloque(int cantidad, Formato formato)
+        
+        public Bloque(int cantidad, Formato formato):this()
         {
             Cantidad = cantidad;
             Debug.Assert(cantidad >= 0);

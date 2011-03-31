@@ -167,7 +167,7 @@ namespace SWPEditor.Aplicacion
             Parrafo ultimoParrafo;
             while (p != null)
             {
-                int longitud=p.ObtenerLongitud();
+                int longitud=p.Longitud;
                 if (suma+longitud>numCaracter)  {
                     IndicarPosicion(p.ID,numCaracter-suma,seleccionar);
                     return;
@@ -313,7 +313,7 @@ namespace SWPEditor.Aplicacion
         }
         public bool IrSiguienteCaracter(bool moverSeleccion,TipoAvance TipoAvance)
         {
-            if (posicionInsercion == parrafoSeleccionado.ObtenerLongitud())
+            if (posicionInsercion == parrafoSeleccionado.Longitud)
             {
                 if (parrafoSeleccionado.Siguiente == null) return false;
                 IndicarPosicion(parrafoSeleccionado.Siguiente.ID, 0, moverSeleccion);
@@ -330,7 +330,7 @@ namespace SWPEditor.Aplicacion
             if (posicionInsercion == 0)
             {
                 if (parrafoSeleccionado.Anterior == null) return false; //no se puede borrar antes del primer párrafo.
-                IndicarPosicion(parrafoSeleccionado.Anterior.ID, parrafoSeleccionado.Anterior.ObtenerLongitud(), moverSeleccion);
+                IndicarPosicion(parrafoSeleccionado.Anterior.ID, parrafoSeleccionado.Anterior.Longitud, moverSeleccion);
                 
             }
             else
@@ -415,7 +415,7 @@ namespace SWPEditor.Aplicacion
             parrafoInicioRango = inicio;
             posicionInicioRango = 0;
             parrafoFinRango = fin;
-            posicionFinRango = fin.ObtenerLongitud();
+            posicionFinRango = fin.Longitud;
             parrafoSeleccionado = parrafoInicioRango;
             posicionInsercion = 0;
         }

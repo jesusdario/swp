@@ -10,7 +10,7 @@ namespace SWPEditor.Dominio
     {
         Documento _contenedor;
         TextoFormato.Texto bufferTexto = new TextoFormato.Texto();
-        public int ID { get; private set; }       
+        internal int ID { get; private set; }       
         private int Posicion { get; set; }
         public Parrafo Anterior { get; private set; }
         public Parrafo Siguiente { get; private set; }
@@ -25,7 +25,7 @@ namespace SWPEditor.Dominio
                 _Formato = value;
             }
         }
-        public void ConectarDespues(Parrafo parrafo)
+        internal void ConectarDespues(Parrafo parrafo)
         {
             if (parrafo != null)
             {
@@ -33,7 +33,7 @@ namespace SWPEditor.Dominio
             }
             Siguiente = parrafo;
         }
-        public void ConectarAntes(Parrafo parrafo)
+        internal void ConectarAntes(Parrafo parrafo)
         {
             if (parrafo != null)
             {
@@ -69,7 +69,6 @@ namespace SWPEditor.Dominio
             bufferTexto.Append(cad);
             _contenedor.NotificarCambio(this);
         }
-
         public void AgregarCaracter(int posicionInsercion, char caracter)
         {
             bufferTexto.Insert(posicionInsercion, caracter);
@@ -95,7 +94,7 @@ namespace SWPEditor.Dominio
             }
         }
 
-        public void FusionarCon(Parrafo parrafoSiguiente)
+        internal void FusionarCon(Parrafo parrafoSiguiente)
         {
             bufferTexto.Agregar(parrafoSiguiente.bufferTexto);
             ConectarDespues(parrafoSiguiente.Siguiente);
@@ -106,9 +105,12 @@ namespace SWPEditor.Dominio
             _contenedor.NotificarCambio(this);
         }
 
-        public int ObtenerLongitud()
+        public int Longitud
         {
-            return bufferTexto.Length;
+            get
+            {
+                return bufferTexto.Length;
+            }
         }
 
         internal Parrafo DividirParrafo(int idnuevo,int posicionDivision)
@@ -233,19 +235,32 @@ namespace SWPEditor.Dominio
         {
             return bufferTexto.ObtenerFormatoComun(posicionInicio, cantidad);
         }
-        public void SimplificarFormato()
+        internal void SimplificarFormato()
         {
             bufferTexto.SimplificarFormato();
         }
         public IEnumerable<Bloque> ObtenerBloques()
         {
+            Bloque bc = new Bloque(0,null);
             for (int i = 0; i < bufferTexto.ObtenerNumBloques(); i++)
             {
-                yield return bufferTexto.ObtenerBloque(i);
+                Bloque b=bufferTexto.ObtenerBloque(i);
+                bc.CambiarCantidad(b.Cantidad);
+                bc.Formato=Formato.ObtenerFormatoTexto().Fusionar(b.Formato);
+                yield return bc;                
             }
         }
-
-
+        public IEnumerable<Bloque> ObtenerBloques(int inicio, int cantidad)
+        {
+            Bloque bc = new Bloque(0, null);
+            IEnumerable<Bloque> rango=bufferTexto.ObtenerRangoBloques(inicio,cantidad);
+            foreach (Bloque b in rango)
+            {
+                bc.CambiarCantidad(b.Cantidad);
+                bc.Formato = Formato.ObtenerFormatoTexto().Fusionar(b.Formato);
+                yield return bc;
+            }
+        }
         public void AlinearIzquierda()
         {
             Formato = Formato.Fusionar(FormatoParrafo.CrearAlineacionIzquierda());
@@ -262,13 +277,13 @@ namespace SWPEditor.Dominio
             _contenedor.NotificarCambio(this);
         }
 
-        internal void AumentarInterlineado()
+        public void AumentarInterlineado()
         {
             Formato = Formato.Fusionar(FormatoParrafo.CrearEspacioInterlineal(Formato.ObtenerEspaciadoInterlineal() + 0.5m));
             _contenedor.NotificarCambio(this);
         }
 
-        internal void DisminuirInterlineado()
+        public void DisminuirInterlineado()
         {
             decimal valor = Formato.ObtenerEspaciadoInterlineal()-0.5m;
             if (valor < 1) valor = 1;
@@ -276,9 +291,9 @@ namespace SWPEditor.Dominio
             _contenedor.NotificarCambio(this);
         }
 
-        internal void InsertarCadena(int posicionInsercion, string cadena)
+        public void InsertarCadena(int posicionInsercion, string cadena)
         {
-            Debug.Assert(posicionInsercion >= 0 && posicionInsercion <= ObtenerLongitud());
+            Debug.Assert(posicionInsercion >= 0 && posicionInsercion <= Longitud);
             bufferTexto.Insert(posicionInsercion, cadena);
             _contenedor.NotificarCambio(this);
         }

@@ -8,10 +8,61 @@ namespace SWPEditor.Dominio.TextoFormato
     struct Texto
     {
         StringBuilder st;
-        List<Bloque> _bloques;
+        struct ContenedorBloques
+        {
+            List<Bloque> _bloques;
+            public bool SinAsignar()
+            {
+                return _bloques == null;
+            }
+            public int Cantidad
+            {
+                get
+                {
+                    return _bloques.Count;
+                }
+            }
+            public void Eliminar(int indice)
+            {
+                _bloques.RemoveAt(indice);
+            }
+            public void Asignar()
+            {
+                _bloques = new List<Bloque>();
+            }
+            public Bloque Obtener(int i)
+            {
+                return _bloques[i];
+            }
+            public void Agregar(int cantidad, Formato formato)
+            {
+                _bloques.Add(new Bloque(cantidad, formato));
+            }
+            public void Guardar(int i, Bloque bloque)
+            {
+                _bloques[i] = bloque;
+            }
+
+            internal void EliminarRango(int indice, int cantidad)
+            {
+                _bloques.RemoveRange(indice, Cantidad);
+            }
+
+            internal void Insertar(int indice, Bloque bloque)
+            {
+                _bloques.Insert(indice, bloque);
+            }
+
+            internal void AgregarDesde(ContenedorBloques contenedorBloques)
+            {
+                _bloques.AddRange(contenedorBloques._bloques);
+            }
+        }
+        ContenedorBloques _bloques;
         public void Iniciar()
         {
             st = new StringBuilder();
+            _bloques = new ContenedorBloques();
         }
         public int Length { get { return st.Length; } }
         public char this[int indice]
@@ -25,7 +76,7 @@ namespace SWPEditor.Dominio.TextoFormato
         static Bloque _BloqueVacio = new Bloque(0,null);
         public Bloque ObtenerBloque(int indice)
         {
-            if (_bloques == null&&indice==0)
+            if (_bloques.SinAsignar()&&indice==0)
             {
                 if (st.Length == 0)
                 {
@@ -36,9 +87,80 @@ namespace SWPEditor.Dominio.TextoFormato
                     return new Bloque(st.Length, null);
                 }
             }
-            return _bloques[indice];
+            return _bloques.Obtener(indice);
         }
         public IEnumerable<Bloque> ObtenerRangoBloques(int inicio, int cantidad)
+        {
+            Bloque bc = new Bloque(0, null);
+            if (_bloques.SinAsignar())
+            {
+                if (st.Length == 0)
+                {
+                    yield return _BloqueVacio;
+                }
+                else
+                {
+                    bc.CambiarCantidad(cantidad);
+                    yield return bc;                    
+                }
+            }
+            else
+            {
+                
+                if (_bloques.Cantidad == 1)
+                {
+                    Bloque b = _bloques.Obtener(0);
+                    bc.CambiarCantidad(b.Cantidad);
+                    bc.Formato = b.Formato;
+                    yield return bc;
+                    yield break;
+                }
+                int inicioBloque = 0;
+                int finSeleccion = inicio + cantidad;
+                for (int i = 0; i < _bloques.Cantidad; i++)
+                {
+                    Bloque b=_bloques.Obtener(i);
+                    int finBloque = inicioBloque + b.Cantidad;
+                    bool inicioEnBloque = inicio >= inicioBloque && inicio < finBloque;
+                    bool enmedio=inicioBloque>finSeleccion&&finBloque>finSeleccion;
+                    bool finEnBloque = finSeleccion >= inicioBloque && finSeleccion <= finBloque;
+                    if (inicioEnBloque)
+                    {
+                        if (finEnBloque)
+                        {
+                            bc.CambiarCantidad(finBloque - inicioBloque);
+                            bc.Formato = b.Formato;
+                            yield return bc;
+                            yield break;
+                        }
+                        else
+                        {
+                            bc.Formato=b.Formato;
+                            bc.CambiarCantidad(b.Cantidad);
+                            bc.DisminuirCantidad(inicio - inicioBloque);
+                            yield return bc;
+                        }
+                    }
+                    else
+                    {
+                        if (finEnBloque)
+                        {
+                            bc.Formato = b.Formato;
+                            bc.CambiarCantidad(finSeleccion-inicioBloque);
+                            yield return bc;
+                            yield break;                            
+                        } else if (enmedio)
+                        {
+                            bc.Formato = b.Formato;
+                            bc.CambiarCantidad(b.Cantidad);
+                            yield return bc;
+                        }                        
+                    }
+                }
+            }
+        }
+        
+        /*public IEnumerable<Bloque> ObtenerRangoBloques(int inicio, int cantidad)
         {
             if (_bloques == null)
             {
@@ -61,6 +183,7 @@ namespace SWPEditor.Dominio.TextoFormato
                 int inicioBloque = 0;
                 int finSeleccion=inicio+cantidad;
                 int finBloque = 0;
+                
                 for (int i = 0; i < _bloques.Count; i++)
                 {
                     Bloque actual=_bloques[i];
@@ -111,7 +234,7 @@ namespace SWPEditor.Dominio.TextoFormato
                     inicioBloque += actual.Cantidad;
                 }
             }
-        }
+        }*/
         internal string ToString(int inicio, int cantidad)
         {
             Debug.Assert(inicio >= 0 && inicio + cantidad >= 0 && inicio+cantidad <= Length&&cantidad>=0);
@@ -129,9 +252,11 @@ namespace SWPEditor.Dominio.TextoFormato
         }
         private void ExtenderBloques(int delta)
         {
-            if (_bloques != null)
+            if (!_bloques.SinAsignar())
             {
-                _bloques[_bloques.Count - 1].IncrementarCantidad(delta);
+                Bloque b = _bloques.Obtener(_bloques.Cantidad - 1);
+                b.IncrementarCantidad(delta);
+                _bloques.Guardar(_bloques.Cantidad - 1, b);
 #if DEBUG
 
                 //Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
@@ -141,25 +266,30 @@ namespace SWPEditor.Dominio.TextoFormato
         }
         private void IncrementarBloque(int posicion, int delta)
         {
-            if (_bloques != null)
+            if (!_bloques.SinAsignar())
             {
                 int suma = 0;
-                for (int i = 0; i < _bloques.Count; i++)
+                for (int i = 0; i < _bloques.Cantidad; i++)
                 {
-                    suma += _bloques[i].Cantidad;
+                    Bloque b = _bloques.Obtener(i);
+                    suma += b.Cantidad;
                     if (suma >= posicion)//||(_bloques[i].Cantidad==0&&suma==posicion))
                     {
                         int inc = i + 1;
-                        while (inc < _bloques.Count && _bloques[inc].Cantidad==0)
+                        while (inc < _bloques.Cantidad && _bloques.Obtener(inc).Cantidad==0)
                         {
                             inc++;
                         }
                         inc=inc-1;
-                        _bloques[inc].IncrementarCantidad(delta);
+                        Bloque bc=_bloques.Obtener(inc);
+                        bc.IncrementarCantidad(delta);
+                        _bloques.Guardar(inc, bc);
                         return;
                     }
                 }
-                _bloques[_bloques.Count-1].IncrementarCantidad(delta);
+                Bloque bd = _bloques.Obtener(_bloques.Cantidad - 1);
+                bd.IncrementarCantidad(delta);
+                _bloques.Guardar(_bloques.Cantidad-1,bd);
 #if DEBUG
 
                 //Debug.Assert(_bloques.Sum(x => x.Cantidad) == Length); ;
@@ -206,12 +336,12 @@ namespace SWPEditor.Dominio.TextoFormato
         }
         internal void SimplificarFormato()
         {
-            if (_bloques == null) return;
-            for (int i = _bloques.Count-1; i >= 0; i--)
+            if (_bloques.SinAsignar()) return;
+            for (int i = _bloques.Cantidad-1; i >= 0; i--)
             {
-                if (_bloques[i].Cantidad == 0)
+                if (_bloques.Obtener(i).Cantidad == 0)
                 {
-                    _bloques.RemoveAt(i);
+                    _bloques.Eliminar(i);
                 }
             }
 #if DEBUG
@@ -223,7 +353,7 @@ namespace SWPEditor.Dominio.TextoFormato
         internal void Remove(int posicion, int cantidad)
         {
             st.Remove(posicion, cantidad);
-            if (_bloques!=null) {
+            if (!_bloques.SinAsignar()) {
                 int primerbloque, ultimobloque;
                 int deltaini, deltafin;
                 ObtenerRango(posicion, cantidad,
@@ -231,16 +361,22 @@ namespace SWPEditor.Dominio.TextoFormato
                     out ultimobloque, out deltafin);
                 if (primerbloque == ultimobloque)
                 {
-                    _bloques[primerbloque].DisminuirCantidad(deltafin - deltaini);
+                    Bloque b=_bloques.Obtener(primerbloque);
+                    b.DisminuirCantidad(deltafin - deltaini);
+                    _bloques.Guardar(primerbloque, b);
                 }
                 else
                 {
-                    _bloques[primerbloque].DisminuirCantidad((_bloques[primerbloque] .Cantidad - deltaini));
-                    _bloques[ultimobloque].DisminuirCantidad(deltafin);
+                    Bloque b = _bloques.Obtener(primerbloque);
+                    b.DisminuirCantidad((b.Cantidad - deltaini));
+                    _bloques.Guardar(primerbloque, b);
+                    Bloque b2 = _bloques.Obtener(ultimobloque);
+                    b2.DisminuirCantidad(deltafin);
+                    _bloques.Guardar(ultimobloque,b2);
                     int bloquesremover = ultimobloque - 1 - primerbloque;
                     if (bloquesremover > 0)
                     {
-                        _bloques.RemoveRange(primerbloque + 1, bloquesremover);
+                        _bloques.EliminarRango(primerbloque + 1, bloquesremover);
                     }
 #if DEBUG
 
@@ -263,10 +399,10 @@ namespace SWPEditor.Dominio.TextoFormato
             deltaini = 0;
             deltafin = 0;
             bool bloqueini = false;
-            for (int i = 0; i < _bloques.Count; i++)
+            for (int i = 0; i < _bloques.Cantidad; i++)
             {
                 sumaant = suma;
-                suma = suma + _bloques[i].Cantidad;
+                suma = suma + _bloques.Obtener(i).Cantidad;
                 if (!bloqueini && posicionini < suma)
                 {
                     deltaini = posicionini - sumaant;
@@ -283,18 +419,18 @@ namespace SWPEditor.Dominio.TextoFormato
             }
             if (!bloqueini)
             {
-                deltaini = _bloques[_bloques.Count - 1].Cantidad;
-                primerbloque = _bloques.Count - 1;
+                deltaini = _bloques.Obtener(_bloques.Cantidad - 1).Cantidad;
+                primerbloque = _bloques.Cantidad - 1;
             }
-            deltafin = _bloques[_bloques.Count - 1].Cantidad; 
-            ultimobloque = _bloques.Count - 1;
+            deltafin = _bloques.Obtener(_bloques.Cantidad - 1).Cantidad; 
+            ultimobloque = _bloques.Cantidad - 1;
         }
         private void AsegurarBloques()
         {
-            if (_bloques == null)
+            if (_bloques.SinAsignar())
             {
-                _bloques = new List<Bloque>();
-                _bloques.Add(new Bloque(Length, null));
+                _bloques.Asignar();
+                _bloques.Agregar(Length, null);// (new Bloque(Length, null));
             }
         }
         public void AplicarFormato(Formato formato, int inicio, int cantidad)
@@ -305,35 +441,39 @@ namespace SWPEditor.Dominio.TextoFormato
             ObtenerRango(inicio, cantidad, out primerbloque, out deltaini, out ultimobloque, out deltafin);
             if (primerbloque == ultimobloque)
             {
-                Bloque a = _bloques[primerbloque];
+                Bloque a = _bloques.Obtener(primerbloque);
                 Bloque b = new Bloque(deltafin - deltaini, a.Formato);
                 b.FusionarFormato(formato);
                 Bloque c = new Bloque(a.Cantidad - deltafin, a.Formato);
                 a.DisminuirCantidad(a.Cantidad - deltaini);
-                _bloques.Insert(primerbloque + 1, b);
-                _bloques.Insert(primerbloque + 2, c);
+                _bloques.Guardar(primerbloque,a);
+                _bloques.Insertar(primerbloque + 1, b);
+                _bloques.Insertar(primerbloque + 2, c);
             }
             else
             {
-                Bloque a = _bloques[primerbloque];
+                Bloque a = _bloques.Obtener(primerbloque);
                 //disminuir el tamaño de los bloques e insertar nuevos bloques al medio combinados.
                 if (a.Cantidad != deltaini)
                 {
-                    _bloques.Insert(primerbloque + 1, new Bloque(a.Cantidad - deltaini, a.Formato));
+                    _bloques.Insertar(primerbloque + 1, new Bloque(a.Cantidad - deltaini, a.Formato));
                     ultimobloque++;
                 }
                 a.DisminuirCantidad(a.Cantidad - deltaini);
-                Bloque b = _bloques[ultimobloque];
+                _bloques.Guardar(primerbloque,a);
+                Bloque b = _bloques.Obtener(ultimobloque);
                 if (deltafin != 0)
                 {
-                    _bloques.Insert(ultimobloque, new Bloque(deltafin, b.Formato));
+                    _bloques.Insertar(ultimobloque, new Bloque(deltafin, b.Formato));
                     ultimobloque++;
                 }
                 b.DisminuirCantidad(deltafin);
+                _bloques.Guardar(ultimobloque, b);
                 for (int i = primerbloque + 1; i < ultimobloque; i++)
                 {
-                    _bloques[i].FusionarFormato(formato);
-
+                    Bloque bq=_bloques.Obtener(i);
+                    bq.FusionarFormato(formato);
+                    _bloques.Guardar(i, bq);
                 }
                
 #if DEBUG
@@ -350,24 +490,24 @@ namespace SWPEditor.Dominio.TextoFormato
 
         internal int ObtenerNumBloques()
         {
-            if (_bloques == null) return 1;
-            return _bloques.Count;
+            if (_bloques.SinAsignar()) return 1;
+            return _bloques.Cantidad;
         }
 
         internal void Agregar(Texto texto)
         {
-            if (_bloques != null || texto._bloques != null)
+            if (_bloques.SinAsignar() || !texto._bloques.SinAsignar())
             {
                 AsegurarBloques();
-                if (texto._bloques == null)
+                if (texto._bloques.SinAsignar())
                 {
-                    Bloque b=_BloqueVacio.Clonar();
-                    b.CambiarCantidad(texto.st.Length);
-                    _bloques.Add(b);
+                    //Bloque b=_BloqueVacio.Clonar();
+                    //b.CambiarCantidad(texto.st.Length);
+                    _bloques.Agregar(texto.st.Length,null);
                 }
                 else
                 {
-                    _bloques.AddRange(texto._bloques);
+                    _bloques.AgregarDesde(texto._bloques);
                 }
             }
             st.Append(texto.st);  
@@ -383,27 +523,27 @@ namespace SWPEditor.Dominio.TextoFormato
         {
             Texto texto2 = new Texto();
             
-            if (_bloques != null)
+            if (!_bloques.SinAsignar())
             {
                 int primerbloque, ultimobloque;
                 int deltaini, deltafin;
                 ObtenerRango(posicionDivision, st.Length-posicionDivision, out primerbloque, out deltaini, out ultimobloque, out deltafin);
-                int saldoprimerbloque = _bloques[primerbloque].Cantidad - deltaini;
-                _bloques[primerbloque].CambiarCantidad(deltaini);
-
-                texto2._bloques = new List<Bloque>();
-                Bloque clon = null;
+                Bloque bloqueinicio = _bloques.Obtener(primerbloque);
+                int saldoprimerbloque = bloqueinicio.Cantidad - deltaini;
+                bloqueinicio.CambiarCantidad(deltaini);
+                _bloques.Guardar(primerbloque, bloqueinicio);
+                texto2._bloques=new ContenedorBloques();
                 if (saldoprimerbloque != 0)
                 {
-                    clon = _bloques[primerbloque].Clonar();
-                    clon.CambiarCantidad(saldoprimerbloque);
-                    texto2._bloques.Add(clon);
+                    Bloque clon = _bloques.Obtener(primerbloque);//.Clonar();
+                    texto2._bloques.Agregar(saldoprimerbloque,clon.Formato);
                 }
-                for (int i = primerbloque + 1; i < _bloques.Count; i++)
+                for (int i = primerbloque + 1; i < _bloques.Cantidad; i++)
                 {
-                    texto2._bloques.Add(_bloques[i]);
+                    Bloque b = _bloques.Obtener(i);
+                    texto2._bloques.Agregar(b.Cantidad,b.Formato);
                 }
-                _bloques.RemoveRange(primerbloque + 1, _bloques.Count - (primerbloque + 1));
+                _bloques.EliminarRango(primerbloque + 1, _bloques.Cantidad - (primerbloque + 1));
                 
             }
             texto2.Iniciar();
@@ -425,10 +565,10 @@ namespace SWPEditor.Dominio.TextoFormato
             t.Iniciar();
             IEnumerable<Bloque> bloques=ObtenerRangoBloques(inicio,cantidad);
             t.st.Append(st);
-            t._bloques = new List<Bloque>();
+            t._bloques = new ContenedorBloques();
             foreach (Bloque b in bloques)
             {
-                t._bloques.Add(b.Clonar());
+                t._bloques.Agregar(b.Cantidad,b.Formato);
             }
             return t;
         }

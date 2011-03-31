@@ -14,7 +14,7 @@ namespace SWPEditor.Dominio.TextoFormato
         public Medicion? EspacioPosterior { get; private set; }
         public decimal? EspaciadoInterlineal { get; private set; }
         public AlineacionParrafo? AlineacionHorizontal { get; private set; }
-
+        public Formato FormatoTexto { get; private set; }
         public AlineacionParrafo ObtenerAlineacionHorizontal()
         {
             return AlineacionHorizontal.HasValue ? AlineacionHorizontal.Value : FormatoBase.AlineacionHorizontal.Value;
@@ -82,6 +82,11 @@ namespace SWPEditor.Dominio.TextoFormato
             FormatoParrafo f = new FormatoParrafo();
             f.AlineacionHorizontal = AlineacionParrafo.Centro;
             return f;
+        }
+
+        internal Formato ObtenerFormatoTexto()
+        {
+            return FormatoTexto??Formato.ObtenerPredefinido();
         }
     }
 }
