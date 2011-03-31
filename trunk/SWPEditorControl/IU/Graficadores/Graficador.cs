@@ -163,13 +163,13 @@ namespace SWPEditor.IU.Graficadores
         }
         static StringFormat FormatoPresentacion;
         static StringFormat FormatoMedicion;
-        System.Drawing.Text.TextRenderingHint presenttexto = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+        System.Drawing.Text.TextRenderingHint presenttexto = System.Drawing.Text.TextRenderingHint.AntiAlias;
         static GraficadorGDI()
         {
             Bitmap bmp = new Bitmap(1, 1, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
             bmp.SetResolution(10000, 10000);
             _GraficadorConsultas = new GraficadorGDI(Graphics.FromImage(bmp));
-            _GraficadorConsultas.g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+            _GraficadorConsultas.g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             FormatoMedicion = new StringFormat(StringFormat.GenericTypographic);
             FormatoMedicion.FormatFlags = 0;
             FormatoMedicion.FormatFlags = StringFormatFlags.FitBlackBox |
