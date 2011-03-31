@@ -18,30 +18,32 @@ namespace SWPEditor.IU
 {
     public partial class SWPEditorControl : Control
     {
-        Escritorio escritorio;
-        private ContPresentarDocumento _ControlDocumento
-        {
-            get
-            {
-                return escritorio.ControlDocumento;
-            }
-        }
+        SWPGenericControl _base;
+        SWPClipboard _clipboard;
         public SWPEditorControl()
             : base()
         {
             DoubleBuffered = true;
+            
             Documento _documento = new Documento();
-            escritorio = new Escritorio(_documento,GraficadorGDI.ObtenerGraficadorConsultas());
-            escritorio.ActualizarPresentacion += new EventHandler(contpresentacion_ActualizarPresentacion);
-            escritorio.Dimensiones=new TamBloque(new Medicion(50, Unidad.Milimetros), new Medicion(50, Unidad.Milimetros));
+            _clipboard = new SWPClipboard();
+            _base = new SWPGenericControl(GraficadorGDI.ObtenerGraficadorConsultas());
             this.SetStyle(ControlStyles.Selectable, true);
             Enabled = true;
             Visible = true;
+            _base.PrintRequested += new EventHandler(_base_PrintRequested);
+            _base.RefreshRequested += new EventHandler(_base_RefreshRequested);
         }
 
-        void contpresentacion_ActualizarPresentacion(object sender, EventArgs e)
+        void _base_RefreshRequested(object sender, EventArgs e)
         {
             Refresh();
+        }
+
+        void _base_PrintRequested(object sender, EventArgs e)
+        {
+            SWPEditorPrinter imp = new SWPEditorPrinter(_base.GetDocument());
+            imp.Print();
         }
         protected override bool IsInputChar(char charCode)
         {
@@ -53,237 +55,148 @@ namespace SWPEditor.IU
         }
         protected override void OnResize(EventArgs e)
         {
-            using (Graphics graf = Graphics.FromHwnd(Handle))
+            using (Graphics g = Graphics.FromHwnd(Handle))
             {
-                GraficadorGDI g = new GraficadorGDI(graf);
-                escritorio.Dimensiones = g.Traducir(new SizeF(Width, Height));
+                _base.NotifySizeChanged(new GraficadorGDI(g).Traducir(new SizeF(Width, Height)));
             }
             base.OnResize(e);
         }
         
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
-            _ControlDocumento.TeclaPulsada(e.KeyChar);
+            _base.NotifyCharacterPressed(e.KeyChar);
             e.Handled = true;
             base.OnKeyPress(e);
         }
-        private Unidad CentesimaPulgada = new Unidad("CentPlg", "CP", 0.01, Unidad.Pulgadas);
+        //private Unidad CentesimaPulgada = new Unidad("CentPlg", "CP", 0.01, Unidad.Pulgadas);
         public void Print()
         {
-            PrintDialog impr = new PrintDialog();
-            PrintDocument docimpr = new PrintDocument();
-            impr.Document = docimpr;
-            impr.UseEXDialog = true;
-            if (impr.ShowDialog(this) == DialogResult.OK)
-            {
-                //docimpr.PrinterSettings = impr.PrinterSettings;
-                docimpr.QueryPageSettings += new QueryPageSettingsEventHandler(docimpr_QueryPageSettings);
-                //docimpr.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
-                docimpr.OriginAtMargins = true;
-                docimpr.PrintPage += new PrintPageEventHandler(impresora_PrintPage);
-                numpagina = null;
-                docimpr.Print();
-            }
+            _base.Print();
         }
-
+        static Dictionary<Keys, SWPGenericControl.Key> _traduccion = new Dictionary<Keys, SWPGenericControl.Key>();
+        static SWPEditorControl()
+        {
+            _traduccion.Add(Keys.X, SWPGenericControl.Key.Cut);
+            _traduccion.Add(Keys.C, SWPGenericControl.Key.Copy);
+            _traduccion.Add(Keys.V, SWPGenericControl.Key.Paste);
+            _traduccion.Add(Keys.Up, SWPGenericControl.Key.Up);
+            _traduccion.Add(Keys.Down, SWPGenericControl.Key.Down);
+            _traduccion.Add(Keys.Left, SWPGenericControl.Key.Left);
+            _traduccion.Add(Keys.Right, SWPGenericControl.Key.Right);
+            _traduccion.Add(Keys.PageDown, SWPGenericControl.Key.PageDown);
+            _traduccion.Add(Keys.PageUp, SWPGenericControl.Key.PageUp);
+            _traduccion.Add(Keys.Back, SWPGenericControl.Key.BackSpace);
+            _traduccion.Add(Keys.Enter, SWPGenericControl.Key.Enter);
+        }
         
         protected override void OnKeyDown(KeyEventArgs e)
         {
+            
             switch (e.KeyCode)
             {
                 case Keys.X:
-                    if (e.Control) //CTRL+V=PEGAR
-                    {
-                        Cut();
-                        e.Handled = true;
-                    }
-                    break;
+                case Keys.C:
                 case Keys.V:
+                case Keys.E:
                     if (e.Control) //CTRL+V=PEGAR
                     {
-                        Paste();
+                        _base.NotifyKeyDown(_traduccion[e.KeyCode], e.Shift, e.Control, _clipboard);
                         e.Handled = true;
+                        e.SuppressKeyPress = true;
                     }
                     break;
-                case Keys.C: //CTRL+C=COPIAR
-                    if (e.Control)
+                default:
+                    if (_traduccion.ContainsKey(e.KeyCode))
                     {
-                        Copy();
+                        _base.NotifyKeyDown(_traduccion[e.KeyCode], e.Shift, e.Control, _clipboard);
                         e.Handled = true;
+                        e.SuppressKeyPress = true;
                     }
                     break;
-                case Keys.P: //CTRL+P=IMPRIMIR
-                    if (e.Control)
-                    {
-                        Print();
-                    }
-                    break;
-                case Keys.E://CTRL+E=SELECCIONAR TODO
-                    if (e.Control)
-                    {
-                        SelectAll();
-                        e.Handled = true;
-                    }
-                    break;
-                case Keys.Delete:
-                    DeleteCharacter();
-                    e.Handled = true;
-                    break;
-                case Keys.Back:
-                    DeletePreviousCharacter();
-                    e.Handled = true;
-                    break;
-                case Keys.PageUp:
-                    GotoPreviousPage(e.Shift);
-                    break;
-                case Keys.PageDown:
-                    GotoNextPage(e.Shift); ;
-                    break;
-                case Keys.Home:
-                    GotoLineStart(e.Shift);
-                    e.Handled = true;
-                    break;
-                case Keys.End:
-                    GotoLineEnd(e.Shift);
-                    break;
-                case Keys.Left:
-                    GotoLeft(e.Shift, e.Control);
-                    e.Handled = true;
-                    break;
-                case Keys.Right:
-                    GotoRight(e.Shift, e.Control);
-                    e.Handled = true;
-                    break;
-                case Keys.Enter:
-                    InsertParagraph(e.Shift);
-                    e.Handled = true;
-                    break;
-                case Keys.Up:
-                    GotoUp(e.Shift);
-                    e.Handled = true;
-                    break;
-                case Keys.Down:
-                    GotoDown(e.Shift);
-                    e.Handled = true;
-                    break;
-
             }
             base.OnKeyDown(e);
         }
         
         public void InsertText(string text)
         {
-            _ControlDocumento.InsertarTexto(text);
+            _base.InsertText(text);
         }
         public string GetText() {
-            return _ControlDocumento.ObtenerTexto();
+            return _base.GetText();
         }
         public void SetText(string value) {
-            _ControlDocumento.SeleccionarTodo();
-            _ControlDocumento.InsertarTexto(value);        
+            _base.SetText(value);
         }
         public void SelectAll()
         {
-            _ControlDocumento.SeleccionarTodo();
+            _base.SelectAll();
         }
 
         public void GotoDown(bool select)
         {
-            _ControlDocumento.IrLineaInferior(select);
+            _base.GotoDown(select);
         }
 
         public void GotoUp(bool select)
         {
-            _ControlDocumento.IrLineaSuperior(select);
+            _base.GotoUp(select); 
         }
 
         public void InsertParagraph(bool select)
         {
-            _ControlDocumento.InsertarParrafo(select);
-
+            _base.InsertParagraph(select);
         }
 
         public void GotoRight(bool select, bool advanceByWord)
         {
-            _ControlDocumento.IrSiguienteCaracter(select, advanceByWord ? TipoAvance.AvanzarPorPalabras : TipoAvance.AvanzarPorCaracteres);
+            _base.GotoRight(select, advanceByWord);
         }
 
         public void GotoLeft(bool select, bool advanceByWord)
         {
-            _ControlDocumento.IrAnteriorCaracter(select, advanceByWord ? TipoAvance.AvanzarPorPalabras : TipoAvance.AvanzarPorCaracteres);
+            _base.GotoLeft(select, advanceByWord);
         }
 
         public void GotoLineEnd(bool select)
         {
-            _ControlDocumento.IrSiguienteCaracter(select, TipoAvance.AvanzarPorLineas);
+            _base.GotoLineEnd(select);
         }
 
         public void GotoLineStart(bool select)
         {
-            _ControlDocumento.IrAnteriorCaracter(select, TipoAvance.AvanzarPorLineas);
+            _base.GotoLineStart(select);
         }
 
         public void GotoNextPage(bool select)
         {
-            _ControlDocumento.IrSiguienteCaracter(select, TipoAvance.AvanzarPorPaginas);
+            _base.GotoNextPage(select);
         }
         public void GotoPreviousPage(bool select)
         {
-            _ControlDocumento.IrAnteriorCaracter(select, TipoAvance.AvanzarPorPaginas);                    
+            _base.GotoPreviousPage(select);
         }
         public void DeletePreviousCharacter()
         {
-            _ControlDocumento.BorrarCaracterAnterior();            
+            _base.DeletePreviousCharacter();
         }
         public void DeleteCharacter()
         {
-            _ControlDocumento.BorrarCaracter();                    
+            _base.DeleteCharacter();
         }
         public void Cut()
         {
-            _ControlDocumento.Cortar(new SWPClipboard());
+            _base.Cut(_clipboard);
         }
         public void Copy()
         {
-            _ControlDocumento.Copiar(new SWPClipboard());
+            _base.Copy(_clipboard);
         }
 
         public void Paste()
         {
-            _ControlDocumento.Pegar(new SWPClipboard());            
+            _base.Paste(_clipboard);
         }
-        int? numpagina;
         
-        void docimpr_QueryPageSettings(object sender, QueryPageSettingsEventArgs e)
-        {
-            if (!numpagina.HasValue)
-            {
-                numpagina = 0;
-            }
-            //int lim = escritorio.Controlador.Documento.ObtenerNumPaginas();
-            Pagina pag = escritorio.ControlDocumento.Documento.ObtenerPagina(numpagina.Value);
-
-            e.PageSettings.PaperSize = new PaperSize("Personalizado",
-                (int)pag.Dimensiones.Ancho.ConvertirA(CentesimaPulgada).Valor,
-                (int)pag.Dimensiones.Alto.ConvertirA(CentesimaPulgada).Valor);
-        }
-        void impresora_PrintPage(object sender, PrintPageEventArgs e)
-        {
-            if (!numpagina.HasValue) {
-                numpagina=0;
-            }
-            if (escritorio.ControlDocumento.Documento.EsUltimaPagina(numpagina.Value)) {
-                e.HasMorePages = false;
-            }
-            GraficadorGDI g=new GraficadorGDI(e.Graphics);
-            e.Graphics.ResetTransform();
-            e.Graphics.PageUnit = GraphicsUnit.Display;
-            g.CambiarResolucion(96, 96);//Utilizar resolucion pantalla
-            
-            //g.CambiarResolucion(e.PageSettings.PrinterResolution.X, e.PageSettings.PrinterResolution.Y);
-            escritorio.ControlDocumento.Documento.DibujarPagina(g, new Punto(Medicion.Cero, Medicion.Cero), numpagina.Value, null);
-            numpagina++;
-        }
         const int deltax = 0;
         const int deltay = 0;
         protected override void OnPaint(PaintEventArgs e)
@@ -292,7 +205,8 @@ namespace SWPEditor.IU
             try
             {
                 IGraficador graf = new GraficadorGDI(e.Graphics);
-                escritorio.Dibujar(graf, _ControlDocumento.ObtenerSeleccion());
+                _base.DrawDesktop(graf, true, true);
+
             }
             catch (Exception ex)
             {
@@ -303,6 +217,7 @@ namespace SWPEditor.IU
         }
         
         bool EnCaptura = false;
+        /*
         protected void RegistrarPosicionSinc(float x, float y, bool ampliarSeleccion)
         {
             using (Graphics g = Graphics.FromHwnd(this.Handle))
@@ -310,13 +225,17 @@ namespace SWPEditor.IU
                 float posx = x - deltax;
                 float posy = y - deltay;
                 GraficadorGDI graf = new GraficadorGDI(g);
-                escritorio.IrAPosicion(graf.Traducir(new PointF(posx, posy)), ampliarSeleccion);
+                _baa.IrAPosicion(graf.Traducir(new PointF(posx, posy)), ampliarSeleccion);
+            }
+        }*/
+        private Punto TranslatePoint(PointF punto)
+        {
+            using (Graphics g = Graphics.FromHwnd(Handle))
+            {
+                return new GraficadorGDI(g).Traducir(punto);
             }
         }
-        protected void RegistrarPosicion(float x,float y,bool ampliarSeleccion) {
-            RegistrarPosicionSinc(x, y, ampliarSeleccion);
-            
-        }
+        
         protected override void OnMouseDown(MouseEventArgs e)
         {
             if (!Focused)
@@ -325,7 +244,7 @@ namespace SWPEditor.IU
             }
             if (!EnCaptura)
             {
-                RegistrarPosicion(e.X, e.Y, (ModifierKeys&Keys.Shift)!=0);
+                _base.NotifyMouseDown(TranslatePoint(new PointF(e.X, e.Y)), (ModifierKeys & Keys.Shift) != 0);
                 Capture = true;
                 EnCaptura = true;
             } 
@@ -335,14 +254,10 @@ namespace SWPEditor.IU
         {
             if (EnCaptura)
             {
-                RegistrarPosicion(e.X, e.Y, true);
+                _base.NotifyMouseUp(TranslatePoint(new PointF(e.X, e.Y)));
                 Capture = false;
                 EnCaptura = false;
-                Seleccion s = _ControlDocumento.ObtenerSeleccion();
-                if (s != null && s.EstaVacia)
-                {
-                    _ControlDocumento.QuitarSeleccion();
-                }
+                
             }
             base.OnMouseUp(e);
         }
@@ -351,77 +266,78 @@ namespace SWPEditor.IU
         {
             if (EnCaptura)
             {
-                RegistrarPosicion(e.X, e.Y, true);
+                _base.NotifyMouseMove(TranslatePoint(new PointF(e.X, e.Y)));
             }
             base.OnMouseMove(e);
         }
 
         public void ChangeFontColor(System.Drawing.Color color)
         {
-            _ControlDocumento.CambiarColorLetra(new SWPEditor.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
+            _base.ChangeFontColor(new SWPEditor.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
+            
         }
         public void ChangeFontBackground(System.Drawing.Color color)
         {
-            _ControlDocumento.CambiarColorFondo(new SWPEditor.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
+            _base.ChangeFontBackground(new SWPEditor.Dominio.TextoFormato.ColorDocumento(color.A, color.R, color.G, color.B));
         }
         public void ChangeFontBold()
         {
-            _ControlDocumento.CambiarLetraNegrilla();
+            _base.ChangeFontBold();
         }
 
         public void ChangeFontItalic()
         {
-            _ControlDocumento.CambiarLetraCursiva();
+            _base.ChangeFontItalic();
         }
 
         public void ChangeFontUnderlined()
         {
-            _ControlDocumento.CambiarLetraSubrayado();
+            _base.ChangeFontUnderlined();
         }
 
         public void IncreaseFontSize()
         {
-            _ControlDocumento.AgrandarLetra();
+            _base.IncreaseFontSize();
         }
 
         public void ReduceFontSize()
         {
-            _ControlDocumento.ReducirLetra();
+            _base.ReduceFontSize();
         }
 
         internal void ChangeFont(Font font)
         {
-            _ControlDocumento.CambiarLetra(font.FontFamily.Name,new Medicion(font.SizeInPoints,Unidad.Puntos));
+            _base.ChangeFont(font.FontFamily.Name,new Medicion(font.SizeInPoints,Unidad.Puntos));
         }
 
         internal void SetFontSizeInPoints(decimal valor)
         {
-            _ControlDocumento.CambiarTamLetra(new Medicion((float)valor, Unidad.Puntos));
+            _base.SetFontSizeInPoints(valor);
         }
 
         internal void AlignLeft()
         {
-            _ControlDocumento.AlinearIzquierda();
+            _base.AlignLeft();
         }
 
         internal void AlignCenter()
         {
-            _ControlDocumento.AlinearCentro();
+            _base.AlignCenter();
         }
 
         internal void AlignRight()
         {
-            _ControlDocumento.AlinearDerecha();
+            _base.AlignRight();
         }
 
         internal void IncreaseLineSpace()
         {
-            _ControlDocumento.AumentarInterlineado();
+            _base.IncreaseLineSpace();
         }
 
         internal void DecreaseLineSpace()
         {
-            _ControlDocumento.DisminuirInterlineado();
+            _base.DecreaseLineSpace();
         }
     }
 }

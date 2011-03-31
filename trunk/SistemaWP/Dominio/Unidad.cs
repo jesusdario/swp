@@ -23,6 +23,6 @@ namespace SWPEditor.Dominio
         public static readonly Unidad Pulgadas = new Unidad("Pulgadas", "\"", 0.0254,Metros);
         public static readonly Unidad Puntos = new Unidad("Puntos", "\"", 1/72.0, Pulgadas);
         public static readonly Unidad Documento = new Unidad("Documento", "doc", 1 / 300.0, Pulgadas);
-        public static readonly Unidad Pagina = new Unidad("Pantalla", "pg", 1 / 96.0, Pulgadas);
+        public static readonly Unidad Pantalla = new Unidad("Pantalla", "pg", 1 / 96.0, Pulgadas);
     }
 }

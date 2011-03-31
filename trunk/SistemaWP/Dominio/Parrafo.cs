@@ -224,7 +224,7 @@ namespace SWPEditor.Dominio
             
             return 0;
         }
-#if FORMATO
+
         internal void CambiarFormato(Formato formato, int posicionInicio, int cantidad)
         {
             bufferTexto.AplicarFormato(formato, posicionInicio, cantidad);
@@ -244,7 +244,7 @@ namespace SWPEditor.Dominio
                 yield return bufferTexto.ObtenerBloque(i);
             }
         }
-#endif
+
 
         public void AlinearIzquierda()
         {

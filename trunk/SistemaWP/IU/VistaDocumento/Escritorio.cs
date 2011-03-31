@@ -66,7 +66,7 @@ namespace SWPEditor.IU.VistaDocumento
             ControlDocumento = controlador;
             EsquinaSuperior = new Punto(Medicion.Cero, Medicion.Cero);
         }
-        public void Dibujar(IGraficador graficador,Seleccion seleccion)
+        public void Dibujar(IGraficador graficador,Seleccion seleccion,bool dibujarCursor)
         {
             AsegurarGraficador();
             Posicion pos = ControlDocumento.ObtenerPosicion();
@@ -77,7 +77,7 @@ namespace SWPEditor.IU.VistaDocumento
             IEnumerable<Pagina> pags = _Documento.ObtenerDesde(PaginaSuperior);
             foreach (Pagina p in pags) {
                 LienzoPagina l = new LienzoPagina(i,new Punto(derecha,inicio));
-                l.Dibujar(graficador, _Documento, pos, seleccion);
+                l.Dibujar(graficador, _Documento, pos, seleccion, dibujarCursor);
                 if (Medicion.Cero-inicio > Dimensiones.Alto+EsquinaSuperior.Y)
                 {
                     return;
