@@ -46,7 +46,7 @@ namespace SWPEditor.IU.PresentacionDocumento
                 }
                 Debug.Assert(posparrafoanterior == l.Inicio);
                 Debug.Assert(l.Inicio >= 0);
-                Debug.Assert(l.Inicio + l.Cantidad <= l.Parrafo.ObtenerLongitud());
+                Debug.Assert(l.Inicio + l.Cantidad <= l.Parrafo.Longitud);
                 posparrafoanterior = l.Inicio + l.Cantidad;
             }
         }

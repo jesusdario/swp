@@ -15,11 +15,37 @@ namespace SWPEditor.Dominio
         void ParrafoEliminado(Parrafo p);
         void ParrafosCambiados(Parrafo parrafoInicio, Parrafo parrafoFin);
     }
-    public class Documento
+    public class Documento:IEnumerable<Parrafo>
     {
         Dictionary<int, Parrafo> m_Parrafos = new Dictionary<int, Parrafo>();
         List<IObservadorDocumento> m_Observadores = new List<IObservadorDocumento>();
         public object ObjetoLock { get { return m_Parrafos; } }
+
+        #region Miembros de IEnumerable<Parrafo>
+
+        public IEnumerator<Parrafo> GetEnumerator()
+        {
+            lock (ObjetoLock)
+            {
+                Parrafo actual = ObtenerPrimerParrafo();
+                while (actual != null)
+                {
+                    yield return actual;
+                    actual = actual.Siguiente;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Miembros de IEnumerable
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        #endregion
         internal void AgregarObservador(IObservadorDocumento observador)
         {
             m_Observadores.Add(observador);
@@ -143,7 +169,7 @@ namespace SWPEditor.Dominio
                     EnParrafosCambiados(p, parrafoSeleccionado);
                     return parrafoSeleccionado;
                 }
-                else if (posicionInsercion == parrafoSeleccionado.ObtenerLongitud())
+                else if (posicionInsercion == parrafoSeleccionado.Longitud)
                 {
                     int idnuevo = CrearNuevoID(parrafoSeleccionado.ID + 1);
                     Parrafo p = new Parrafo(this, idnuevo, parrafoSeleccionado, parrafoSeleccionado.Siguiente, parrafoSeleccionado);
@@ -198,12 +224,12 @@ namespace SWPEditor.Dominio
                 }
                 else
                 {
-                    inicio.Escribir(esc, posicionInicio, inicio.ObtenerLongitud() - posicionInicio);
+                    inicio.Escribir(esc, posicionInicio, inicio.Longitud - posicionInicio);
                     Parrafo p = inicio.Siguiente;
                     while (p != null)
                     {
                         if (p == fin) break;
-                        p.Escribir(esc, 0, p.ObtenerLongitud());
+                        p.Escribir(esc, 0, p.Longitud);
                         p = p.Siguiente;
                     }
                     if (fin != null)
@@ -307,10 +333,10 @@ namespace SWPEditor.Dominio
                     Parrafo p = parrafoInicio.Siguiente;
                     while (p != parrafoFin)
                     {
-                        p.CambiarFormato(formato, 0, p.ObtenerLongitud());
+                        p.CambiarFormato(formato, 0, p.Longitud);
                         p = p.Siguiente;
                     }
-                    parrafoInicio.CambiarFormato(formato, posicionInicio, parrafoInicio.ObtenerLongitud() - posicionInicio);
+                    parrafoInicio.CambiarFormato(formato, posicionInicio, parrafoInicio.Longitud - posicionInicio);
                     parrafoFin.CambiarFormato(formato, 0, posicionFin);
                     EnParrafosCambiados(parrafoInicio, parrafoFin);
                 }
@@ -333,7 +359,7 @@ namespace SWPEditor.Dominio
                     int inicio = posicionInicio;
                     while (p != parrafoFin)
                     {
-                        f = f.ObtenerInterseccion(p.ObtenerFormatoComun(inicio, p.ObtenerLongitud() - inicio));
+                        f = f.ObtenerInterseccion(p.ObtenerFormatoComun(inicio, p.Longitud - inicio));
                         p = p.Siguiente;
                         inicio = 0;
                     }
@@ -362,7 +388,7 @@ namespace SWPEditor.Dominio
             {
                 Parrafo actual = parrafoInicial;
                 Parrafo p;
-                p = actual.ObtenerSubParrafo(doc, posicionInicial, actual.ObtenerLongitud() - posicionInicial);
+                p = actual.ObtenerSubParrafo(doc, posicionInicial, actual.Longitud - posicionInicial);
                 p.CambiarID(doc.CrearNuevoID(1));
                 doc.AgregarParrafo(p);
                 Parrafo anterior = p;
@@ -371,7 +397,7 @@ namespace SWPEditor.Dominio
                 {
                     if (p == parrafoFinal)
                         break;
-                    p=actual.ObtenerSubParrafo(doc,0,actual.ObtenerLongitud());
+                    p=actual.ObtenerSubParrafo(doc,0,actual.Longitud);
                     p.CambiarID(doc.CrearNuevoID(anterior.ID));
                     doc.AgregarParrafo(p);
                     anterior.ConectarDespues(p);
@@ -385,5 +411,7 @@ namespace SWPEditor.Dominio
             }
             return doc;
         }
+
+        
     }
 }

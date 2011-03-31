@@ -43,53 +43,69 @@ namespace SWPEditor.Dominio.TextoFormato
         FlagsFormato Flags { get; set; }
         public string ObtenerFamiliaLetra()
         {
-            return FamiliaLetra ?? FormatoBase.FamiliaLetra;
+            return FamiliaLetra ?? Contexto.FamiliaLetra;
         }
         public Medicion ObtenerTamLetra()
         {
-            return TamLetra ?? FormatoBase.TamLetra.Value;
+            if (FactorEscalaLetra != 1)
+            {
+                return (TamLetra ?? Contexto.TamLetra.Value)*FactorEscalaLetra;
+            }
+            else
+            {
+                return TamLetra ?? Contexto.TamLetra.Value;
+            }
         }
         public ColorDocumento ObtenerColorLetra()
         {
-            return ColorLetra ?? FormatoBase.ColorLetra.Value;
+            return ColorLetra ?? Contexto.ColorLetra.Value;
         }
         public ColorDocumento ObtenerColorFondo()
         {
-            return ColorFondo ?? FormatoBase.ColorFondo.Value;
+            return ColorFondo ?? Contexto.ColorFondo.Value;
         }
         public bool ObtenerNegrilla()
         {
-            return Negrilla ?? FormatoBase.Negrilla.Value;
+            return Negrilla ?? Contexto.Negrilla.Value;
         }
         public bool ObtenerCursiva()
         {
-            return Cursiva ?? FormatoBase.Cursiva.Value;
+            return Cursiva ?? Contexto.Cursiva.Value;
         }
         public bool ObtenerSubrayado()
         {
-            return Subrayado ?? FormatoBase.Subrayado.Value;
+            return Subrayado ?? Contexto.Subrayado.Value;
         }
-        private static Formato FormatoBase;
+        private static Formato Contexto;
         static Formato()
         {
-            FormatoBase = new Formato();
-            FormatoBase.FamiliaLetra="Arial";
-            FormatoBase.TamLetra=new Medicion(12, Unidad.Puntos);
-            FormatoBase.Subrayado = false;
-            FormatoBase.Negrilla = false;
-            FormatoBase.Cursiva = false;
-            FormatoBase.ColorLetra = ColorDocumento.Negro;
-            FormatoBase.ColorFondo = ColorDocumento.Transparente;
-            FormatoBase.FactorEscalaLetra = 1;
+            Contexto = new Formato();
+            Contexto.FamiliaLetra = "Arial";
+            Contexto.TamLetra = new Medicion(12, Unidad.Puntos);
+            Contexto.Subrayado = false;
+            Contexto.Negrilla = false;
+            Contexto.Cursiva = false;
+            Contexto.ColorLetra = ColorDocumento.Negro;
+            Contexto.ColorFondo = ColorDocumento.Transparente;
+            Contexto.FactorEscalaLetra = 1;
         }
+        public void Limpiar()
+        {
+            FamiliaLetra = null;
+            TamLetra = null;
+            Flags = SinFlags;
+            FactorEscalaLetra = 1.0f;
+            ColorLetra = null;
+            ColorFondo = null;
+        }
+        const FlagsFormato SinFlags = (FlagsFormato)((int)(FlagsFormato.Negrilla | FlagsFormato.Cursiva | FlagsFormato.Subrayado) >> 1);
         private Formato() {
-            Flags = (FlagsFormato)((int)(FlagsFormato.Negrilla | FlagsFormato.Cursiva | FlagsFormato.Subrayado) >> 1);//Dejar los flags en "SIN DEFINIR"
+            Flags = SinFlags;//Dejar los flags en "SIN DEFINIR"
         }
         private Formato(string familiaLetra, Medicion? tamLetra):this()
         {
             FamiliaLetra = familiaLetra;
-            TamLetra = tamLetra;
-            
+            TamLetra = tamLetra;            
         }
         public static Formato CrearNegrilla(bool valor)
         {
@@ -226,17 +242,37 @@ namespace SWPEditor.Dominio.TextoFormato
                 f = formatoConstructor;
                 f.FamiliaLetra = formato2.FamiliaLetra ?? FamiliaLetra;
                 //Redondear letra a dos decimales, en puntos
-                f.TamLetra = ((formato2.TamLetra ?? TamLetra)*FactorEscalaLetra*formato2.FactorEscalaLetra);
+                bool escalado=false;
+                if (TamLetra.HasValue)
+                {
+                    if (formato2.TamLetra.HasValue)
+                    {
+                        f.TamLetra = formato2.TamLetra*f.FactorEscalaLetra*formato2.FactorEscalaLetra;
+                    }
+                    else
+                    {
+                        f.TamLetra = TamLetra * f.FactorEscalaLetra * formato2.FactorEscalaLetra;
+                    }
+                    escalado = true;
+                }
+                //f.TamLetra = ((formato2.TamLetra ?? TamLetra)*FactorEscalaLetra*formato2.FactorEscalaLetra);
                 f.Negrilla = formato2.Negrilla ?? Negrilla;
                 f.Cursiva = formato2.Cursiva ?? Cursiva;
                 f.Subrayado = formato2.Subrayado ?? Subrayado;
                 f.ColorFondo = formato2.ColorFondo ?? ColorFondo;
                 f.ColorLetra = formato2.ColorLetra ?? ColorLetra;
-                f.FactorEscalaLetra = 1;
+                if (escalado)
+                {
+                    f.FactorEscalaLetra = 1;
+                }
+                else
+                {
+                    f.FactorEscalaLetra = formato2.FactorEscalaLetra * FactorEscalaLetra;
+                }
                 return ObtenerDeCache(f);
             }
             else
-            {
+            {   
                 return this;
             }
         }
@@ -260,7 +296,7 @@ namespace SWPEditor.Dominio.TextoFormato
 
         internal static Formato ObtenerPredefinido()
         {
-            return FormatoBase;
+            return Contexto;
         }
     }
 }

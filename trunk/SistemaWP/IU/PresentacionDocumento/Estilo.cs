@@ -17,7 +17,8 @@ namespace SWPEditor.IU.PresentacionDocumento
         public Brocha ColorLetra { get; set; }
         public Estilo(Bloque bloque)
         {
-            Debug.Assert(bloque != null);
+            //Debug.Assert(bloque != null);
+            Debug.Assert(bloque.Formato != null);
             Formato f = bloque.Formato;
             
             ColorFondo = new BrochaSolida(f.ObtenerColorFondo());

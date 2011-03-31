@@ -173,7 +173,7 @@ namespace SWPEditor.IU.PresentacionDocumento
                     return;
                 }
             }
-            if (posicion == Linea.Cantidad&&Linea.Inicio+posicion<Linea.Parrafo.ObtenerLongitud())
+            if (posicion == Linea.Cantidad&&Linea.Inicio+posicion<Linea.Parrafo.Longitud)
             {
                 posicion = 0;
                 AvanzarLinea();

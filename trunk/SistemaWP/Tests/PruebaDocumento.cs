@@ -44,7 +44,7 @@ namespace SWPEditor.Tests
             Parrafo p = d.ObtenerParrafo(1);
             p.AgregarCadena("Esta es una prueba");
 
-            d.InsertarParrafo(p, p.ObtenerLongitud());
+            d.InsertarParrafo(p, p.Longitud);
             Debug.Assert(p.ToString() == "Esta es una prueba");
             Debug.Assert(p.Siguiente.ToString() == "");
         }

@@ -64,7 +64,7 @@ namespace SWPEditor.IU.PresentacionDocumento
         }
         public TamBloque MedirDeParrafo(int inicio, int cantidad,out Medicion maximaBase)
         {
-            Debug.Assert(inicio >= 0&&inicio+cantidad<=Parrafo.ObtenerLongitud()&&cantidad>=0);
+            Debug.Assert(inicio >= 0&&inicio+cantidad<=Parrafo.Longitud&&cantidad>=0);
             
             AvanceBloques av = new AvanceBloques(this);
             int inicioact=inicio;
@@ -112,7 +112,7 @@ namespace SWPEditor.IU.PresentacionDocumento
         {
             get
             {
-                return Inicio + Cantidad == Parrafo.ObtenerLongitud();
+                return Inicio + Cantidad == Parrafo.Longitud;
             }
         }
         public int ObtenerNumCaracter(Medicion posicionx,Medicion anchoLinea)
@@ -331,11 +331,11 @@ namespace SWPEditor.IU.PresentacionDocumento
         
         internal static Linea ObtenerSiguienteLinea(Parrafo parrafo, int caracterinicio, Medicion ancho,bool incluirAltoParrafo,bool incluirBaseParrafo)
         {            
-            int tamparrafo = parrafo.ObtenerLongitud();
+            int tamparrafo = parrafo.Longitud;
             //Estilo e = new Estilo();
             if (tamparrafo == 0)
             {
-                Estilo estparrafo=new Estilo(new Bloque(0,null));
+                Estilo estparrafo=new Estilo(new Bloque(0,parrafo.Formato.ObtenerFormatoTexto()));
                 Medicion alto = estparrafo.Medir(string.Empty).Alto;//e.Medir(string.Empty).Alto;
                 if (parrafo.Formato.ObtenerEspaciadoInterlineal() != 1)
                 {
@@ -365,7 +365,7 @@ namespace SWPEditor.IU.PresentacionDocumento
                 Inicio = caracterinicio, 
                 AltoLinea = Medicion.Cero
             };*/
-            TamBloque tampromedio=new Estilo(new Bloque(4,null)).Medir("MMMM");
+            TamBloque tampromedio=new Estilo(new Bloque(4,parrafo.Formato.ObtenerFormatoTexto())).Medir("MMMM");
             
             Medicion anchocaracter = tampromedio.Ancho / 4;
             int numcaracteres=(int)(ancho/anchocaracter);
@@ -415,7 +415,7 @@ namespace SWPEditor.IU.PresentacionDocumento
 
         internal TamBloque ObtenerMargenEdicion()
         {
-            Estilo e = new Estilo(new Bloque(0,null));
+            Estilo e = new Estilo(new Bloque(0,Parrafo.Formato.ObtenerFormatoTexto()));
             return e.Medir("MM");
         }
     }    
