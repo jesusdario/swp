@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{83A21222-4BE1-4227-8FCA-C3977951DA1D}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -78,6 +78,7 @@
     <Compile Include="Dominio\Unidad.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IU\SWPControlGenerico.cs" />
     <Compile Include="IU\Graficos\Lapiz.cs" />
     <Compile Include="IU\PresentacionDocumento\AvanceBloques.cs" />
     <Compile Include="IU\PresentacionDocumento\ContPresentarDocumento.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="IU\PresentacionDocumento\Pagina.cs" />
     <Compile Include="Aplicacion\Seleccion.cs" />
     <Compile Include="IU\PresentacionDocumento\DocumentoImpreso.cs" />
+    <Compile Include="IU\SWPImpresoraGenerica.cs" />
     <Compile Include="IU\VistaDocumento\Escritorio.cs" />
     <Compile Include="IU\VistaDocumento\LienzoPagina.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

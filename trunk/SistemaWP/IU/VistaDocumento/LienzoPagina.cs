@@ -25,16 +25,19 @@ namespace SWPEditor.IU.VistaDocumento
             Punto punto2 = new Punto(pos.PosicionPagina.X, pos.PosicionPixelY + pos.AltoLinea);
             graficador.DibujarLinea(lp, pos.PosicionPagina - PosicionInicioDibujo, punto2-PosicionInicioDibujo);
         }
-        public void Dibujar(IGraficador graf,DocumentoImpreso documento,Posicion posicion,Seleccion seleccion)
+        public void Dibujar(IGraficador graf,DocumentoImpreso documento,Posicion posicion,Seleccion seleccion,bool dibujarCursor)
         {
             Pagina p=documento.ObtenerPagina(IDPagina);
             if (p == null) return;
             graf.RellenarRectangulo(BrochaSolida.Blanco, new Punto(Medicion.Cero, Medicion.Cero)-PosicionInicioDibujo, p.Dimensiones);
             graf.DibujarRectangulo(Lapiz.Negro, new Punto(Medicion.Cero, Medicion.Cero) - PosicionInicioDibujo, p.Dimensiones);
             documento.DibujarPagina(graf, new Punto(Medicion.Cero, Medicion.Cero) - PosicionInicioDibujo, IDPagina, seleccion);
-            if (IDPagina == posicion.IndicePagina&&seleccion==null)
+            if (dibujarCursor)
             {
-                DibujarCursor(graf,posicion);
+                if (IDPagina == posicion.IndicePagina && seleccion == null)
+                {
+                    DibujarCursor(graf, posicion);
+                }
             }
         }
     }
