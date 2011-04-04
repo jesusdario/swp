@@ -161,7 +161,7 @@ namespace SWPEditor.IU.PresentacionDocumento
                         Linea l = _Lineas.Obtener(q);
                         if (l.Parrafo == parrafoBuscado)
                         {
-                            lineabusqueda = p.LineaInicio;
+                            lineabusqueda = q;
                             salirbucle = true;
                             break;
                         }
@@ -171,7 +171,7 @@ namespace SWPEditor.IU.PresentacionDocumento
                         }
                         else
                         {
-                            lineabusqueda = p.LineaInicio;
+                            lineabusqueda = q;
                             salirbucle = true;
                             break;
                         }
