@@ -72,9 +72,18 @@ namespace SWPEditor.IU.PresentacionDocumento
             TamBloque bq = new TamBloque(Medicion.Cero, Medicion.Cero);
             Medicion maxbase = Medicion.Cero;
             IEnumerable<Bloque> bloques=av.ObtenerBloquesDe(this);
+            bool primerbloqueOK=false;
+            //Medir al menos uno de los bloques
             foreach (Bloque b in bloques)
             {
-                if (b.Cantidad == 0) continue;
+                if (!primerbloqueOK)
+                {
+                    primerbloqueOK = true;
+                }
+                else
+                {
+                    if (b.Cantidad == 0) continue;
+                }                
                 Estilo e = new Estilo( b);
                 Medicion medicionbase = e.MedirBase();
                 if (medicionbase > maxbase)
