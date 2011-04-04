@@ -129,5 +129,9 @@ namespace SWPEditor.Dominio
                 return a / b.ConvertirA(a.Unidad);
             }
         }
+        public override string ToString()
+        {
+            return Valor + " "+Unidad.Nombre;
+        }
     }
 }

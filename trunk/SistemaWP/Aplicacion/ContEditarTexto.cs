@@ -13,7 +13,8 @@ namespace SWPEditor.Aplicacion
         AvanzarPorPalabras,
         AvanzarPorLineas,
         AvanzarPorParrafos,
-        AvanzarPorPaginas
+        AvanzarPorPaginas,
+        AvanzarPorDocumento //para ir al inicio/final del documento
     }
     class ContEditarTexto
     {
@@ -162,6 +163,14 @@ namespace SWPEditor.Aplicacion
         }
         public void IrAPosicion(int numCaracter,bool seleccionar)
         {
+            if (anteriorFormato != null)
+            {
+                if (!parrafoSeleccionado.EstaEliminado)
+                {
+                    parrafoSeleccionado.SimplificarFormato();
+                }
+                anteriorFormato = null;
+            }
             Parrafo p=_documentoEdicion.ObtenerPrimerParrafo();
             int suma = 0;
             Parrafo ultimoParrafo;
@@ -216,7 +225,8 @@ namespace SWPEditor.Aplicacion
             int inicio = 0;
             int cantidad = 0;
             int poscadena = 0;
-            
+            _documentoEdicion.SuprimirNotificaciones();
+            Parrafo pinicio = parrafoSeleccionado;
             for (int i=0;i<cadena.Length;i++)
             {
                 char c = cadena[i];
@@ -229,6 +239,7 @@ namespace SWPEditor.Aplicacion
                     if (cantidad > 0)
                     {
                         parrafoSeleccionado.InsertarCadena(posicionInsercion, cadena.Substring(inicio, cantidad));
+                        parrafoSeleccionado.SimplificarFormato();
                         _estadisticas.RegistrarInsercion(parrafoSeleccionado, posicionInsercion, cantidad);
                         posicionInsercion = posicionInsercion + cantidad;
                         inicio = i+1;
@@ -246,11 +257,15 @@ namespace SWPEditor.Aplicacion
             if (cantidad > 0)
             {
                 parrafoSeleccionado.InsertarCadena(posicionInsercion, cadena.Substring(inicio, cantidad));
+                parrafoSeleccionado.SimplificarFormato();
                 _estadisticas.RegistrarInsercion(parrafoSeleccionado, posicionInsercion, cantidad);                        
                 posicionInsercion = posicionInsercion + cantidad;
                 inicio = poscadena + 1;
                 cantidad = 0;
             }
+            Parrafo pfin = parrafoSeleccionado;
+            _documentoEdicion.ReanudarNotificaciones();
+            _documentoEdicion.NotificarCambios(pinicio, pfin);
             
         }
         public void AgregarCaracter(char caracter)
@@ -278,11 +293,11 @@ namespace SWPEditor.Aplicacion
         }
         int SiguientePosicion(TipoAvance tipo)
         {
-            if (anteriorFormato != null)
-            {
-                parrafoSeleccionado.SimplificarFormato();
-                anteriorFormato = null;
-            }
+            //if (anteriorFormato != null)
+            //{
+            //    parrafoSeleccionado.SimplificarFormato();
+            //    anteriorFormato = null;
+            //}
             switch (tipo)
             {
                 case TipoAvance.AvanzarPorCaracteres:
@@ -295,11 +310,11 @@ namespace SWPEditor.Aplicacion
         }
         int AnteriorPosicion(TipoAvance tipo)
         {
-            if (anteriorFormato != null)
-            {
-                parrafoSeleccionado.SimplificarFormato();
-                anteriorFormato = null;
-            }
+            //if (anteriorFormato != null)
+            //{
+            //    parrafoSeleccionado.SimplificarFormato();
+            //    anteriorFormato = null;
+            //}
             switch (tipo)
             {
                 case TipoAvance.AvanzarPorCaracteres:
@@ -313,29 +328,74 @@ namespace SWPEditor.Aplicacion
         }
         public bool IrSiguienteCaracter(bool moverSeleccion,TipoAvance TipoAvance)
         {
-            if (posicionInsercion == parrafoSeleccionado.Longitud)
-            {
-                if (parrafoSeleccionado.Siguiente == null) return false;
-                IndicarPosicion(parrafoSeleccionado.Siguiente.ID, 0, moverSeleccion);
+            if (TipoAvance == TipoAvance.AvanzarPorDocumento)
+            {//Ir al principio del documento
+                Parrafo ultimoParrafo = _documentoEdicion.ObtenerUltimoParrafo();
+                IndicarPosicion(ultimoParrafo.ID, ultimoParrafo.Longitud, moverSeleccion);
+                
             }
-            else
+            else if (TipoAvance == TipoAvance.AvanzarPorParrafos)
             {
-                IndicarPosicion(parrafoSeleccionado.ID, SiguientePosicion(TipoAvance), moverSeleccion);
+                if (parrafoSeleccionado.Siguiente != null)
+                {
+                    IndicarPosicion(parrafoSeleccionado.Siguiente.ID, 0, moverSeleccion);
+                }
+                else
+                {
+                    IndicarPosicion(parrafoSeleccionado.ID, parrafoSeleccionado.Longitud, moverSeleccion);
+                }
+            
+            } else {
+                if (posicionInsercion == parrafoSeleccionado.Longitud)
+                {
+                    if (parrafoSeleccionado.Siguiente == null) return false;
+                    IndicarPosicion(parrafoSeleccionado.Siguiente.ID, 0, moverSeleccion);
+                }
+                else
+                {
+                    IndicarPosicion(parrafoSeleccionado.ID, SiguientePosicion(TipoAvance), moverSeleccion);
+                }
             }
             return true;
         }
 
         public bool IrAnteriorCaracter(bool moverSeleccion, TipoAvance TipoAvance)
         {
-            if (posicionInsercion == 0)
+            if (TipoAvance == TipoAvance.AvanzarPorDocumento)
             {
-                if (parrafoSeleccionado.Anterior == null) return false; //no se puede borrar antes del primer párrafo.
-                IndicarPosicion(parrafoSeleccionado.Anterior.ID, parrafoSeleccionado.Anterior.Longitud, moverSeleccion);
-                
+                IndicarPosicion(_documentoEdicion.ObtenerPrimerParrafo().ID, 0, moverSeleccion);
+            }
+            else if (TipoAvance == TipoAvance.AvanzarPorParrafos)
+            {
+                if (posicionInsercion == 0)
+                {
+
+                    if (parrafoSeleccionado.Anterior != null)
+                    {
+                        IndicarPosicion(parrafoSeleccionado.Anterior.ID, 0, moverSeleccion);
+                    }
+                    else
+                    {
+                        IndicarPosicion(parrafoSeleccionado.ID, 0, moverSeleccion);
+                    }
+                }
+                else
+                {
+                    IndicarPosicion(parrafoSeleccionado.ID, 0, moverSeleccion);
+                }
             }
             else
             {
-                IndicarPosicion(parrafoSeleccionado.ID, AnteriorPosicion(TipoAvance), moverSeleccion);
+                if (posicionInsercion == 0)
+                {
+                    if (parrafoSeleccionado.Anterior == null) return false; //no se puede borrar antes del primer párrafo.
+                    IndicarPosicion(parrafoSeleccionado.Anterior.ID, parrafoSeleccionado.Anterior.Longitud, moverSeleccion);
+
+                }
+                else
+                {
+                    IndicarPosicion(parrafoSeleccionado.ID, AnteriorPosicion(TipoAvance), moverSeleccion);
+                }
             }
             return true;
         }
@@ -376,11 +436,12 @@ namespace SWPEditor.Aplicacion
         public void InsertarParrafo()
         {
             ReemplazarSeleccion();
-            ;
             Parrafo nuevo=_documentoEdicion.InsertarParrafo(parrafoSeleccionado, posicionInsercion);
-            _estadisticas.RegistrarInsercionParrafo(parrafoSeleccionado,posicionInsercion,nuevo);
-            parrafoSeleccionado=nuevo;            
+            parrafoSeleccionado.SimplificarFormato();
+            nuevo.SimplificarFormato();
+            parrafoSeleccionado = nuevo;
             posicionInsercion = 0;
+            _estadisticas.RegistrarInsercionParrafo(parrafoSeleccionado, posicionInsercion, nuevo);
         }
 
         public Seleccion ObtenerSeleccion()
@@ -565,6 +626,14 @@ namespace SWPEditor.Aplicacion
         internal void DisminuirInterlineado()
         {
             AplicarOperacionParrafos(x => x.DisminuirInterlineado());
+        }
+
+        internal void AgregarParrafos(IEnumerable<Parrafo> parrafos)
+        {
+            foreach (Parrafo parrafo in parrafos)
+            {
+                this.DocumentoEdicion.AgregarParrafo(parrafoSeleccionado,posicionInsercion,parrafo,false,false);
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ namespace SWPEditor
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message+"\r\n"+ex.StackTrace, "Advertencia");
+                MessageBox.Show(ex.Message+"\r\n"+ex.StackTrace, "Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
             }
             return;
             

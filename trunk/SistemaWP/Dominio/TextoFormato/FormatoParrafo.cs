@@ -35,8 +35,8 @@ namespace SWPEditor.Dominio.TextoFormato
         public FormatoParrafo() {
         }
         private static readonly FormatoParrafo FormatoBase=new FormatoParrafo() {
-            EspacioAnterior=new Medicion(5,Unidad.Milimetros),
-            EspacioPosterior=new Medicion(5,Unidad.Milimetros),
+            EspacioAnterior=new Medicion(1,Unidad.Milimetros),
+            EspacioPosterior=new Medicion(1,Unidad.Milimetros),
             EspaciadoInterlineal=1.0m,
             AlineacionHorizontal=AlineacionParrafo.Izquierda};
         public FormatoParrafo Clonar()

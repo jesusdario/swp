@@ -45,11 +45,27 @@ namespace SWPEditor.IU
                 _RefreshRequested -= value;
             }
         }
+        EventHandler _DocumentChanged;
+        public event EventHandler DocumentChanged
+        {
+            add
+            {
+                _DocumentChanged += value;
+            }
+            remove
+            {
+                _DocumentChanged -= value;
+            }
+        }
         void contpresentacion_ActualizarPresentacion(object sender, EventArgs e)
         {
             if (_RefreshRequested != null)
             {
                 _RefreshRequested(this, EventArgs.Empty);
+                if (_DocumentChanged != null)
+                {
+                    _DocumentChanged(this, EventArgs.Empty);
+                }
             }
         }
         public void DrawDesktop(IGraficador graficador,bool dibujarSeleccion,bool dibujarCursor)
@@ -105,7 +121,7 @@ namespace SWPEditor.IU
         {
             _ControlDocumento.Pegar(clipboard);
         }
-        public void NotifyKeyDown(Key tecla, bool shift, bool control,IClipboard clipboard)
+        public void NotifyKeyDown(Key tecla, bool select, IClipboard clipboard)
         {
             switch (tecla)
             {
@@ -114,6 +130,10 @@ namespace SWPEditor.IU
                 case Key.Copy: Copy(clipboard); break;
                 case Key.Print: Print(); break;
                 case Key.SelectAll: SelectAll(); break;
+                case Key.DocumentHome: GotoDocumentStart(select); break;
+                case Key.DocumentEnd: GotoDocumentEnd(select); break;
+                case Key.ParagraphPrevious: GotoPreviousParagraph(select); break;
+                case Key.ParagraphNext: GotoNextParragraph(select); break;
                 case Key.Delete:
                     DeleteCharacter();
                     break;
@@ -121,38 +141,71 @@ namespace SWPEditor.IU
                     DeletePreviousCharacter();
                     break;
                 case Key.PageUp:
-                    GotoPreviousPage(shift);
+                    GotoPreviousPage(select);
                     break;
                 case Key.PageDown:
-                    GotoNextPage(shift);
+                    GotoNextPage(select);
                     break;
                 case Key.Home:
-                    GotoLineStart(shift);
+                    GotoLineStart(select);
                     break;
                 case Key.End:
-                    GotoLineEnd(shift);
+                    GotoLineEnd(select);
                     break;
                 case Key.Left:
-                    GotoLeft(shift, control);
+                    GotoLeft(select);
                     break;
                 case Key.Right:
-                    GotoRight(shift, control);
+                    GotoRight(select);
+                    break;
+                case Key.PreviousWord:
+                    GotoPreviousWord(select);
+                    break;
+                case Key.NextWord:
+                    GotoNextWord(select);
                     break;
                 case Key.Enter:
-                    InsertParagraph(shift);
+                    InsertParagraph(select);
                     break;
                 case Key.Up:
-                    GotoUp(shift);
+                    GotoUp(select);
                     break;
                 case Key.Down:
-                    GotoDown(shift);
+                    GotoDown(select);
                     break;
 
             }
         }
+
+        private void GotoPreviousParagraph(bool select)
+        {
+            _ControlDocumento.IrAParrafoAnterior(select);
+        }
+
+        private void GotoNextParragraph(bool select)
+        {
+            _ControlDocumento.IrAParrafoSiguiente(select);
+        }
+
+
+        private void GotoDocumentEnd(bool select)
+        {
+            _ControlDocumento.IrAFinDocumento(select);
+        }
+
+        private void GotoDocumentStart(bool select)
+        {
+            _ControlDocumento.IrAInicioDocumento(select);
+        }
         public enum Key
         {
-            Up,Down,Right,Left,PageUp,PageDown,Home,End,Enter,Delete,BackSpace,Cut,Copy,Paste,Print,SelectAll
+            Up,Down,Right,Left,PageUp,PageDown,Home,End,Enter,Delete,BackSpace,Cut,Copy,Paste,Print,SelectAll,
+            DocumentHome,
+            DocumentEnd,
+            ParagraphPrevious,
+            ParagraphNext,
+            PreviousWord,
+            NextWord
         }
         
         private Unidad CentesimaPulgada = new Unidad("CentPlg", "CP", 0.01, Unidad.Pulgadas);
@@ -189,14 +242,22 @@ namespace SWPEditor.IU
 
         }
 
-        public void GotoRight(bool select, bool advanceByWord)
+        public void GotoRight(bool select)
         {
-            _ControlDocumento.IrSiguienteCaracter(select, advanceByWord ? TipoAvance.AvanzarPorPalabras : TipoAvance.AvanzarPorCaracteres);
+            _ControlDocumento.IrSiguienteCaracter(select, TipoAvance.AvanzarPorCaracteres);
         }
 
-        public void GotoLeft(bool select, bool advanceByWord)
+        public void GotoLeft(bool select)
         {
-            _ControlDocumento.IrAnteriorCaracter(select, advanceByWord ? TipoAvance.AvanzarPorPalabras : TipoAvance.AvanzarPorCaracteres);
+            _ControlDocumento.IrAnteriorCaracter(select, TipoAvance.AvanzarPorCaracteres);
+        }
+        public void GotoPreviousWord(bool select)
+        {
+            _ControlDocumento.IrAnteriorCaracter(select, TipoAvance.AvanzarPorPalabras);
+        }
+        public void GotoNextWord(bool select)
+        {
+            _ControlDocumento.IrSiguienteCaracter(select, TipoAvance.AvanzarPorPalabras);
         }
 
         public void GotoLineEnd(bool select)
@@ -308,6 +369,12 @@ namespace SWPEditor.IU
         public void DecreaseLineSpace()
         {
             _ControlDocumento.DisminuirInterlineado();
+        }
+
+        public DocumentPosition GetPosition()
+        {
+            Posicion posicion=_ControlDocumento.ObtenerPosicion();
+            return new DocumentPosition(posicion.IndicePagina+1, posicion.IndiceLinea+1, posicion.PosicionCaracter+1);
         }
     }
 }

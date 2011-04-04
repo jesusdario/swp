@@ -5,7 +5,7 @@ using SWPEditor.Dominio;
 
 namespace SWPEditor.IU.Graficos
 {
-    public interface IGraficador
+    public interface IGraficador:IDisposable
     {
         void DibujarLinea(SWPEditor.IU.Graficos.Lapiz lapiz, SWPEditor.IU.PresentacionDocumento.Punto inicio, SWPEditor.IU.PresentacionDocumento.Punto fin);
         void DibujarRectangulo(SWPEditor.IU.Graficos.Lapiz lapiz, SWPEditor.IU.PresentacionDocumento.Punto inicio, SWPEditor.IU.PresentacionDocumento.TamBloque bloque);

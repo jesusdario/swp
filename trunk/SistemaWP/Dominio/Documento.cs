@@ -56,6 +56,7 @@ namespace SWPEditor.Dominio
         }
         private void EnAdicionParrafo(Parrafo p)
         {
+            if (evitarNotificaciones) return;
             foreach (IObservadorDocumento obs in m_Observadores)
             {
                 obs.ParrafoAgregado(p);
@@ -63,6 +64,7 @@ namespace SWPEditor.Dominio
         }
         private void EnEliminacionParrafo(Parrafo p)
         {
+            if (evitarNotificaciones) return;
             foreach (IObservadorDocumento obs in m_Observadores)
             {
                 obs.ParrafoEliminado(p);
@@ -70,6 +72,7 @@ namespace SWPEditor.Dominio
         }
         private void EnCambioParrafo(Parrafo p)
         {
+            if (evitarNotificaciones) return;
             foreach (IObservadorDocumento obs in m_Observadores)
             {
                 obs.ParrafoCambiado(p);
@@ -77,6 +80,7 @@ namespace SWPEditor.Dominio
         }
         private void EnParrafosCambiados(Parrafo inicio,Parrafo fin)
         {
+            if (evitarNotificaciones) return;
             foreach (IObservadorDocumento obs in m_Observadores)
             {
                 obs.ParrafosCambiados(inicio,fin);
@@ -91,6 +95,7 @@ namespace SWPEditor.Dominio
         {
             Parrafo elim = m_Parrafos[id];
             m_Parrafos.Remove(id);
+            elim.NotificarEliminacion();
         }
         
         public Documento()
@@ -273,12 +278,21 @@ namespace SWPEditor.Dominio
             {
                 if (parrafoSeleccionado == parrafoFinRango)
                 {
-                    parrafoSeleccionado.BorrarRangoCaracteres(posicionInicio, posicionFinRango);
+                    parrafoSeleccionado.BorrarRangoCaracteres(Math.Min(posicionInicio,posicionFinRango), Math.Abs(posicionFinRango-posicionInicio));//En caso que la posición inicio sea mayor a fin, el valor absoluto devolverá siempre el valor correcto.
                     EnCambioParrafo(parrafoSeleccionado);
                     return parrafoSeleccionado;
                 }
                 else
                 {
+                    if (!parrafoSeleccionado.EsSiguiente(parrafoFinRango))
+                    {
+                        Parrafo aux = parrafoFinRango;
+                        int posaux = posicionFinRango;
+                        parrafoFinRango = parrafoSeleccionado;
+                        posicionFinRango = posicionInicio;
+                        parrafoSeleccionado = aux;
+                        posicionInicio = posaux;
+                    }
                     Debug.Assert(parrafoSeleccionado.EsSiguiente(parrafoFinRango));
                     parrafoSeleccionado.BorrarHastaFin(posicionInicio);
                     Parrafo s = parrafoSeleccionado.Siguiente;
@@ -411,7 +425,38 @@ namespace SWPEditor.Dominio
             }
             return doc;
         }
+        internal void AgregarParrafo(Parrafo parrafoBase, int posicionInsercion, Parrafo parrafo, bool romperPrimerParrafo,bool romperUltimoParrafo)
+        {
+            Parrafo nuevo=parrafoBase.DividirParrafo(CrearNuevoID(parrafoBase.ID), posicionInsercion);
 
-        
+            Parrafo clon = parrafo.Clonar(this);
+            Parrafo siguienteActual = parrafo.Siguiente;
+            parrafoBase.ConectarDespues(clon);
+            clon.ConectarDespues(siguienteActual);
+            if (!romperPrimerParrafo)
+            {
+                FusionarSiguiente(parrafoBase);
+            }
+            if (!romperUltimoParrafo)
+            {
+                FusionarSiguiente(clon);
+            }
+            EnParrafosCambiados(parrafoBase, nuevo);
+        }
+
+        bool evitarNotificaciones = false;
+        internal void SuprimirNotificaciones()
+        {
+            evitarNotificaciones = true;
+        }
+        internal void ReanudarNotificaciones()
+        {
+            evitarNotificaciones = false;
+        }
+
+        internal void NotificarCambios(Parrafo pinicio, Parrafo pfin)
+        {
+            EnParrafosCambiados(pinicio, pfin);
+        }
     }
 }

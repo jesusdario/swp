@@ -22,29 +22,44 @@ namespace SWPEditor.IU.PresentacionDocumento
             numcaracterActual = 0;
             _listaPaginas = listaPaginas;
         }
-        public void Recalcular(Parrafo inicio, Parrafo fin)
+        public int Recalcular(Parrafo inicio, Parrafo fin)
         {
             if (!_enIteracionLineas)
             {
-                int a = BuscarInt(0, inicio);
-                if (a != -1)
+                if (_lineas.Count > 0)
                 {
-                    Recalcular(a, inicio);
-                }
-                else
-                {
-                    if (inicio.Anterior != null)
+                    int a = BuscarInt(0, inicio);
+                    if (a != -1)
                     {
-                        a = BuscarInt(0,inicio.Anterior);
-                        if (a != -1)
-                        {
-                            Recalcular(a, inicio.Anterior);
-                        }
+                        Recalcular(a, inicio);
+                        return a;
                     }
                     else
                     {
-                        Recalcular(0, _documento.ObtenerPrimerParrafo());
+                        if (inicio.Anterior != null)
+                        {
+                            a = BuscarInt(0, inicio.Anterior);
+                            if (a != -1)
+                            {
+                                Recalcular(a, inicio.Anterior);
+                                return a;
+                            }
+                            else
+                            {
+                                return Math.Max(_lineas.Count - 1, 0);
+                                //throw new Exception("Párrafo no encontrado");
+                            }
+                        }
+                        else
+                        {
+                            Recalcular(0, _documento.ObtenerPrimerParrafo());
+                            return 0;
+                        }
                     }
+                }
+                else
+                {
+                    return 0;
                 }
             }
             else
@@ -70,26 +85,110 @@ namespace SWPEditor.IU.PresentacionDocumento
                 throw new Exception("No se puede recalcular mientras se itera por las lineas");
             }
         }
-        public IEnumerable<Linea> ObtenerDesde(int indice)
+        bool cursorLibre=true;
+        private void LiberarCursor()
         {
-            try
+            cursorLibre = true;
+        }
+        class CursorLineas : IDisposable, IEnumerable<Linea>
+        {
+            ListaLineas lista;
+            int indicebase;
+            public CursorLineas(ListaLineas l,int indiceinicio)
             {
-                _enIteracionLineas = true;
-                AsegurarHasta(indice);
-
-                while (true)
+                lista = l;
+                indicebase = indiceinicio;
+            }
+            class Enumerador : IEnumerator<Linea>,IDisposable
+            {
+                int indice;
+                Linea actual;
+                CursorLineas cursor;
+                public Enumerador(CursorLineas c)
                 {
-                    if (completo && indice >= _lineas.Count)
-                        yield break;
-                    yield return _lineas[indice];
+                    cursor = c;
+                    indice = c.indicebase;
+                    actual = null;
+                }
+                #region Miembros de IEnumerator<Linea>
+
+                public Linea Current
+                {
+                    get {
+                        return actual;
+                    }
+                }
+
+                #endregion
+
+                #region Miembros de IDisposable
+
+                public void Dispose()
+                {
+                    cursor.Dispose();
+                    cursor = null;
+                }
+
+                #endregion
+
+                #region Miembros de IEnumerator
+
+                object System.Collections.IEnumerator.Current
+                {
+                    get { return actual; }
+                }
+
+                public bool MoveNext()
+                {
+                    cursor.lista.AsegurarHasta(indice);
+                    if (cursor.lista.completo&& indice >= cursor.lista._lineas.Count)
+                    {
+                        return false;
+                    }
+                    actual = cursor.lista._lineas[indice];
                     indice++;
-                    AsegurarHasta(indice);
+                    return true;
+                }
+
+                public void Reset()
+                {
+                    indice = cursor.indicebase;
+                    actual = null;
+                }
+
+                #endregion
+            }
+            #region Miembros de IEnumerable<Linea>
+
+            public IEnumerator<Linea> GetEnumerator()
+            {
+                return new Enumerador(this);
+            }
+
+            public void Dispose()
+            {
+                if (lista != null)
+                {
+                    lista.LiberarCursor();
+                    lista = null;
                 }
             }
-            finally
+            #endregion
+
+            #region Miembros de IEnumerable
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
             {
-                _enIteracionLineas = false;
+                return new Enumerador(this);
             }
+
+            #endregion
+        }
+        public IEnumerable<Linea> ObtenerDesde(int indice)
+        {
+            if (!cursorLibre) throw new Exception("Ya existe una iteración de líneas. Debe terminarse esa iteración");
+            cursorLibre = false;
+            return new CursorLineas(this, indice);            
         }
         private void CalcularSiguiente()
         {
@@ -119,46 +218,91 @@ namespace SWPEditor.IU.PresentacionDocumento
             AsegurarHasta(indice);
             return _lineas[indice];
         }
-
-        private int BuscarInt(int lineainicio, Parrafo p)
+        private int BusquedaBin(List<Linea> lista,Parrafo parrafo,int inicio, int fin)
         {
-            if (_lineas[lineainicio].Parrafo.EsSiguiente(p))
+            if (inicio > fin)
             {
-                for (int i = lineainicio + 1; i < _lineas.Count; i++)
-                {
-                    
-                    if (_lineas[i].Parrafo == p)
-                    {
-                        return i;
-                    }
-                    if (!_lineas[i].Parrafo.EsSiguiente(p))
-                    {
-                        break;
-                    }
-                }
+                return -1;
+            }
+            int centro = (inicio + fin) / 2;
+            if (lista[centro].Parrafo == parrafo)
+            {
+                return centro;
+            }
+            else if (lista[centro].Parrafo.EsSiguiente(parrafo))
+            {
+                return BusquedaBin(lista, parrafo, centro + 1, fin);
             }
             else
             {
-                for (int i = lineainicio; i >= 0; i--)
+                return BusquedaBin(lista, parrafo, inicio, centro - 1);
+            }
+        }
+        private int BuscarInt(int lineainicio, Parrafo parrafoBuscado)
+        {
+            if (_lineas.Count == 0) return -1;
+            if (_lineas[_lineas.Count-1].Parrafo.EsSiguiente(parrafoBuscado))
+            {
+                return -1;//No se encuentra en líneas disponibles
+            }
+            int iniciob=BusquedaBin(_lineas, parrafoBuscado, 0, _lineas.Count-1);
+            if (iniciob != -1)
+            {
+                while (iniciob > 0 && _lineas[iniciob].Inicio != 0)
                 {
-                    Linea act = _lineas[i];
-                    if (act.Parrafo == p && act.Inicio == 0)
-                    {
-                        return i;
-                    }
-                    if (!p.EsSiguiente(_lineas[i].Parrafo))
-                    {
-                        break;
-                    }
+                    iniciob--;
                 }
             }
-            return -1;
+            return iniciob;
+            //if (_lineas[lineainicio].Parrafo.EsSiguiente(p))
+            //{
+            //    for (int i = lineainicio + 1; i < _lineas.Count; i++)
+            //    {
+                    
+            //        if (_lineas[i].Parrafo == p)
+            //        {
+            //            return i;
+            //        }
+            //        if (!_lineas[i].Parrafo.EsSiguiente(p))
+            //        {
+            //            break;
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    for (int i = lineainicio; i >= 0; i--)
+            //    {
+            //        Linea act = _lineas[i];
+            //        if (act.Parrafo == p)
+            //        {
+            //            if (act.Inicio == 0)
+            //            {
+            //                return i;
+            //            }
+            //        } else if (!p.EsSiguiente(_lineas[i].Parrafo))
+            //        {
+            //            break;
+            //        }
+            //    }
+            //}
+            //return -1;
         }
         public int BuscarInicialDeParrafo(int lineainicio, Parrafo p)
         {
             AsegurarHasta(lineainicio);
+            
+            if (lineainicio<_lineas.Count)
+            {
+                while (!completo&&_lineas[lineainicio].Parrafo.EsSiguiente(p))
+                {
+                    AsegurarHasta(lineainicio + 1);
+                    lineainicio++;
+                }
+            }
+            
             int res = BuscarInt(lineainicio, p);
-            if (res==-1) throw new Exception("Linea no encontrada");
+            //if (res==-1) throw new Exception("Linea no encontrada");
             return res;
         }
 

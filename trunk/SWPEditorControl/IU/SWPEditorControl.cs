@@ -34,10 +34,20 @@ namespace SWPEditor.IU
             _base.PrintRequested += new EventHandler(_base_PrintRequested);
             _base.RefreshRequested += new EventHandler(_base_RefreshRequested);
         }
-
+        public event EventHandler DocumentChanged
+        {
+            add
+            {
+                _base.DocumentChanged += value;
+            }
+            remove
+            {
+                _base.DocumentChanged -= value;
+            }
+        }
         void _base_RefreshRequested(object sender, EventArgs e)
         {
-            Refresh();
+            Invalidate(true);
         }
 
         void _base_PrintRequested(object sender, EventArgs e)
@@ -74,11 +84,19 @@ namespace SWPEditor.IU
             _base.Print();
         }
         static Dictionary<Keys, SWPGenericControl.Key> _traduccion = new Dictionary<Keys, SWPGenericControl.Key>();
+        static Dictionary<Keys, SWPGenericControl.Key> _traduccioncontrol = new Dictionary<Keys, SWPGenericControl.Key>();
         static SWPEditorControl()
         {
-            _traduccion.Add(Keys.X, SWPGenericControl.Key.Cut);
-            _traduccion.Add(Keys.C, SWPGenericControl.Key.Copy);
-            _traduccion.Add(Keys.V, SWPGenericControl.Key.Paste);
+            _traduccioncontrol.Add(Keys.X, SWPGenericControl.Key.Cut);
+            _traduccioncontrol.Add(Keys.C, SWPGenericControl.Key.Copy);
+            _traduccioncontrol.Add(Keys.V, SWPGenericControl.Key.Paste);
+            _traduccioncontrol.Add(Keys.E, SWPGenericControl.Key.SelectAll);
+            _traduccioncontrol.Add(Keys.Up, SWPGenericControl.Key.ParagraphPrevious);
+            _traduccioncontrol.Add(Keys.Down, SWPGenericControl.Key.ParagraphNext);
+            _traduccioncontrol.Add(Keys.Home, SWPGenericControl.Key.DocumentHome);
+            _traduccioncontrol.Add(Keys.End, SWPGenericControl.Key.DocumentEnd);
+            _traduccioncontrol.Add(Keys.Left, SWPGenericControl.Key.PreviousWord);
+            _traduccioncontrol.Add(Keys.Right, SWPGenericControl.Key.NextWord);
             _traduccion.Add(Keys.Up, SWPGenericControl.Key.Up);
             _traduccion.Add(Keys.Down, SWPGenericControl.Key.Down);
             _traduccion.Add(Keys.Left, SWPGenericControl.Key.Left);
@@ -87,32 +105,23 @@ namespace SWPEditor.IU
             _traduccion.Add(Keys.PageUp, SWPGenericControl.Key.PageUp);
             _traduccion.Add(Keys.Back, SWPGenericControl.Key.BackSpace);
             _traduccion.Add(Keys.Enter, SWPGenericControl.Key.Enter);
+            _traduccion.Add(Keys.Delete, SWPGenericControl.Key.Delete);
+            _traduccion.Add(Keys.Home, SWPGenericControl.Key.Home);
+            _traduccion.Add(Keys.End, SWPGenericControl.Key.End);
         }
         
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            
-            switch (e.KeyCode)
+            if (e.Control&&_traduccioncontrol.ContainsKey(e.KeyCode))
             {
-                case Keys.X:
-                case Keys.C:
-                case Keys.V:
-                case Keys.E:
-                    if (e.Control) //CTRL+V=PEGAR
-                    {
-                        _base.NotifyKeyDown(_traduccion[e.KeyCode], e.Shift, e.Control, _clipboard);
-                        e.Handled = true;
-                        e.SuppressKeyPress = true;
-                    }
-                    break;
-                default:
-                    if (_traduccion.ContainsKey(e.KeyCode))
-                    {
-                        _base.NotifyKeyDown(_traduccion[e.KeyCode], e.Shift, e.Control, _clipboard);
-                        e.Handled = true;
-                        e.SuppressKeyPress = true;
-                    }
-                    break;
+                _base.NotifyKeyDown(_traduccioncontrol[e.KeyCode],e.Shift,_clipboard);
+                e.Handled = true;
+                e.SuppressKeyPress = true;                
+            } else if (_traduccion.ContainsKey(e.KeyCode))
+            {
+                _base.NotifyKeyDown(_traduccion[e.KeyCode], e.Shift, _clipboard);
+                e.Handled = true;
+                e.SuppressKeyPress = true;
             }
             base.OnKeyDown(e);
         }
@@ -147,14 +156,23 @@ namespace SWPEditor.IU
             _base.InsertParagraph(select);
         }
 
-        public void GotoRight(bool select, bool advanceByWord)
+        public void GotoPreviousWord(bool select)
         {
-            _base.GotoRight(select, advanceByWord);
+            _base.GotoPreviousWord(select);
         }
 
-        public void GotoLeft(bool select, bool advanceByWord)
+        public void GotoNextWord(bool select)
         {
-            _base.GotoLeft(select, advanceByWord);
+            _base.GotoNextWord(select);
+        }
+        public void GotoRight(bool select)
+        {
+            _base.GotoRight(select);
+        }
+
+        public void GotoLeft(bool select)
+        {
+            _base.GotoLeft(select);
         }
 
         public void GotoLineEnd(bool select)
@@ -199,13 +217,19 @@ namespace SWPEditor.IU
         
         const int deltax = 0;
         const int deltay = 0;
+        protected override void OnPaintBackground(PaintEventArgs pevent)
+        {
+            //base.OnPaintBackground(pevent);
+        }
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
             try
             {
-                IGraficador graf = new GraficadorGDI(e.Graphics);
-                _base.DrawDesktop(graf, true, true);
+                using (IGraficador graf = new GraficadorGDI(e.Graphics))
+                {
+                    _base.DrawDesktop(graf, true, true);
+                }
 
             }
             catch (Exception ex)
@@ -232,7 +256,10 @@ namespace SWPEditor.IU
         {
             using (Graphics g = Graphics.FromHwnd(Handle))
             {
-                return new GraficadorGDI(g).Traducir(punto);
+                using (GraficadorGDI gr = new GraficadorGDI(g))
+                {
+                    return gr.Traducir(punto);
+                }
             }
         }
         
@@ -339,5 +366,11 @@ namespace SWPEditor.IU
         {
             _base.DecreaseLineSpace();
         }
+        public DocumentPosition Position {
+            get {
+                return _base.GetPosition();
+            }
+        }
     }
+    
 }

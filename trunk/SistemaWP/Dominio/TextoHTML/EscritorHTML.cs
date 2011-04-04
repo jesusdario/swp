@@ -73,7 +73,7 @@ namespace SWPEditor.Dominio.Html
                 st2.Append("text-decoration:underline;");
             }
             st2.Append("font-size:");
-            st2.Append(formato.ObtenerTamLetra().ConvertirA(Unidad.Puntos).Valor.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            st2.Append(formato.ObtenerTamLetraEscalado().ConvertirA(Unidad.Puntos).Valor.ToString(System.Globalization.CultureInfo.InvariantCulture));
             st2.Append("pt;");
         
             if (formato.ColorLetra.HasValue)

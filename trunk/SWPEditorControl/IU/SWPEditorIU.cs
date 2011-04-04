@@ -52,6 +52,15 @@ namespace SWPEditor.IU
         private void PresentadorDocumento_Load(object sender, EventArgs e)
         {
             swpEditor1.Select();
+            swpEditor1.DocumentChanged += new EventHandler(swpEditor1_DocumentChanged);
+        }
+
+        void swpEditor1_DocumentChanged(object sender, EventArgs e)
+        {
+            DocumentPosition pos=swpEditor1.Position;
+            LabelPage.Text = "Page: "+pos.Page;
+            LabelLine.Text = "Line: " + pos.Line;
+            LabelCharacter.Text = "Character: " + pos.Character;
         }
 
         private void negrillaToolStripMenuItem_Click(object sender, EventArgs e)
@@ -225,24 +234,5 @@ namespace SWPEditor.IU
         }
         
 
-    }
-    class PresentadorCursor
-    {
-        public IGraficador Graficador { get; set; }
-        public Punto Inicio { get; set; }
-        public Punto Fin { get; set; }
-        public bool Visible {get;set;}
-        public PresentadorCursor(IGraficador graficador)
-        {
-            Thread t = new Thread(Ejecutar);
-            t.IsBackground = true;
-            t.Start();
-        }
-        public void Ejecutar()
-        {
-            //Lapiz l = new Lapiz() { Ancho = new Medicion(0.5, Unidad.Milimetros), Brocha = new BrochaSolida() { Color = new ColorDocumento(127, 0, 0) } };            //Graficador.DibujarLinea(l, Inicio, Fin);
-            //Graphics g = new Graphics();
-            //g.
-        }
     }
 }

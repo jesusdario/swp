@@ -6,7 +6,8 @@ using System.Diagnostics;
 
 namespace SWPEditor.IU.PresentacionDocumento
 {
-    public class ListaPaginas:IObservadorDocumento
+    
+    public class ListaPaginas : IObservadorDocumento
     {
         List<Pagina> _Paginas;
         ListaLineas _Lineas;
@@ -54,7 +55,7 @@ namespace SWPEditor.IU.PresentacionDocumento
                     {
                         return _Paginas[i].ObtenerAnchoLinea(numlinea);
                     }
-                    
+
                 }
             }
             return act.ObtenerAnchoLinea(numlinea);
@@ -80,7 +81,7 @@ namespace SWPEditor.IU.PresentacionDocumento
                             _listaCompleta = true;
                             break;
                         }
-                    }                    
+                    }
                 }
             }
         }
@@ -91,7 +92,7 @@ namespace SWPEditor.IU.PresentacionDocumento
             AsegurarExistencia(indice);
             if (_listaCompleta && indice >= _Paginas.Count)
                 return null;
-            
+
             return _Paginas[indice];
         }
         public ListaPaginas(Documento documento, DocumentoImpreso docimpreso)
@@ -104,9 +105,9 @@ namespace SWPEditor.IU.PresentacionDocumento
         public void Iniciar(ListaLineas listalineas)
         {
             _Lineas = listalineas;
-            Pagina p = new Pagina(0,this,_Lineas);
+            Pagina p = new Pagina(0, this, _Lineas);
             _Paginas.Add(p);
-            
+
         }
         public Medicion ObtenerAncho(int numlinea)
         {
@@ -144,14 +145,14 @@ namespace SWPEditor.IU.PresentacionDocumento
         {
             Pagina pag = _Paginas[_Paginas.Count - 1];
             Linea inicial = _Lineas.Obtener(pag.LineaInicio);
-            if (inicial.Parrafo==parrafoBuscado||inicial.Parrafo.EsSiguiente(parrafoBuscado))
+            if (inicial.Parrafo == parrafoBuscado || inicial.Parrafo.EsSiguiente(parrafoBuscado))
             {
                 int indice = _Paginas.Count - 1;
                 int lineabusqueda = -1;
 
                 //Hacer búsqueda lineal, puesto que aún no se ha calculado
                 IEnumerable<Pagina> pags = ObtenerDesde(_Paginas.Count - 1);
-                bool salirbucle=false;
+                bool salirbucle = false;
                 foreach (Pagina p in pags)
                 {
                     int lim = p.LineaInicio + p.Cantidad;
@@ -178,17 +179,18 @@ namespace SWPEditor.IU.PresentacionDocumento
                     if (salirbucle) break;
                     indice++;
                 }
-                if (lineabusqueda == -1) throw new Exception("Párrafo no encontrado");
-                int linea = BuscarLineaInicioParrafo(lineabusqueda, parrafoBuscado);
+                if (lineabusqueda == -1)
+                    throw new Exception("Párrafo no encontrado");
+                int linea = lineabusqueda;//BuscarLineaInicioParrafo(lineabusqueda, parrafoBuscado);
                 Posicion pos = new Posicion(_docimpreso);
-                
+
                 _docimpreso.Completar(pos, indice, linea, 0);
                 Debug.Assert(pos.Linea != null);
                 return pos;
             }
             else
             {
-                Posicion pos= BuscarParrafo(parrafoBuscado, 0, _Paginas.Count - 1);
+                Posicion pos = BuscarParrafo(parrafoBuscado, 0, _Paginas.Count - 1);
                 Debug.Assert(pos.Linea != null);
                 return pos;
             }
@@ -252,40 +254,75 @@ namespace SWPEditor.IU.PresentacionDocumento
                 return false;
             }
         }
+        private int BuscarPaginaExistenteLinea(int linea,int inicio,int fin)
+        {
+            if (inicio > fin)
+            {
+                return -1;
+            }
+            int centro = (inicio + fin) / 2;
+            if (_Paginas[centro].ContieneLinea(linea))
+            {
+                return centro;
+            }
+            else if (linea<_Paginas[centro].LineaInicio)
+            {
+                return BuscarPaginaExistenteLinea(linea, inicio, centro - 1);
+            }
+            else
+            {
+                return BuscarPaginaExistenteLinea(linea, centro+1,fin);
+            }
 
+        }
         #region Miembros de IObservadorDocumento
         private void Recalcular(Parrafo p)
         {
             Parrafo busq = p;
             int indicelinea = 0;
             int indicepagina = 0;
-            Pagina act = _Paginas[0];
-            bool recalculado = false;
-            _Lineas.Recalcular(p,p);
-            IEnumerable<Linea> lista = _Lineas.ObtenerDesde(0);
-            foreach (Linea l in lista)
-            {                
-                if (act.LineaInicio >= indicelinea)
+            indicelinea = _Lineas.Recalcular(p, p);
+            if (_Paginas.Count > 0)
+            {
+                Pagina act;
+                indicelinea = Math.Max(indicelinea - 1, 0);//Recalcular desde una linea antes (caso de inicio de página, y linea que disminuye de tamaño hasta entrar en página anterior
+                indicepagina = BuscarPaginaExistenteLinea(indicelinea, 0, _Paginas.Count - 1);
+                if (indicepagina == -1)
                 {
-                    if (act.Recalcular(indicelinea))
+                    indicepagina = 0;
+                    act = _Paginas[0];
+                    while (indicepagina < _Paginas.Count - 1 && indicelinea > act.LineaInicio + act.Cantidad)
                     {
-                        //Desde esta página hacia adelante debe quitarse de la lista
-                        _Paginas.RemoveRange(indicepagina + 1, _Paginas.Count - indicepagina - 1);
-                        _listaCompleta = false;
-                        break;
+                        indicepagina++;
+                        act = _Paginas[indicepagina];
                     }
-                }
-                if (indicepagina < _Paginas.Count - 1)
-                {
-                    act = _Paginas[indicepagina];
                 }
                 else
                 {
-                    break;
-                }                
-                indicelinea++;
-            }            
-            
+                    act = _Paginas[indicepagina];
+                }
+                int inicioPagina = act.LineaInicio;
+                int finPagina = act.LineaInicio + act.Cantidad;
+
+                if (inicioPagina <= indicelinea && indicelinea < finPagina)
+                {
+                    act.Recalcular(indicelinea);
+                    _Paginas.RemoveRange(indicepagina + 1, _Paginas.Count - indicepagina - 1);
+                    _listaCompleta = false;
+
+                }
+                else
+                {
+                    if (indicepagina == _Paginas.Count - 1)
+                    {
+                        _listaCompleta = false;
+                    }
+                }
+            }
+            else
+            {
+                _listaCompleta = false;
+            }        
         }
         public void ParrafoAgregado(Parrafo p)
         {
@@ -302,7 +339,7 @@ namespace SWPEditor.IU.PresentacionDocumento
             //Recalcular(p.Anterior ?? p.Siguiente);
         }
 
-        
+
 
         public void ParrafosCambiados(Parrafo parrafoInicio, Parrafo parrafoFin)
         {

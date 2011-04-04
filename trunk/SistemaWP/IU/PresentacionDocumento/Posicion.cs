@@ -82,7 +82,7 @@ namespace SWPEditor.IU.PresentacionDocumento
         public Posicion ObtenerFinLinea()
         {
             Posicion p = new Posicion(VDocumento);
-            VDocumento.Completar(p, IndicePagina, IndiceLinea, Math.Max(Linea.Cantidad-1,0));
+            VDocumento.Completar(p, IndicePagina, IndiceLinea, Linea.EsUltimaLineaParrafo?Linea.Cantidad:Math.Max(Linea.Cantidad-1,0));
             return p;
         }
         public Posicion ObtenerLineaSuperior()
@@ -156,7 +156,21 @@ namespace SWPEditor.IU.PresentacionDocumento
             {
                 VDocumento.Completar(this, IndicePagina + 1, 0, 0);
             }
-        }        
+        }
+        internal Posicion ObtenerInicioPagina()
+        {
+            Posicion pos = ObtenerCopia();
+            VDocumento.Completar(pos, IndicePagina, Pagina.LineaInicio, 0);
+            return pos;
+        }
+        internal Posicion ObtenerFinPagina()
+        {
+            Posicion pos = ObtenerCopia();
+            pos.IndicePagina = Pagina.LineaInicio + Pagina.Cantidad;
+            VDocumento.Completar(pos, IndicePagina, Pagina.LineaInicio + Pagina.Cantidad+(Pagina.Cantidad>0?-1:0), 0);
+            VDocumento.Completar(pos, IndicePagina, Pagina.LineaInicio + Pagina.Cantidad + (Pagina.Cantidad > 0 ? -1 : 0), pos.Linea.Cantidad);
+            return pos;
+        }
         internal void Avanzar(int posicion)
         {
             Debug.Assert(Linea != null);
@@ -181,5 +195,7 @@ namespace SWPEditor.IU.PresentacionDocumento
             PosicionCaracter = posicion;
             //while (Linea.Inicio+Linea.Cantidad
         }
+
+        
     }
 }

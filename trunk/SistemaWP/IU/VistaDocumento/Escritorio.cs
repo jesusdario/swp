@@ -5,6 +5,7 @@ using SWPEditor.IU.Graficos;
 using SWPEditor.Dominio;
 using SWPEditor.IU.PresentacionDocumento;
 using SWPEditor.Aplicacion;
+using System.Diagnostics;
 
 namespace SWPEditor.IU.VistaDocumento
 {
@@ -55,6 +56,7 @@ namespace SWPEditor.IU.VistaDocumento
             }
         }
         private IGraficador _graficadorConsultas;
+        BrochaSolida fondo = new BrochaSolida(new SWPEditor.Dominio.TextoFormato.ColorDocumento(50,25,25));
         public Escritorio(Documento _documento,IGraficador graficadorConsultas)
         {
             if (graficadorConsultas == null)
@@ -71,18 +73,19 @@ namespace SWPEditor.IU.VistaDocumento
             AsegurarGraficador();
             Posicion pos = ControlDocumento.ObtenerPosicion();
             AsegurarVisibilidad(pos);
-            Medicion inicio = EsquinaSuperior.Y;
-            Medicion derecha = EsquinaSuperior.X;
+            Medicion inicio = Medicion.Cero-EsquinaSuperior.Y;
+            Medicion derecha = Medicion.Cero - EsquinaSuperior.X;
             int i=PaginaSuperior;
             IEnumerable<Pagina> pags = _Documento.ObtenerDesde(PaginaSuperior);
+            graficador.RellenarRectangulo(fondo, Punto.Origen, Dimensiones);
             foreach (Pagina p in pags) {
                 LienzoPagina l = new LienzoPagina(i,new Punto(derecha,inicio));
                 l.Dibujar(graficador, _Documento, pos, seleccion, dibujarCursor);
-                if (Medicion.Cero-inicio > Dimensiones.Alto+EsquinaSuperior.Y)
+                if (inicio > Dimensiones.Alto+EsquinaSuperior.Y)
                 {
                     return;
                 }
-                inicio -= p.Dimensiones.Alto + EspacioEntrePaginas;
+                inicio += p.Dimensiones.Alto + EspacioEntrePaginas;
                 i++;
             }
         }
@@ -92,30 +95,6 @@ namespace SWPEditor.IU.VistaDocumento
             return puntoTest.X >= esquinaSuperior.X && (puntoTest.X < esquinaSuperior.X + tamaño.Ancho)
                 && puntoTest.Y >= esquinaSuperior.Y && (puntoTest.Y < esquinaSuperior.Y + tamaño.Alto);
         }
-        /// <summary>
-        /// Asegura la visibilidad de un punto en la página.
-        /// </summary>
-        /// <param name="pt"></param>
-        private void AsegurarVisibilidadPunto(Punto pt)
-        {
-            if (pt.Y > EsquinaSuperior.Y + Dimensiones.Alto)
-            {
-                EsquinaSuperior = new Punto(EsquinaSuperior.X, pt.Y - Dimensiones.Alto);
-            }
-            if (pt.Y < EsquinaSuperior.Y)
-            {
-                EsquinaSuperior = new Punto(EsquinaSuperior.X, pt.Y);
-            }
-
-            if (pt.X > EsquinaSuperior.X + Dimensiones.Ancho)
-            {
-                EsquinaSuperior = new Punto(pt.X - Dimensiones.Ancho, EsquinaSuperior.Y);
-            }
-            if (pt.X < EsquinaSuperior.X)
-            {
-                EsquinaSuperior = new Punto(pt.X, EsquinaSuperior.Y);
-            }
-        }
         public void AsegurarVisibilidadMargen(Posicion posicion)
         {
             AsegurarGraficador();
@@ -123,43 +102,148 @@ namespace SWPEditor.IU.VistaDocumento
             Punto pt = posicion.PosicionPagina;
             Punto arribaizq = pt.Agregar(Medicion.Cero - margen.Ancho, Medicion.Cero - margen.Alto);
             Punto abajoder = pt.Agregar(margen.Ancho, margen.Alto + posicion.AltoLinea);
-            AsegurarVisibilidadPunto(abajoder);
-            AsegurarVisibilidadPunto(arribaizq);
+            AsegurarVisibilidadPuntoPagina(posicion.IndicePagina,abajoder);
+            AsegurarVisibilidadPuntoPagina(posicion.IndicePagina, arribaizq);
         }
-        
+        private void IrPaginaAnterior()
+        {
+            if (PaginaSuperior>0) {
+                Pagina p=_Documento.ObtenerPagina(PaginaSuperior-1);
+                if (p == null)
+                {
+                    PaginaSuperior--;
+                    p = _Documento.ObtenerPagina(PaginaSuperior - 1);
+                    return;
+                }
+                Medicion deltatot = Medicion.Cero;
+                Medicion delta = p.Dimensiones.Alto + EspacioEntrePaginas;
+                EsquinaSuperior = new Punto(EsquinaSuperior.X, EsquinaSuperior.Y + delta);
+                PaginaSuperior--;
+           
+            }
+        }
+        private Medicion IrPaginaSiguiente()
+        {
+            Pagina p = _Documento.ObtenerPagina(PaginaSuperior + 1);
+            if (p == null) return Medicion.Cero;
+            PaginaSuperior = PaginaSuperior + 1;
+            Medicion delta = EsquinaSuperior.Y-(p.Dimensiones.Alto + EspacioEntrePaginas);
+            EsquinaSuperior = new Punto(EsquinaSuperior.X, EsquinaSuperior.Y+delta);
+            return delta;
+        }
+        private void IncrementarEsquinaY(Medicion delta)
+        {
+            EsquinaSuperior = EsquinaSuperior.AgregarY(delta);
+        }
+        private void IncrementarEsquinaX(Medicion delta)
+        {
+            EsquinaSuperior = EsquinaSuperior.AgregarX(delta);
+        }
+        private void AsegurarVisibilidadX(Punto pt)
+        {
+            if (pt.X < EsquinaSuperior.X)
+            {
+                Medicion delta = pt.X - EsquinaSuperior.X;
+                IncrementarEsquinaX(delta);
+            }
+            if (pt.X > EsquinaSuperior.X + Dimensiones.Ancho)
+            {
+                Medicion delta = pt.X - (EsquinaSuperior.X + Dimensiones.Ancho);
+                IncrementarEsquinaX(delta);
+            }
+        }
+        private Pagina ObtenerPaginaSuperior()
+        {
+            return _Documento.ObtenerPagina(PaginaSuperior);
+        }
+        private Punto ObtenerFinEscritorioY()
+        {
+            return EsquinaSuperior.AgregarY(Dimensiones.Alto);
+        }
+        private void AsegurarVisibilidadPagina(int numpagina,Punto pt)
+        {
+            Debug.Assert(PaginaSuperior <= numpagina);
+            IEnumerable<Pagina> pags = _Documento.ObtenerDesde(PaginaSuperior);
+            Medicion inicioPagina = Medicion.Cero-EsquinaSuperior.Y;
+            int indice = PaginaSuperior;
+            Pagina paginaSuperior=Documento.ObtenerPagina(numpagina);
+            foreach (Pagina p in pags)
+            {
+                while (inicioPagina > Dimensiones.Alto)
+                {
+                    Medicion delta;
+                    delta = inicioPagina - Dimensiones.Alto;
+                    IncrementarEsquinaY(delta);
+                    inicioPagina = inicioPagina - delta;
+                    Pagina superior = ObtenerPaginaSuperior();
+                    while (superior!=null&&EsquinaSuperior.Y > superior.Dimensiones.Alto + EspacioEntrePaginas)
+                    {
+                        Medicion altoact = ObtenerPaginaSuperior().Dimensiones.Alto + EspacioEntrePaginas;
+                        PaginaSuperior = PaginaSuperior + 1;
+                        IncrementarEsquinaY(Medicion.Cero-altoact);
+                        inicioPagina -= altoact;
+                        superior = ObtenerPaginaSuperior();
+                    }
+                }
+                Medicion finPagina = inicioPagina + p.Dimensiones.Alto;
+                if (indice == numpagina)
+                {
+                    pt = pt.AgregarY(inicioPagina);//calcular coordenadas de punto en relacion a escritorio
+                    if (pt.Y < Medicion.Cero)
+                    {
+                        Medicion delta = pt.Y;
+                        EsquinaSuperior = new Punto(EsquinaSuperior.X, EsquinaSuperior.Y + delta);
+                        pt = pt.AgregarY(Medicion.Cero-delta);
+                        AsegurarVisibilidadX(pt);
+                        return;
+                    }
+                    if (pt.Y > Dimensiones.Alto)
+                    {
+                        Medicion delta = pt.Y-Dimensiones.Alto;
+                        EsquinaSuperior = new Punto(EsquinaSuperior.X, EsquinaSuperior.Y + delta);
+                        pt = pt.AgregarY(Medicion.Cero - delta);
+                        AsegurarVisibilidadX(pt);
+                        return;
+                    }
+                    AsegurarVisibilidadX(pt);
+                    return;
+                }
+                inicioPagina = finPagina + EspacioEntrePaginas;
+                indice++;
+            }
+        }
         public void AsegurarVisibilidad(Posicion posicion)
         {
+            TamBloque pos = posicion.ObtenerMargenEdicion();
+            if (LineaAnterior != posicion.IndiceLinea)
+            {
+                AsegurarVisibilidadPuntoPagina(posicion.IndicePagina, posicion.PosicionPagina);
+            }
+            AsegurarVisibilidadMargen(posicion);
+        }
+        void AsegurarVisibilidadPuntoPagina(int numpagina,Punto pt)
+        {
             AsegurarGraficador();
-            int numpagina = posicion.IndicePagina;
-            Punto pt = posicion.PosicionPagina;
-            
-            if (posicion.IndicePagina != PaginaSuperior)
+            /*   
+             *     -----
+             * 
+             * ->
+             *     -----
+             *     -----
+             * 
+             * 
+             *     -----
+             *     -----
+             * 
+             * 
+             *     -----
+             * 
+             * */
+            while (numpagina < PaginaSuperior) //No es visible la página superior, disminuir una página
             {
-                if (posicion.IndicePagina < PaginaSuperior)
-                {
-                    PaginaSuperior = posicion.IndicePagina;
-                    EsquinaSuperior = new Punto(EsquinaSuperior.X, Dimensiones.Alto);
-                    AsegurarVisibilidadPunto(new Punto(Medicion.Cero, Dimensiones.Alto));
-                }
-                else
-                {
-                    PaginaSuperior = posicion.IndicePagina;
-                    EsquinaSuperior = new Punto(EsquinaSuperior.X, Medicion.Cero);
-                    AsegurarVisibilidadPunto(new Punto(Medicion.Cero, Medicion.Cero));
-                }
-                AsegurarVisibilidad(posicion);
+                IrPaginaAnterior();                
             }
-            else
-            {
-                
-                TamBloque pos = posicion.ObtenerMargenEdicion();
-                if (LineaAnterior != posicion.IndiceLinea)
-                {
-                    AsegurarVisibilidadPunto(new Punto(posicion.Pagina.Margen.Izquierdo,pt.Y+posicion.AltoLinea));
-                }
-                AsegurarVisibilidadMargen(posicion);
-            }
-            LineaAnterior = posicion.IndiceLinea;
+            AsegurarVisibilidadPagina(numpagina, pt);
         }
 
         public void IrAPosicion(Punto punto, bool ampliarSeleccion)
@@ -181,5 +265,21 @@ namespace SWPEditor.IU.VistaDocumento
             }
             ControlDocumento.RegistrarPosicion(indice, pt2, ampliarSeleccion);
         }       
+    }
+    public class DistribucionPaginas
+    {
+        
+        public Punto ObtenerPuntoEscritorio(int pagina, Punto punto)
+        {
+            return Punto.Origen;
+        }
+        public Punto ObtenerPuntoPagina(Punto posicionEscritorio)
+        {
+            return Punto.Origen;
+        }
+        public void AsegurarVisibilidadPuntoPagina(int pagina, Punto punto)
+        {
+            
+        }        
     }
 }
