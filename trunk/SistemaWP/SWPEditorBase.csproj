@@ -52,6 +52,22 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'debugx86|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\debugx86\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'debugx86|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\debugx86\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;FORMATO</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -72,12 +88,14 @@
     </Compile>
     <Compile Include="Dominio\TextoFormato\Formato.cs" />
     <Compile Include="Dominio\TextoFormato\FormatoParrafo.cs" />
+    <Compile Include="Dominio\TextoFormato\IndiceBloque.cs" />
     <Compile Include="Dominio\TextoFormato\Texto.cs" />
     <Compile Include="Dominio\TextoHTML\EscritorHTML.cs" />
     <Compile Include="Dominio\Texto\EscritorTexto.cs" />
     <Compile Include="Dominio\Unidad.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="IU\DocumentPosition.cs" />
     <Compile Include="IU\SWPControlGenerico.cs" />
     <Compile Include="IU\Graficos\Lapiz.cs" />
     <Compile Include="IU\PresentacionDocumento\AvanceBloques.cs" />
@@ -101,6 +119,7 @@
     <Compile Include="IU\VistaDocumento\Escritorio.cs" />
     <Compile Include="IU\VistaDocumento\LienzoPagina.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tests\PruebaBloques.cs" />
     <Compile Include="Tests\PruebaDocumento.cs" />
     <Compile Include="Tests\PruebaOperacionesAleatoria.cs" />
     <Compile Include="Tests\PruebaParrafo.cs" />
@@ -123,6 +142,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Tests\PruebaTexto.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="IU\Imagenes\Agrandar.png" />

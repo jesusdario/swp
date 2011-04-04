@@ -47,6 +47,10 @@ namespace SWPEditor.IU.PresentacionDocumento
                 }
             }
         }
+        public void Pegar(Documento doc)
+        {
+            conttexto.AgregarParrafos(doc);
+        }
         public void Pegar(IClipboard clipboard)
         {
             lock (this)
@@ -68,31 +72,6 @@ namespace SWPEditor.IU.PresentacionDocumento
             {
                 Seleccion sel = conttexto.ObtenerSeleccion();
                 clipboard.Copiar(sel);
-//                string cad = null;
-//                if (sel == null)
-//                    cad = string.Empty;
-//                else
-//                    cad = sel.ObtenerHtml();
-//                string cadini="<body class='e0'>";
-//                string cadini2 = "<!--StartFragment-->";
-//                string cadfin="</body>";
-//                string cadfin2 = "<!--EndFragment--></body>";
-//                string cnueva=cad.Replace(cadini, cadini2).Replace(cadfin,cadfin2);
-//                string cadbase = @"Version:1.0
-//    StartHTML:-1
-//    EndHTML:-1
-//    StartFragment:AAAAAAAAAA
-//    EndFragment:BBBBBBBBBB
-//<!DOCUMENT>";
-//                int indice1 = cnueva.IndexOf(cadini2)+cadbase.Length;
-//                int indice2 = cnueva.IndexOf(cadfin2) + cadfin2.Length + cadbase.Length;
-//                cadbase=cadbase
-//                    .Replace("AAAAAAAAAA",indice1.ToString().PadLeft(10,'0'))
-//                    .Replace("BBBBBBBBBB",indice2.ToString().PadLeft(10,'0'));
-//                cnueva=cadbase+cnueva;
-                
-//                Clipboard.SetText(cnueva, TextDataFormat.Html);
-//                //Clipboard.SetText(cad, TextDataFormat.UnicodeText);
             }
         }
         
@@ -199,7 +178,13 @@ namespace SWPEditor.IU.PresentacionDocumento
             lock (this)
             {
                 Posicion pos = ObtenerPosicion();
+                int indiceactual = pos.IndicePagina;
                 Posicion possiguiente = pos.ObtenerPaginaAnterior();
+                int indicenuevo = possiguiente.IndicePagina;
+                if (indicenuevo == indiceactual)
+                {
+                    possiguiente = possiguiente.ObtenerInicioPagina();
+                }
                 CambiarPosicion(possiguiente, ampliarSeleccion);
                 EnActualizarPresentacion(false);
             }
@@ -209,7 +194,13 @@ namespace SWPEditor.IU.PresentacionDocumento
             lock (this)
             {
                 Posicion pos = ObtenerPosicion();
+                int indiceactual = pos.IndicePagina;
                 Posicion possiguiente = pos.ObtenerPaginaSiguiente();
+                int indicenuevo = possiguiente.IndicePagina;
+                if (indicenuevo == indiceactual)
+                {
+                    possiguiente=possiguiente.ObtenerFinPagina();
+                }
                 CambiarPosicion(possiguiente, ampliarSeleccion);
                 EnActualizarPresentacion(false);
             }
@@ -374,6 +365,28 @@ namespace SWPEditor.IU.PresentacionDocumento
         {
             conttexto.DisminuirInterlineado();
             EnActualizarPresentacion(true);
+        }
+
+
+
+        internal void IrAInicioDocumento(bool moverSeleccion)
+        {
+            IrAnteriorCaracter(moverSeleccion, TipoAvance.AvanzarPorDocumento);
+        }
+
+        internal void IrAFinDocumento(bool moverSeleccion)
+        {
+            IrSiguienteCaracter(moverSeleccion, TipoAvance.AvanzarPorDocumento);
+        }
+
+        internal void IrAParrafoSiguiente(bool moverSeleccion)
+        {
+            IrSiguienteCaracter(moverSeleccion, TipoAvance.AvanzarPorParrafos);
+        }
+
+        internal void IrAParrafoAnterior(bool moverSeleccion)
+        {
+            IrAnteriorCaracter(moverSeleccion, TipoAvance.AvanzarPorParrafos); 
         }
     }
 }

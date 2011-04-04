@@ -61,11 +61,16 @@
             this.AlignRight = new System.Windows.Forms.ToolStripButton();
             this.FontColor = new System.Windows.Forms.ToolStripButton();
             this.BackgroundColor = new System.Windows.Forms.ToolStripButton();
-            this.swpEditor1 = new SWPEditor.IU.SWPEditorControl();
             this.IncreaseLineSpace = new System.Windows.Forms.ToolStripButton();
             this.DecreaseLineSpace = new System.Windows.Forms.ToolStripButton();
+            this.swpEditor1 = new SWPEditor.IU.SWPEditorControl();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.LabelPage = new System.Windows.Forms.ToolStripStatusLabel();
+            this.LabelLine = new System.Windows.Forms.ToolStripStatusLabel();
+            this.LabelCharacter = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.ToolBar.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -374,17 +379,6 @@
             this.BackgroundColor.Text = "Background Color";
             this.BackgroundColor.Click += new System.EventHandler(this.BackgroundColor_Click);
             // 
-            // swpEditor1
-            // 
-            this.swpEditor1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.swpEditor1.CausesValidation = false;
-            this.swpEditor1.Location = new System.Drawing.Point(0, 52);
-            this.swpEditor1.Name = "swpEditor1";
-            this.swpEditor1.Size = new System.Drawing.Size(470, 275);
-            this.swpEditor1.TabIndex = 1;
-            // 
             // IncreaseLineSpace
             // 
             this.IncreaseLineSpace.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -405,23 +399,62 @@
             this.DecreaseLineSpace.Text = "Decrease Line Space";
             this.DecreaseLineSpace.Click += new System.EventHandler(this.DecreaseLineSpace_Click);
             // 
-            // PresentadorDocumento
+            // swpEditor1
+            // 
+            this.swpEditor1.CausesValidation = false;
+            this.swpEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.swpEditor1.Location = new System.Drawing.Point(0, 49);
+            this.swpEditor1.Name = "swpEditor1";
+            this.swpEditor1.Size = new System.Drawing.Size(470, 256);
+            this.swpEditor1.TabIndex = 1;
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.LabelPage,
+            this.LabelLine,
+            this.LabelCharacter});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 305);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(470, 22);
+            this.statusStrip1.TabIndex = 3;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // LabelPage
+            // 
+            this.LabelPage.Name = "LabelPage";
+            this.LabelPage.Size = new System.Drawing.Size(0, 17);
+            // 
+            // LabelLine
+            // 
+            this.LabelLine.Name = "LabelLine";
+            this.LabelLine.Size = new System.Drawing.Size(0, 17);
+            // 
+            // LabelCharacter
+            // 
+            this.LabelCharacter.Name = "LabelCharacter";
+            this.LabelCharacter.Size = new System.Drawing.Size(0, 17);
+            // 
+            // SWPEditorIU
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(470, 327);
-            this.Controls.Add(this.ToolBar);
             this.Controls.Add(this.swpEditor1);
+            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.ToolBar);
             this.Controls.Add(this.menuStrip1);
             this.DoubleBuffered = true;
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "PresentadorDocumento";
+            this.Name = "SWPEditorIU";
             this.Text = "SWP. Simple Text Editor";
             this.Load += new System.EventHandler(this.PresentadorDocumento_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ToolBar.ResumeLayout(false);
             this.ToolBar.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -464,5 +497,9 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripButton IncreaseLineSpace;
         private System.Windows.Forms.ToolStripButton DecreaseLineSpace;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel LabelPage;
+        private System.Windows.Forms.ToolStripStatusLabel LabelLine;
+        private System.Windows.Forms.ToolStripStatusLabel LabelCharacter;
     }
 }

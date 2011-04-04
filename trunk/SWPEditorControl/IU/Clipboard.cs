@@ -21,12 +21,19 @@ namespace SWPEditor.IU
             {
                 return _documento.ObtenerTexto();
             }
+            else if (format == typeof(Documento))
+            {
+                return _documento;
+            }
             return null;
         }
 
         public object GetData(string format)
         {
-            if (format == DataFormats.Html)
+            if (format == "SWPEditor.Document")
+            {
+                return _documento;
+            } else if (format == DataFormats.Html)
             {
                 string cad = null;
                 cad = _documento.ObtenerHTML();
@@ -65,7 +72,7 @@ namespace SWPEditor.IU
 
         public bool GetDataPresent(Type format)
         {
-            return false;
+            return format==typeof(Documento)||format==typeof(string);
         }
 
         public bool GetDataPresent(string format)
@@ -75,17 +82,17 @@ namespace SWPEditor.IU
 
         public bool GetDataPresent(string format, bool autoConvert)
         {
-            return format == DataFormats.Html || format == DataFormats.Text;
+            return format == DataFormats.Html || format == DataFormats.Text||format=="SWPEditor.Document";
         }
 
         public string[] GetFormats()
         {
-            return new string[] { DataFormats.Html, DataFormats.Text };
+            return new string[] { "SWPEditor.Document", DataFormats.Html, DataFormats.Text };
         }
 
         public string[] GetFormats(bool autoConvert)
         {
-            return new string[] { DataFormats.Html, DataFormats.Text };
+            return new string[] { "SWPEditor.Document", DataFormats.Html, DataFormats.Text };
         }
 
         public void SetData(object data)
@@ -138,10 +145,22 @@ namespace SWPEditor.IU
             IDataObject obj=Clipboard.GetDataObject();
             if (obj != null)
             {
-                string cad = (string)obj.GetData(DataFormats.Text,true);
-                if (cad != null)
+                
+                /*if (obj.GetDataPresent("SWPEditor.Document",true))
                 {
-                    editor.InsertarTexto(cad);
+                    Documento doc=(Documento)obj.GetData("SWPEditor.Document",true);
+                    if (doc != null)
+                    {
+                        editor.Pegar(doc);
+                    }
+                }
+                else*/
+                {
+                    string cad = (string)obj.GetData(DataFormats.Text, true);
+                    if (cad != null)
+                    {
+                        editor.InsertarTexto(cad);
+                    }
                 }
             }
         

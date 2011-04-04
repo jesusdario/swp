@@ -26,6 +26,7 @@ namespace SWPEditor.IU.PresentacionDocumento
             Parrafo = parrafo; Inicio = inicio; Cantidad = cantidad; AltoLinea = altoLinea; AltoBase = altoBase;
             AnchoLinea = anchoLinea;
         }
+        
         private void Normalizar(ref int posicion)
         {
             if (posicion > Cantidad)
@@ -70,8 +71,10 @@ namespace SWPEditor.IU.PresentacionDocumento
             int inicioact=inicio;
             TamBloque bq = new TamBloque(Medicion.Cero, Medicion.Cero);
             Medicion maxbase = Medicion.Cero;
-            foreach (Bloque b in av.ObtenerBloquesDe(this))
+            IEnumerable<Bloque> bloques=av.ObtenerBloquesDe(this);
+            foreach (Bloque b in bloques)
             {
+                if (b.Cantidad == 0) continue;
                 Estilo e = new Estilo( b);
                 Medicion medicionbase = e.MedirBase();
                 if (medicionbase > maxbase)
@@ -199,6 +202,7 @@ namespace SWPEditor.IU.PresentacionDocumento
                 Medicion altobase = AltoBase;
                 foreach (Bloque b in lista)
                 {
+                    if (b.Cantidad == 0) continue;
                     Estilo e = new Estilo(b);
                     Medicion baset = e.MedirAlto();
                     string total = Parrafo.ObtenerSubCadena(posbase, b.Cantidad);

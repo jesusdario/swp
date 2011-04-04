@@ -45,7 +45,7 @@ namespace SWPEditor.Dominio.TextoFormato
         {
             return FamiliaLetra ?? Contexto.FamiliaLetra;
         }
-        public Medicion ObtenerTamLetra()
+        public Medicion ObtenerTamLetraEscalado()
         {
             if (FactorEscalaLetra != 1)
             {
@@ -55,6 +55,10 @@ namespace SWPEditor.Dominio.TextoFormato
             {
                 return TamLetra ?? Contexto.TamLetra.Value;
             }
+        }
+        public float ObtenerEscalaLetra()
+        {
+            return FactorEscalaLetra;
         }
         public ColorDocumento ObtenerColorLetra()
         {
@@ -241,34 +245,13 @@ namespace SWPEditor.Dominio.TextoFormato
                 if (formatoConstructor == null) formatoConstructor = new Formato();
                 f = formatoConstructor;
                 f.FamiliaLetra = formato2.FamiliaLetra ?? FamiliaLetra;
-                //Redondear letra a dos decimales, en puntos
-                bool escalado=false;
-                if (TamLetra.HasValue)
-                {
-                    if (formato2.TamLetra.HasValue)
-                    {
-                        f.TamLetra = formato2.TamLetra*f.FactorEscalaLetra*formato2.FactorEscalaLetra;
-                    }
-                    else
-                    {
-                        f.TamLetra = TamLetra * f.FactorEscalaLetra * formato2.FactorEscalaLetra;
-                    }
-                    escalado = true;
-                }
-                //f.TamLetra = ((formato2.TamLetra ?? TamLetra)*FactorEscalaLetra*formato2.FactorEscalaLetra);
+                f.TamLetra = formato2.TamLetra ?? TamLetra;
                 f.Negrilla = formato2.Negrilla ?? Negrilla;
                 f.Cursiva = formato2.Cursiva ?? Cursiva;
                 f.Subrayado = formato2.Subrayado ?? Subrayado;
                 f.ColorFondo = formato2.ColorFondo ?? ColorFondo;
                 f.ColorLetra = formato2.ColorLetra ?? ColorLetra;
-                if (escalado)
-                {
-                    f.FactorEscalaLetra = 1;
-                }
-                else
-                {
-                    f.FactorEscalaLetra = formato2.FactorEscalaLetra * FactorEscalaLetra;
-                }
+                f.FactorEscalaLetra = (float)Math.Round(formato2.FactorEscalaLetra * FactorEscalaLetra,2);
                 return ObtenerDeCache(f);
             }
             else

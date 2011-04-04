@@ -12,8 +12,10 @@ namespace SWPEditor.Dominio
         TextoFormato.Texto bufferTexto = new TextoFormato.Texto();
         internal int ID { get; private set; }       
         private int Posicion { get; set; }
-        public Parrafo Anterior { get; private set; }
-        public Parrafo Siguiente { get; private set; }
+        private Parrafo _Anterior;
+        private Parrafo _Siguiente;
+        internal Parrafo Anterior { get { return _Anterior; } }
+        internal Parrafo Siguiente { get { return _Siguiente; } }
         FormatoParrafo _Formato;
         public FormatoParrafo Formato { 
             get {
@@ -25,39 +27,48 @@ namespace SWPEditor.Dominio
                 _Formato = value;
             }
         }
+        internal IEnumerable<IndiceBloque> ObtenerIndices()
+        {
+            foreach (IndiceBloque b in bufferTexto.ObtenerIndices())
+            {
+                IndiceBloque bloque = b;
+                bloque.Formato=Formato.ObtenerFormatoTexto().Fusionar(b.Formato);
+                yield return bloque;
+            }
+        }
         internal void ConectarDespues(Parrafo parrafo)
         {
             if (parrafo != null)
             {
-                parrafo.Anterior = this;
+                parrafo._Anterior = this;
             }
-            Siguiente = parrafo;
+            _Siguiente = parrafo;
         }
         internal void ConectarAntes(Parrafo parrafo)
         {
             if (parrafo != null)
             {
-                parrafo.Siguiente = this;
+                parrafo._Siguiente = this;
             }
-            Anterior = parrafo;
+            _Anterior = parrafo;
         }
-        public Parrafo(Documento documento,int id,Parrafo anterior,Parrafo siguiente)
+        internal Parrafo(Documento documento, int id, Parrafo anterior, Parrafo siguiente)
         {
             _contenedor = documento;
             ID = id;
             Posicion = 1;
-            Anterior = anterior;
-            Siguiente = siguiente;
+            _Anterior = anterior;
+            _Siguiente = siguiente;
             bufferTexto.Iniciar();
         }
-        public Parrafo(Documento _documento,int id, Parrafo anterior, Parrafo siguiente,Parrafo formatoBase)
+        internal Parrafo(Documento _documento,int id, Parrafo anterior, Parrafo siguiente,Parrafo formatoBase)
         {
             _contenedor = _documento;
             ID = id;
             _Formato = formatoBase._Formato==null?null:formatoBase.Formato.Clonar();
             Posicion = 1;
-            Anterior = anterior;
-            Siguiente = siguiente;
+            _Anterior = anterior;
+            _Siguiente = siguiente;
             bufferTexto.Iniciar();
         }
         public string ObtenerSubCadena(int inicio, int cantidad)
@@ -94,13 +105,13 @@ namespace SWPEditor.Dominio
             }
         }
 
-        internal void FusionarCon(Parrafo parrafoSiguiente)
+        internal void FusionarCon(Parrafo parrafo_Siguiente)
         {
-            bufferTexto.Agregar(parrafoSiguiente.bufferTexto);
-            ConectarDespues(parrafoSiguiente.Siguiente);
-            if (_Formato != null || parrafoSiguiente._Formato != null)
+            bufferTexto.Agregar(parrafo_Siguiente.bufferTexto);
+            ConectarDespues(parrafo_Siguiente._Siguiente);
+            if (_Formato != null || parrafo_Siguiente._Formato != null)
             {
-                _Formato = Formato.Fusionar(parrafoSiguiente.Formato);
+                _Formato = Formato.Fusionar(parrafo_Siguiente.Formato);
             }
             _contenedor.NotificarCambio(this);
         }
@@ -115,7 +126,7 @@ namespace SWPEditor.Dominio
 
         internal Parrafo DividirParrafo(int idnuevo,int posicionDivision)
         {
-            Parrafo nuevo = new Parrafo(_contenedor,idnuevo, this, Siguiente);
+            Parrafo nuevo = new Parrafo(_contenedor,idnuevo, this, _Siguiente);
             nuevo._Formato = _Formato;
             InsertarSiguiente(nuevo);
             nuevo.bufferTexto=bufferTexto.Dividir(posicionDivision);          
@@ -129,20 +140,25 @@ namespace SWPEditor.Dominio
 
         internal void InsertarAnterior(Parrafo nuevo)
         {
-            if (Anterior != null)
+            if (_Anterior != null)
             {
-                Anterior.Siguiente = nuevo;
+                _Anterior._Siguiente = nuevo;
             }
-            nuevo.Anterior = Anterior;
-            nuevo.Siguiente = this;
-            Anterior = nuevo;
-            Parrafo ant=Anterior;
-            int contador = Posicion-1;
+            nuevo._Anterior = _Anterior;
+            nuevo._Siguiente = this;
+            _Anterior = nuevo;
+            Parrafo ant=_Anterior;
+            int contador = Posicion-5;
             while (ant != null)
             {
                 ant.Posicion = contador;
-                ant = ant.Anterior;
-                contador--;
+                ant = ant._Anterior;
+                int incremento=Math.Max(1,ant!=null&&ant.Posicion<contador?(ant.Posicion-contador)/2:10);
+                contador-=incremento;
+                if (ant != null && ant.Posicion < contador)
+                {
+                    break;
+                }
             }
         }
         public bool EsSiguiente(Parrafo parrafo2)
@@ -151,20 +167,25 @@ namespace SWPEditor.Dominio
         }
         internal void InsertarSiguiente(Parrafo nuevo)
         {
-            if (Siguiente != null)
+            if (_Siguiente != null)
             {
-                Siguiente.Anterior = nuevo;
+                _Siguiente._Anterior = nuevo;
             }
-            nuevo.Anterior = this;
-            nuevo.Siguiente = Siguiente;
-            Siguiente = nuevo;
-            Parrafo sig = Siguiente;
-            int contador = Posicion+1;
+            nuevo._Anterior = this;
+            nuevo._Siguiente = _Siguiente;
+            _Siguiente = nuevo;
+            Parrafo sig = _Siguiente;
+            int contador = Posicion+5;
             while (sig != null)
             {
                 sig.Posicion = contador; 
-                sig = sig.Siguiente;
-                contador++;
+                sig = sig._Siguiente;
+                int incremento=Math.Max(1, sig != null&&sig.Posicion>contador ? (sig.Posicion - contador) / 2 : 10);
+                contador += incremento;
+                if (sig != null && sig.Posicion > contador)
+                {
+                    break;
+                }
             }
         }
 
@@ -178,11 +199,11 @@ namespace SWPEditor.Dominio
             bufferTexto.Remove(0, posicionInicio);
         }
 
-        internal void BorrarRangoCaracteres(int posicionInicio, int posicionFin)
+        internal void BorrarRangoCaracteres(int posicionInicio, int cantidad)
         {
-            if (posicionInicio == posicionFin) return;
-            Debug.Assert(posicionInicio < posicionFin);
-            bufferTexto.Remove(posicionInicio, posicionFin - posicionInicio);
+            if (cantidad==0) return;
+            Debug.Assert(cantidad>0);
+            bufferTexto.Remove(posicionInicio, cantidad);
         }
 
         internal int ObtenerSiguientePalabra(int posicionInsercion)
@@ -239,7 +260,7 @@ namespace SWPEditor.Dominio
         {
             bufferTexto.SimplificarFormato();
         }
-        public IEnumerable<Bloque> ObtenerBloques()
+        internal IEnumerable<Bloque> ObtenerBloques()
         {
             Bloque bc = new Bloque(0,null);
             for (int i = 0; i < bufferTexto.ObtenerNumBloques(); i++)
@@ -250,7 +271,7 @@ namespace SWPEditor.Dominio
                 yield return bc;                
             }
         }
-        public IEnumerable<Bloque> ObtenerBloques(int inicio, int cantidad)
+        internal IEnumerable<Bloque> ObtenerBloques(int inicio, int cantidad)
         {
             Bloque bc = new Bloque(0, null);
             IEnumerable<Bloque> rango=bufferTexto.ObtenerRangoBloques(inicio,cantidad);
@@ -304,10 +325,10 @@ namespace SWPEditor.Dominio
             int inicioBloque = 0;
             int finSeleccion = inicio + cantidad;
             IEnumerable<Bloque> bloques=bufferTexto.ObtenerRangoBloques(inicio,cantidad);
-            inicioBloque = inicio;
+            inicioBloque = inicio;            
             foreach (Bloque b in bloques)
             {
-                esc.EscribirTexto(ObtenerSubCadena(inicioBloque, b.Cantidad), b.Formato);
+                esc.EscribirTexto(ObtenerSubCadena(inicioBloque, b.Cantidad), Formato.ObtenerFormatoTexto().Fusionar(b.Formato));
                 inicioBloque += b.Cantidad;
             }
             esc.TerminarParrafo();
@@ -317,6 +338,28 @@ namespace SWPEditor.Dominio
             Parrafo p = new Parrafo(contenedor, 0, null, null);
             p.bufferTexto = bufferTexto.ObtenerRangoTexto(inicio, cantidad);
             p._Formato = _Formato;
+            return p;
+        }
+        public bool EstaEliminado
+        {
+            get
+            {
+                return ID == int.MaxValue;
+            }
+        }
+        internal void NotificarEliminacion()
+        {
+            ID=int.MaxValue;
+            _Anterior = null;
+            _Siguiente = null;
+            _Formato = null;
+
+        }
+
+        internal Parrafo Clonar(Documento documento)
+        {
+            Parrafo p = new Parrafo(documento, int.MaxValue, null, null);
+            p.bufferTexto = bufferTexto.ObtenerRangoTexto(0, bufferTexto.Length);
             return p;
         }
     }

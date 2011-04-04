@@ -25,7 +25,7 @@ namespace SWPEditor.IU.PresentacionDocumento
             ColorLetra = new BrochaSolida(f.ObtenerColorLetra());
             Letra = new Letra()
             {
-                Tamaño = f.ObtenerTamLetra(),
+                Tamaño = f.ObtenerTamLetraEscalado(),
                 Familia = f.ObtenerFamiliaLetra(),
                 Negrilla = f.ObtenerNegrilla(),
                 Subrayado = f.ObtenerSubrayado(),

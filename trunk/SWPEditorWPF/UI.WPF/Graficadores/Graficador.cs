@@ -102,5 +102,14 @@ namespace SWPEditor.UI.WPF.Graficadores
             FormattedText f = new FormattedText("M", System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight, t, ObtenerMedida(letra.Tamaño), Brushes.Black);
             return ObtenerMedida(f.LineHeight);
         }
+
+        #region Miembros de IDisposable
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }

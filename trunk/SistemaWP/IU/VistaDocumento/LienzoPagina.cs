@@ -23,15 +23,15 @@ namespace SWPEditor.IU.VistaDocumento
             Lapiz lp = new Lapiz() { Ancho = new Medicion(0.5, Unidad.Milimetros), Brocha = new BrochaSolida(new ColorDocumento(127, 0, 0)) };
             Posicion pos = posicion ;
             Punto punto2 = new Punto(pos.PosicionPagina.X, pos.PosicionPixelY + pos.AltoLinea);
-            graficador.DibujarLinea(lp, pos.PosicionPagina - PosicionInicioDibujo, punto2-PosicionInicioDibujo);
+            graficador.DibujarLinea(lp, pos.PosicionPagina + PosicionInicioDibujo, punto2 + PosicionInicioDibujo);
         }
         public void Dibujar(IGraficador graf,DocumentoImpreso documento,Posicion posicion,Seleccion seleccion,bool dibujarCursor)
         {
             Pagina p=documento.ObtenerPagina(IDPagina);
             if (p == null) return;
-            graf.RellenarRectangulo(BrochaSolida.Blanco, new Punto(Medicion.Cero, Medicion.Cero)-PosicionInicioDibujo, p.Dimensiones);
-            graf.DibujarRectangulo(Lapiz.Negro, new Punto(Medicion.Cero, Medicion.Cero) - PosicionInicioDibujo, p.Dimensiones);
-            documento.DibujarPagina(graf, new Punto(Medicion.Cero, Medicion.Cero) - PosicionInicioDibujo, IDPagina, seleccion);
+            graf.RellenarRectangulo(BrochaSolida.Blanco, new Punto(Medicion.Cero, Medicion.Cero)+PosicionInicioDibujo, p.Dimensiones);
+            graf.DibujarRectangulo(Lapiz.Negro, new Punto(Medicion.Cero, Medicion.Cero) + PosicionInicioDibujo, p.Dimensiones);
+            documento.DibujarPagina(graf, new Punto(Medicion.Cero, Medicion.Cero) + PosicionInicioDibujo, IDPagina, seleccion);
             if (dibujarCursor)
             {
                 if (IDPagina == posicion.IndicePagina && seleccion == null)

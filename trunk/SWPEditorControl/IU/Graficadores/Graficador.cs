@@ -31,7 +31,7 @@ namespace SWPEditor.IU.Graficadores
             return _datos[llave];
         }
     }
-    class GraficadorGDI : IGraficador
+    public class GraficadorGDI : IGraficador,IDisposable
     {
         System.Drawing.Graphics g;
         Stock<Brocha, SolidBrush> _brochas;
@@ -80,13 +80,9 @@ namespace SWPEditor.IU.Graficadores
             unidaddispositivoy = new Unidad("UnidadDispositivoY", "dpiy", 1 / dpiy, Unidad.Pulgadas);
             intermedia = new Unidad("UnidadDispositivoXY", "dpixy", 2 / (dpix + dpiy), Unidad.Pulgadas);
             Medicion a = new Medicion(96, unidaddispositivox).ConvertirA(Unidad.Pulgadas);
-            familias = new Dictionary<string, FontFamily>();
-            foreach (FontFamily f in FontFamily.Families)
-            {
-                familias.Add(f.Name, f);
-            }
+            
         }
-        Dictionary<string, FontFamily> familias;
+        static Dictionary<string, FontFamily> familias;
         public GraficadorGDI(System.Drawing.Graphics graficos)
         {
 
@@ -181,6 +177,11 @@ namespace SWPEditor.IU.Graficadores
             FormatoMedicion.LineAlignment = StringAlignment.Near;
             
             FormatoPresentacion = (StringFormat)FormatoMedicion.Clone();
+            familias = new Dictionary<string, FontFamily>();
+            foreach (FontFamily f in FontFamily.Families)
+            {
+                familias.Add(f.Name, f);
+            }
 
         }
         public TamBloque MedirTexto(Letra letra, string texto)
@@ -240,6 +241,15 @@ namespace SWPEditor.IU.Graficadores
             float factor = f.SizeInPoints / (float)f.FontFamily.GetEmHeight(f.Style);
             return new Medicion(f.FontFamily.GetLineSpacing(f.Style) * factor, Unidad.Puntos);
         }
+
+        #region Miembros de IDisposable
+
+        public void Dispose()
+        {
+            g = null;
+        }
+
+        #endregion
     }
     
 }

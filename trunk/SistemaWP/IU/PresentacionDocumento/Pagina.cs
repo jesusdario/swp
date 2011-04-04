@@ -35,9 +35,16 @@ namespace SWPEditor.IU.PresentacionDocumento
             Margen = new Margen() { Derecho = new Medicion(10, Unidad.Milimetros), Izquierdo = new Medicion(10, Unidad.Milimetros), Superior = new Medicion(10, Unidad.Milimetros), Inferior = new Medicion(10, Unidad.Milimetros) };
             AltoActual = Medicion.Cero;
         }
+        public IEnumerable<Linea> ObtenerLineas()
+        {
+            for (int i = LineaInicio; i < Cantidad; i++)
+            {
+                yield return _lineas.Obtener(i);
+            }
+        }
         public bool Recalcular(int indice)
         {
-            if (Completa && indice >= LineaInicio && indice <= LineaInicio + _Cantidad)
+            if (Completa && indice >= LineaInicio && indice < LineaInicio + _Cantidad)
             {
                 _Cantidad = indice - LineaInicio-1;
                 if (_Cantidad < 0) _Cantidad = 0;
@@ -58,31 +65,43 @@ namespace SWPEditor.IU.PresentacionDocumento
             }
             return false;
         }
+        const int lineacompletarmax = 10000000;
         private void CompletarLineas()
         {
-            AsegurarLinea(int.MaxValue);                
+            AsegurarLinea(lineacompletarmax);                
             
         }
         private void AsegurarLinea(int numlinea)
         {
-            if (!Completa&&numlinea >= LineaInicio + _Cantidad)
+            if (!Completa)
             {
-                IEnumerable<Linea> lin = _lineas.ObtenerDesde(LineaInicio+_Cantidad);
-                Medicion altomax = ObtenerAltoLineas();
-                int indice = LineaInicio + _Cantidad;
-                foreach (Linea l in lin)
+                if (numlinea >= LineaInicio + _Cantidad)
                 {
-                    if (l.AltoLinea + AltoActual > altomax) 
-                        break;
-                    AltoActual += l.AltoLinea;
-                    _Cantidad++;
-                    if (indice >= numlinea)
+                    using (IDisposable cursor = (IDisposable)_lineas.ObtenerDesde(LineaInicio + _Cantidad))
                     {
-                        return;
+                        IEnumerable<Linea> lin = cursor as IEnumerable<Linea>;
+                        Medicion altomax = ObtenerAltoLineas();
+                        int indice = LineaInicio + _Cantidad;
+                        foreach (Linea l in lin)
+                        {
+                            if (l.AltoLinea + AltoActual > altomax)
+                            {
+                                if (_Cantidad != 0) //cada página deberá tener por lo menos una línea (caso contrario sería bucle infinito)
+                                {
+                                    break;
+                                }
+                            }
+                            AltoActual += l.AltoLinea;
+                            _Cantidad++;
+                            if (indice >= numlinea)
+                            {
+                                return;
+                            }
+                            indice++;
+                        }
+                        Completa = true;
                     }
-                    indice++;
                 }
-                Completa = true;
             }
         }
         public bool ContieneLinea(int numlinea)
@@ -115,9 +134,9 @@ namespace SWPEditor.IU.PresentacionDocumento
                 pt=l.Dibujar(g,pt, seleccion,avance,anchoPagina,true,true);
             }
         }
-        public Medicion ObtenerAltoLineas(ListaLineas _Lineas)
+        private Medicion ObtenerAltoLineas(ListaLineas _Lineas)
         {
-            int lim = LineaInicio + Cantidad;
+            int lim = LineaInicio + _Cantidad;
             Medicion suma = Medicion.Cero;
             for (int i = LineaInicio; i < lim; i++)
             {
