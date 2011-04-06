@@ -10,41 +10,12 @@ namespace SWPEditor.IU.PresentacionDocumento
     public class AvanceBloques
     {
         Parrafo _parrafoActual;
-        //IEnumerator<Bloque> _enumerador;
-        //Bloque _primerbloque;
-        bool _primerbloqueconsiderado;
-        int _inicioBloque;
         IEnumerator<IndiceBloque> _enumerador;
         IndiceBloque _primerBloque;
-        
+        int inicioActual;
         public AvanceBloques(Linea lineaInicio)
         {
             AvanzarHastaLinea(lineaInicio.Parrafo, lineaInicio);
-            /*
-            _enumerador = lineaInicio.Parrafo.ObtenerBloques().GetEnumerator();
-            int inicioBloque = 0;
-            int finBloque;
-            //int sumaactual = 0;
-            _parrafoActual = lineaInicio.Parrafo;
-            while (_enumerador.MoveNext())
-            {
-                Bloque bloqueactual = _enumerador.Current;
-                finBloque = inicioBloque+bloqueactual.Cantidad;
-                if (inicioBloque <= lineaInicio.Inicio && lineaInicio.Inicio<finBloque)
-                {
-                    int posinibloque=lineaInicio.Inicio - inicioBloque;
-                    int tambloquesiguiente = bloqueactual.Cantidad - posinibloque;
-                    _primerbloque = bloqueactual.Clonar();
-                    _primerbloque.DisminuirCantidad(posinibloque);
-                    _inicioBloque = lineaInicio.Inicio;
-                    break;
-                }
-                else
-                {
-                    _primerbloque = bloqueactual;                    
-                }
-                inicioBloque = finBloque;
-            }*/
         }
         private void AvanzarHastaLinea(Parrafo parrafoInicio,Linea linea)
         {
