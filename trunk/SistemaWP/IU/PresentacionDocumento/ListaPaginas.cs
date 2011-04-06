@@ -249,9 +249,15 @@ namespace SWPEditor.IU.PresentacionDocumento
                 if (_listaCompleta && indicePagina == _Paginas.Count - 1)
                     return true;
                 AsegurarExistencia(indicePagina);
-                if (_listaCompleta && indicePagina == _Paginas.Count - 1)
-                    return true;
-                return false;
+                Pagina res = Obtener(indicePagina);
+                if (res == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return res.EsUltimaPagina;
+                }
             }
         }
         private int BuscarPaginaExistenteLinea(int linea,int inicio,int fin)

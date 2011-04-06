@@ -33,7 +33,7 @@ namespace SWPEditor.IU
             {
                 numpagina = 0;
             }
-            bool resultado = false;
+            bool resultado = true;
             if (_documento.EsUltimaPagina(numpagina.Value))
             {
                 resultado = false;
