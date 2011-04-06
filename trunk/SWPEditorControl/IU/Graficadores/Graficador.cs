@@ -165,6 +165,7 @@ namespace SWPEditor.IU.Graficadores
             Bitmap bmp = new Bitmap(1, 1, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
             bmp.SetResolution(10000, 10000);
             _GraficadorConsultas = new GraficadorGDI(Graphics.FromImage(bmp));
+            _GraficadorConsultas.CambiarResolucion(10000, 10000);
             _GraficadorConsultas.g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             FormatoMedicion = new StringFormat(StringFormat.GenericTypographic);
             FormatoMedicion.FormatFlags = 0;

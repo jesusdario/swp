@@ -50,8 +50,8 @@ namespace SWPEditor.IU
         void impresora_PrintPage(object sender, PrintPageEventArgs e)
         {
             GraficadorGDI g = new GraficadorGDI(e.Graphics);
-            e.Graphics.ResetTransform();
-            e.Graphics.PageUnit = GraphicsUnit.Display;
+            //e.Graphics.ResetTransform();
+            //e.Graphics.PageUnit = GraphicsUnit.Display;
             g.CambiarResolucion(96, 96);//Utilizar resolucion pantalla
             e.HasMorePages = _impgenerica.PrintNextPage(g);            
         }

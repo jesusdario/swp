@@ -16,6 +16,8 @@ namespace SWPEditor.Dominio
         private Parrafo _Siguiente;
         internal Parrafo Anterior { get { return _Anterior; } }
         internal Parrafo Siguiente { get { return _Siguiente; } }
+        public bool EsPrimerParrafo { get { return _Anterior == null; } }
+        public bool EsUltimoParrafo { get { return _Siguiente == null; } }
         FormatoParrafo _Formato;
         public FormatoParrafo Formato { 
             get {

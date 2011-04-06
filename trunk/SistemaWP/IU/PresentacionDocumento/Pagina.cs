@@ -13,6 +13,8 @@ namespace SWPEditor.IU.PresentacionDocumento
         public TamBloque Dimensiones { get; set; }
         public Margen Margen { get; set; }
         public int LineaInicio { get; private set; }
+        public int LineaSiguientePagina { get { return LineaInicio + Cantidad; } }
+        public int UltimaLinea { get { return LineaInicio + Cantidad - 1; } }
         private int _Cantidad;
         public int Cantidad
         {
@@ -26,6 +28,20 @@ namespace SWPEditor.IU.PresentacionDocumento
         private Medicion AltoActual { get; set; }
         ListaPaginas _paginas;
         ListaLineas _lineas;
+        public bool EsPrimeraPagina
+        {
+            get
+            {
+                Linea lin = _lineas.Obtener(LineaInicio);
+                return lin.EsPrimeraLineaParrafo && lin.Parrafo.EsPrimerParrafo;
+            }
+        }
+        public bool EsUltimaPagina { 
+            get {
+                Linea lin=_lineas.Obtener(LineaInicio + Math.Max(0, Cantidad - 1));
+                return lin.EsUltimaLineaParrafo&&lin.Parrafo.EsUltimoParrafo;
+            }
+        }
         public Pagina(int lineaInicio,ListaPaginas paginas,ListaLineas lineas)
         {
             _lineas = lineas;

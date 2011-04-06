@@ -21,6 +21,7 @@ namespace SWPEditor.IU.PresentacionDocumento
         public Medicion AltoLinea { get; private set; }
         public Medicion AltoBase { get; private set; }
         public Medicion AnchoLinea { get; private set; }
+        
         private Linea(Parrafo parrafo, int inicio, int cantidad, Medicion altoLinea, Medicion altoBase,Medicion anchoLinea)
         {
             Parrafo = parrafo; Inicio = inicio; Cantidad = cantidad; AltoLinea = altoLinea; AltoBase = altoBase;
