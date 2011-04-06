@@ -27,25 +27,6 @@ namespace SWPEditor
             return;
             
         }
-        //public static void Tests()
-        //{
-        //    try
-        //    {
-        //        PruebaParrafo.PruebaAgregarCaracter();
-        //        PruebaParrafo.PruebaDividirParrafo();
-        //        PruebaDocumento.ProbarObtenerParrafo();
-        //        PruebaDocumento.ProbarInsertarParrafoInicio();
-        //        PruebaDocumento.ProbarInsertarParrafoMedio();
-        //        PruebaDocumento.ProbarInsertarParrafoFin();
-        //        Console.WriteLine("PRUEBAS EXITOSAS");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex.Message + ":" + ex.StackTrace);
-        //    }
-        //    return;
-
-        //}
     }
 }
 

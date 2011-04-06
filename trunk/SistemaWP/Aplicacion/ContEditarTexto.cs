@@ -225,7 +225,7 @@ namespace SWPEditor.Aplicacion
             int inicio = 0;
             int cantidad = 0;
             int poscadena = 0;
-            _documentoEdicion.SuprimirNotificaciones();
+            //_documentoEdicion.SuprimirNotificaciones();
             Parrafo pinicio = parrafoSeleccionado;
             for (int i=0;i<cadena.Length;i++)
             {
@@ -248,6 +248,10 @@ namespace SWPEditor.Aplicacion
                     if (c == '\n')
                     {
                         InsertarParrafo();
+                        //if (parrafoSeleccionado.EsSiguiente(pinicio))
+                        //{
+                        //    pinicio = parrafoSeleccionado;
+                        //}
                         inicio = i + 1;
                         cantidad = 0;
                     }
@@ -264,8 +268,8 @@ namespace SWPEditor.Aplicacion
                 cantidad = 0;
             }
             Parrafo pfin = parrafoSeleccionado;
-            _documentoEdicion.ReanudarNotificaciones();
-            _documentoEdicion.NotificarCambios(pinicio, pfin);
+            //_documentoEdicion.ReanudarNotificaciones();
+            //_documentoEdicion.NotificarCambios(pinicio, pfin);
             
         }
         public void AgregarCaracter(char caracter)

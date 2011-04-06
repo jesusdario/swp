@@ -197,7 +197,7 @@ namespace SWPEditor.IU.PresentacionDocumento
         }
         Posicion BuscarParrafo(Parrafo parrafoBuscado, int paginainicio, int paginafin)
         {
-            if (paginainicio >= paginafin)
+            if (paginainicio > paginafin)
             {
                 int centro2 = Math.Max(paginainicio, paginafin);
             reintentar:
