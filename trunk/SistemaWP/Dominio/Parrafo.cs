@@ -149,7 +149,9 @@ namespace SWPEditor.Dominio
             nuevo._Anterior = _Anterior;
             nuevo._Siguiente = this;
             _Anterior = nuevo;
-            Parrafo ant=_Anterior;
+            _contenedor.NotificarCambioOrden();
+            
+            /*Parrafo ant=_Anterior;
             int contador = Posicion-5;
             while (ant != null)
             {
@@ -161,11 +163,16 @@ namespace SWPEditor.Dominio
                 {
                     break;
                 }
-            }
+            }*/
         }
         public bool EsSiguiente(Parrafo parrafo2)
         {
+            _contenedor.AsegurarOrden();
             return Posicion < parrafo2.Posicion;
+        }
+        internal void IndicarOrden(int orden)
+        {
+            Posicion = orden;
         }
         internal void InsertarSiguiente(Parrafo nuevo)
         {
@@ -176,6 +183,8 @@ namespace SWPEditor.Dominio
             nuevo._Anterior = this;
             nuevo._Siguiente = _Siguiente;
             _Siguiente = nuevo;
+            _contenedor.NotificarCambioOrden();
+            /*
             Parrafo sig = _Siguiente;
             int contador = Posicion+5;
             while (sig != null)
@@ -188,7 +197,7 @@ namespace SWPEditor.Dominio
                 {
                     break;
                 }
-            }
+            }*/
         }
 
         internal void BorrarHastaFin(int posicionFinRango)

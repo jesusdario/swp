@@ -219,15 +219,32 @@ namespace SWPEditor.Aplicacion
             parrafoFinRango = _documentoEdicion.ObtenerParrafo(idparrafo);
             posicionFinRango = posicion;
         }
-        public void InsertarTexto(string cadena)
+        public IEnumerable<string> ObtenerParrafos(string cadena)
         {
-            ReemplazarSeleccion();
             int inicio = 0;
-            int cantidad = 0;
-            int poscadena = 0;
-            //_documentoEdicion.SuprimirNotificaciones();
-            Parrafo pinicio = parrafoSeleccionado;
-            for (int i=0;i<cadena.Length;i++)
+            int cantidad=0;
+            for (int i = 0; i < cadena.Length; i++)
+            {
+                char c = cadena[i];
+                if (c >= 32)
+                {
+                    cantidad++;
+                }
+                else
+                {
+                    if (c == '\n')
+                    {
+                        yield return cadena.Substring(inicio, cantidad);
+                        inicio = i+1;
+                        cantidad = 0;
+                    }
+                }
+            }
+            if (cantidad != 0)
+            {
+                yield return cadena.Substring(inicio, cantidad);
+            }
+            /*for (int i = 0; i < cadena.Length; i++)
             {
                 char c = cadena[i];
                 if (c >= 32)
@@ -242,7 +259,7 @@ namespace SWPEditor.Aplicacion
                         parrafoSeleccionado.SimplificarFormato();
                         _estadisticas.RegistrarInsercion(parrafoSeleccionado, posicionInsercion, cantidad);
                         posicionInsercion = posicionInsercion + cantidad;
-                        inicio = i+1;
+                        inicio = i + 1;
                         cantidad = 0;
                     }
                     if (c == '\n')
@@ -262,15 +279,18 @@ namespace SWPEditor.Aplicacion
             {
                 parrafoSeleccionado.InsertarCadena(posicionInsercion, cadena.Substring(inicio, cantidad));
                 parrafoSeleccionado.SimplificarFormato();
-                _estadisticas.RegistrarInsercion(parrafoSeleccionado, posicionInsercion, cantidad);                        
+                _estadisticas.RegistrarInsercion(parrafoSeleccionado, posicionInsercion, cantidad);
                 posicionInsercion = posicionInsercion + cantidad;
                 inicio = poscadena + 1;
                 cantidad = 0;
-            }
-            Parrafo pfin = parrafoSeleccionado;
-            //_documentoEdicion.ReanudarNotificaciones();
-            //_documentoEdicion.NotificarCambios(pinicio, pfin);
-            
+            }*/
+        }
+        public void InsertarTexto(string cadena)
+        {
+            ReemplazarSeleccion();
+            Parrafo final=_documentoEdicion.InsertarParrafos(ObtenerParrafos(cadena),parrafoSeleccionado,posicionInsercion);
+            parrafoSeleccionado = final;
+            posicionInsercion = 0;
         }
         public void AgregarCaracter(char caracter)
         {

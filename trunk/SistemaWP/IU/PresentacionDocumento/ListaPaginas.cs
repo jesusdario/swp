@@ -210,7 +210,7 @@ namespace SWPEditor.IU.PresentacionDocumento
                 return p;
 
             }
-            int centro = paginainicio + paginafin;
+            int centro = (paginainicio + paginafin)/2;
             Pagina elemento = _Paginas[centro];
             Linea inicial = _Lineas.Obtener(elemento.LineaInicio);
             if (inicial.Parrafo == parrafoBuscado)
