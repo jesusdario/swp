@@ -23,15 +23,10 @@ namespace SWPEditor.IU.PresentacionDocumento
             
             ColorFondo = new BrochaSolida(f.ObtenerColorFondo());
             ColorLetra = new BrochaSolida(f.ObtenerColorLetra());
-            Letra = new Letra()
-            {
-                Tamaño = f.ObtenerTamLetraEscalado(),
-                Familia = f.ObtenerFamiliaLetra(),
-                Negrilla = f.ObtenerNegrilla(),
-                Subrayado = f.ObtenerSubrayado(),
-                Cursiva = f.ObtenerCursiva()
-            };
-        }       
+            Letra = Letra.Crear(f.FamiliaLetra,f.ObtenerTamLetraEscalado(),
+                f.ObtenerNegrilla(),f.ObtenerCursiva(),f.ObtenerSubrayado());
+            
+        }
         public void Dibujar(IGraficador graficos, Punto posicionbase, string texto)
         {
             //TamBloque b=Medir(texto);
@@ -83,15 +78,15 @@ namespace SWPEditor.IU.PresentacionDocumento
         }
         public Medicion MedirBase()
         {
-            return _GraficadorConsultas.MedirBaseTexto(Letra);
+            return Letra.MedirBaseTexto(_GraficadorConsultas);//.MedirBaseTexto(Letra);
         }
         public Medicion MedirAlto()
         {
-            return _GraficadorConsultas.MedirAltoTexto(Letra);
+            return Letra.MedirAltoTexto(_GraficadorConsultas);//.MedirAltoTexto(Letra);
         }
         public Medicion MedirEspacioLineas()
         {
-            return _GraficadorConsultas.MedirEspacioLineas(Letra);
+            return Letra.MedirEspacioLineas(_GraficadorConsultas);//.MedirEspacioLineas(Letra);
         }
         internal Estilo Clonar()
         {

@@ -163,7 +163,7 @@ namespace SWPEditor.Dominio
         {
             lock (m_Parrafos)
             {
-                if (posicionInsercion == 0)
+                if (posicionInsercion == 0&&parrafoSeleccionado.Longitud!=0)
                 {
                     int idnuevo = CrearNuevoID(parrafoSeleccionado.ID);
                     Parrafo p = new Parrafo(this,idnuevo,
@@ -445,11 +445,11 @@ namespace SWPEditor.Dominio
         }
 
         bool evitarNotificaciones = false;
-        internal void SuprimirNotificaciones()
+        private void SuprimirNotificaciones()
         {
             evitarNotificaciones = true;
         }
-        internal void ReanudarNotificaciones()
+        private void ReanudarNotificaciones()
         {
             evitarNotificaciones = false;
         }
@@ -457,6 +457,58 @@ namespace SWPEditor.Dominio
         internal void NotificarCambios(Parrafo pinicio, Parrafo pfin)
         {
             EnParrafosCambiados(pinicio, pfin);
+        }
+
+        internal void AsegurarOrden()
+        {
+            lock (this)
+            {
+                if (_parrafosDesordenados)
+                {
+                    Parrafo p = ObtenerPrimerParrafo();
+                    int contador = 1;
+                    while (p != null)
+                    {
+                        p.IndicarOrden(contador);
+                        p = p.Siguiente;
+                        contador ++;
+                        //sig.Posicion = contador;
+                        //sig = sig._Siguiente;
+                        //int incremento = Math.Max(1, p != null && p.Posicion > contador ? (p.Posicion - contador) / 2 : 10);
+                        //contador += incremento;
+                        //if (sig != null && sig.Posicion > contador)
+                        //{
+                        //    break;
+                        //}
+                    }
+                    _parrafosDesordenados = false;
+                }
+            }
+        }
+        bool _parrafosDesordenados = true;
+        internal void NotificarCambioOrden()
+        {
+            lock (this)
+            {
+                _parrafosDesordenados = true;
+            }
+        }
+
+        internal Parrafo InsertarParrafos(IEnumerable<string> listaParrafos,Parrafo parrafoInicial,int posicion)
+        {
+            Parrafo inicio=parrafoInicial;
+            SuprimirNotificaciones();
+            foreach (string c in listaParrafos)
+            {
+                parrafoInicial.InsertarCadena(posicion, c);
+                Parrafo par2=InsertarParrafo(parrafoInicial, posicion + c.Length);
+                parrafoInicial = par2;
+                posicion = 0;
+            }
+            ReanudarNotificaciones();
+            Parrafo fin = parrafoInicial;
+            NotificarCambios(inicio, fin);
+            return fin;
         }
     }
 }

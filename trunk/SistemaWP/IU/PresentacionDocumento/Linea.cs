@@ -342,6 +342,7 @@ namespace SWPEditor.IU.PresentacionDocumento
             }
             return posicion - 1;
         }
+        static Dictionary<Parrafo, List<Linea>> lineas = new Dictionary<Parrafo, List<Linea>>();
         
         internal static Linea ObtenerSiguienteLinea(Parrafo parrafo, int caracterinicio, Medicion ancho,bool incluirAltoParrafo,bool incluirBaseParrafo)
         {            
