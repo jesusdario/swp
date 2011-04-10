@@ -83,5 +83,27 @@ namespace SWPEditor.Aplicacion
         {
             return Documento.ObtenerTexto(escritor, ObtenerParrafoInicial(), ObtenerPosicionInicial(), ObtenerParrafoFinal(), ObtenerPosicionFinal());
         }
+
+        internal bool Contiene(Parrafo parrafo, int numcaracter)
+        {
+            Parrafo ini = ObtenerParrafoInicial();
+            Parrafo fin = ObtenerParrafoFinal();
+            if (parrafo == Inicio)
+            {
+                return numcaracter>=PosicionParrafoInicio;
+            }
+            else if (parrafo == Fin)
+            {
+                return numcaracter <= PosicionParrafoFin;
+            }
+            else
+            {
+                if (ini.EsSiguiente(parrafo) && parrafo.EsSiguiente(fin))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
