@@ -151,9 +151,11 @@ namespace SWPEditor.Dominio
                 Parrafo parrafoSiguiente = parrafo.Siguiente;
                 if (parrafoSiguiente != null)
                 {
-                    parrafo.FusionarCon(parrafoSiguiente);
+                    parrafo.AgregarTextoDe(parrafoSiguiente);
+                    parrafo.ConectarDespues(parrafoSiguiente.Siguiente);
                     EliminarParrafo(parrafoSiguiente.ID);
-                    EnParrafosCambiados(parrafo, parrafoSiguiente);
+                    EnParrafosCambiados(parrafo, parrafoSiguiente.Siguiente);
+                    NotificarCambioOrden();                    
                 }
                 else
                 {

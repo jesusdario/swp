@@ -111,14 +111,13 @@ namespace SWPEditor.Dominio
             }
         }
 
-        internal void FusionarCon(Parrafo parrafo_Siguiente)
+        internal void AgregarTextoDe(Parrafo parrafo_Siguiente)
         {
             bufferTexto.Agregar(parrafo_Siguiente.bufferTexto);
-            ConectarDespues(parrafo_Siguiente._Siguiente);
             if (_Formato != null || parrafo_Siguiente._Formato != null)
             {
                 _Formato = Formato.Fusionar(parrafo_Siguiente.Formato);
-            }
+            }            
             _contenedor.NotificarCambio(this);
         }
 
