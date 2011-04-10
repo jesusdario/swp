@@ -79,7 +79,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SistemaWP\SWPEditorBase.csproj">
+    <ProjectReference Include="..\SWPEditorBase\SWPEditorBase.csproj">
       <Project>{83A21222-4BE1-4227-8FCA-C3977951DA1D}</Project>
       <Name>SWPEditorBase</Name>
     </ProjectReference>
