@@ -53,7 +53,7 @@ namespace SWPEditor.UI.WPF.Graficadores
         {
             contexto.DrawLine(CrearLapiz(lapiz), CrearPunto(inicio), CrearPunto(fin));
         }
-        public void DibujarRectangulo(SWPEditor.IU.Graficos.Lapiz lapiz, SWPEditor.IU.PresentacionDocumento.Punto inicio, SWPEditor.IU.PresentacionDocumento.TamBloque bloque)
+        public void DibujarRectangulo(SWPEditor.IU.Graficos.Lapiz lapiz, SWPEditor.IU.PresentacionDocumento.Punto inicio, SWPEditor.Dominio.TamBloque bloque)
         {
             contexto.DrawRectangle(null, CrearLapiz(lapiz), new Rect(CrearPunto(inicio), CrearTam(bloque)));
         }
@@ -64,14 +64,14 @@ namespace SWPEditor.UI.WPF.Graficadores
                 CrearBrocha(brocha));
             contexto.DrawText(f, CrearPunto(posicion));
         }
-        public SWPEditor.IU.PresentacionDocumento.TamBloque MedirTexto(SWPEditor.IU.Graficos.Letra letra, string texto)
+        public SWPEditor.Dominio.TamBloque MedirTexto(SWPEditor.IU.Graficos.Letra letra, string texto)
         {
             Typeface t = new Typeface(new FontFamily(letra.Familia), new FontStyle(), new FontWeight(), new FontStretch());
             FormattedText f = new FormattedText(texto, System.Globalization.CultureInfo.InvariantCulture, FlowDirection.LeftToRight, t, ObtenerMedida(letra.Tamaño),
                 Brushes.Black);
             return new TamBloque(ObtenerMedida(f.WidthIncludingTrailingWhitespace),ObtenerMedida(f.Height));            
         }
-        public void RellenarRectangulo(SWPEditor.IU.Graficos.Brocha brocha, SWPEditor.IU.PresentacionDocumento.Punto inicio, SWPEditor.IU.PresentacionDocumento.TamBloque bloque)
+        public void RellenarRectangulo(SWPEditor.IU.Graficos.Brocha brocha, SWPEditor.IU.PresentacionDocumento.Punto inicio, SWPEditor.Dominio.TamBloque bloque)
         {
             contexto.DrawRectangle(CrearBrocha(brocha), null, new Rect(CrearPunto(inicio), CrearTam(bloque)));
         }

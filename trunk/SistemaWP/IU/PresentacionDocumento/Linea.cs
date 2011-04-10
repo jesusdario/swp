@@ -342,7 +342,6 @@ namespace SWPEditor.IU.PresentacionDocumento
             }
             return posicion - 1;
         }
-        static Dictionary<Parrafo, List<Linea>> lineas = new Dictionary<Parrafo, List<Linea>>();
         
         internal static Linea ObtenerSiguienteLinea(Parrafo parrafo, int caracterinicio, Medicion ancho,bool incluirAltoParrafo,bool incluirBaseParrafo)
         {            
@@ -366,20 +365,9 @@ namespace SWPEditor.IU.PresentacionDocumento
                     alto += parrafo.Formato.ObtenerEspacioPosterior();
                 }
                 ;
-                return new Linea(parrafo,caracterinicio,0,alto,estparrafo.MedirBase(),ancho);/*
-                {   Inicio = caracterinicio, 
-                    Cantidad = 0, 
-                    Parrafo = parrafo, 
-                    AltoLinea = alto,
-                    AltoBase = estparrafo.MedirAlto()
-                };*/
+                return new Linea(parrafo,caracterinicio,0,alto,estparrafo.MedirBase(),ancho);
             }
             Linea actual=new Linea(parrafo,caracterinicio,0,Medicion.Cero,Medicion.Cero,ancho);
-/*                Parrafo = parrafo, 
-                Cantidad = 0, 
-                Inicio = caracterinicio, 
-                AltoLinea = Medicion.Cero
-            };*/
             TamBloque tampromedio=new Estilo(new Bloque(4,parrafo.Formato.ObtenerFormatoTexto())).Medir("MMMM");
             
             Medicion anchocaracter = tampromedio.Ancho / 4;

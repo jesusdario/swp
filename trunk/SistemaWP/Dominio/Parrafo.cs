@@ -309,6 +309,23 @@ namespace SWPEditor.Dominio
             _contenedor.NotificarCambio(this);
         }
 
+        internal void AumentarEspacioAntesParrafo()
+        {
+            Medicion valor = Formato.ObtenerEspacioAnterior();
+            valor = valor + new Medicion(5, Unidad.Puntos);
+            Formato = Formato.Fusionar(FormatoParrafo.CrearEspacioAnterior(valor));
+            _contenedor.NotificarCambio(this);
+        }
+
+        internal void DisminuirEspacioAntesParrafo()
+        {
+            Medicion valor = Formato.ObtenerEspacioAnterior();
+            valor = valor - new Medicion(5, Unidad.Puntos);
+            if (valor.Valor < 0) valor = Medicion.Cero;
+            Formato = Formato.Fusionar(FormatoParrafo.CrearEspacioAnterior(valor));
+            _contenedor.NotificarCambio(this);
+        }
+
         public void AumentarInterlineado()
         {
             Formato = Formato.Fusionar(FormatoParrafo.CrearEspacioInterlineal(Formato.ObtenerEspaciadoInterlineal() + 0.5m));

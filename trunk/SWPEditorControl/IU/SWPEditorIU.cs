@@ -18,6 +18,7 @@ namespace SWPEditor.IU
 {
     public partial class SWPEditorIU : Form
     {
+        
         public SWPEditorIU()
         {
             InitializeComponent();
@@ -113,7 +114,6 @@ namespace SWPEditor.IU
             f.FontMustExist = true;
             f.AllowVerticalFonts = false;
             f.AllowVectorFonts = false;
-            
             f.Font = new Font("Arial", 11);
             f.AllowScriptChange = false;
             f.Color = Color.Black;
@@ -231,6 +231,16 @@ namespace SWPEditor.IU
         private void DecreaseLineSpace_Click(object sender, EventArgs e)
         {
             swpEditor1.DecreaseLineSpace();
+        }
+
+        private void IncreaseSpaceBeforeParagraph_Click(object sender, EventArgs e)
+        {
+            swpEditor1.IncreaseSpaceBeforeParagraph();
+        }
+
+        private void DecreaseSpaceBeforeParagraph_Click(object sender, EventArgs e)
+        {
+            swpEditor1.DecreaseSpaceBeforeParagraph();
         }
         
 

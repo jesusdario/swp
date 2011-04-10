@@ -20,6 +20,18 @@ namespace SWPEditor.IU
     {
         SWPGenericControl _base;
         SWPClipboard _clipboard;
+        public override Color BackColor
+        {
+            get
+            {
+                return base.BackColor;
+            }
+            set
+            {
+                _base.BackgroundColor = new SWPEditor.Dominio.TextoFormato.ColorDocumento(value.A, value.R, value.G, value.B);
+                base.BackColor = value;
+            }
+        }
         public SWPEditorControl()
             : base()
         {
@@ -69,6 +81,7 @@ namespace SWPEditor.IU
             {
                 _base.NotifySizeChanged(new GraficadorGDI(g).Traducir(new SizeF(Width, Height)));
             }
+            Invalidate();
             base.OnResize(e);
         }
         
@@ -370,6 +383,16 @@ namespace SWPEditor.IU
             get {
                 return _base.GetPosition();
             }
+        }
+
+        internal void IncreaseSpaceBeforeParagraph()
+        {
+            _base.AddSpaceBeforeParagraph();
+        }
+
+        internal void DecreaseSpaceBeforeParagraph()
+        {
+            _base.RemoveSpaceBeforeParagraph();
         }
     }
     

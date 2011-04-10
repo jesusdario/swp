@@ -21,6 +21,18 @@ namespace SWPEditor.IU
             }
         }
         Documento _documento;
+        public ColorDocumento BackgroundColor
+        {
+            get
+            {
+                return escritorio.ColorFondo;
+            }
+            set
+            {
+                escritorio.ColorFondo = value;
+                OnRefreshRequested(this, EventArgs.Empty);
+            }
+        }
         public SWPGenericControl(IGraficador graficadorConsultas)
             : base()
         {
@@ -57,7 +69,7 @@ namespace SWPEditor.IU
                 _DocumentChanged -= value;
             }
         }
-        void contpresentacion_ActualizarPresentacion(object sender, EventArgs e)
+        protected void OnRefreshRequested(object sender, EventArgs e)
         {
             if (_RefreshRequested != null)
             {
@@ -67,6 +79,10 @@ namespace SWPEditor.IU
                     _DocumentChanged(this, EventArgs.Empty);
                 }
             }
+        }
+        void contpresentacion_ActualizarPresentacion(object sender, EventArgs e)
+        {
+            OnRefreshRequested(sender, e);
         }
         public void DrawDesktop(IGraficador graficador,bool dibujarSeleccion,bool dibujarCursor)
         {
@@ -80,13 +96,6 @@ namespace SWPEditor.IU
         {
             if (tecla>=32) {
                 _ControlDocumento.TeclaPulsada(tecla);
-            }
-        }
-        public void NotifyKeyDown(char tecla, bool shift, bool control,IClipboard clipboard)
-        {
-            switch (tecla)
-            {
-                
             }
         }
         event EventHandler _PrintRequested;
@@ -371,6 +380,14 @@ namespace SWPEditor.IU
             _ControlDocumento.DisminuirInterlineado();
         }
 
+        public void AddSpaceBeforeParagraph()
+        {
+            _ControlDocumento.AumentarEspacioAntesParrafo();
+        }
+        public void RemoveSpaceBeforeParagraph()
+        {
+            _ControlDocumento.QuitarEspacioAntesParrafo();
+        }
         public DocumentPosition GetPosition()
         {
             Posicion posicion=_ControlDocumento.ObtenerPosicion();

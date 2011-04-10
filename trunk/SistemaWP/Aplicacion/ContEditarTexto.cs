@@ -651,6 +651,15 @@ namespace SWPEditor.Aplicacion
         {
             AplicarOperacionParrafos(x => x.DisminuirInterlineado());
         }
+        internal void AumentarEspacioAntesParrafo()
+        {
+            AplicarOperacionParrafos(x => x.AumentarEspacioAntesParrafo());
+        }
+
+        internal void DisminuirEspacioAntesParrafo()
+        {
+            AplicarOperacionParrafos(x => x.DisminuirEspacioAntesParrafo());
+        }
 
         internal void AgregarParrafos(IEnumerable<Parrafo> parrafos)
         {
@@ -659,5 +668,6 @@ namespace SWPEditor.Aplicacion
                 this.DocumentoEdicion.AgregarParrafo(parrafoSeleccionado,posicionInsercion,parrafo,false,false);
             }
         }
+
     }
 }

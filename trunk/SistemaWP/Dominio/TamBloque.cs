@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using SWPEditor.Dominio;
 
-namespace SWPEditor.IU.PresentacionDocumento
+namespace SWPEditor.Dominio
 {
     public struct TamBloque
     {

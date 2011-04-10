@@ -225,6 +225,22 @@
         6eeiIWjTEA5EACXGH+ELegrWAAAAAElFTkSuQmCC
 </value>
   </data>
+  <data name="IncreaseSpaceBeforeParagraph.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABnSURBVDhPY2AYbKAB6CBiMdztDiRoQjacep6niQv+Q72F
+        7EyQ8wkCmGtABuxHMgQkDhPDawjIFpBCZAzTQJQLYIrJ9gKybSBnIwN0PlavIMczITbcAJpEI8HoQvcb
+        IedikyfJEpyKARSsNPfFSeqjAAAAAElFTkSuQmCC
+</value>
+  </data>
+  <data name="DecreaseSpaceBeforeParagraph.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABRSURBVDhPY2AYbKAB6CBiMdztDiRoQjacep6nmwtAzicK
+        /AeqgmGYJpArQWL7iTEBOaBAGmGAaBfgsoRiA5Bdg9MnxCYiFNfQLRpxOntgXQAApBwu/MG8GvgAAAAA
+        SUVORK5CYII=
+</value>
+  </data>
   <metadata name="statusStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>225, 17</value>
   </metadata>
