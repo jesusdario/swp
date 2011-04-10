@@ -1,4 +1,8 @@
-﻿using System.Reflection;
+/**********************************************
+This Program was written by Dario Romero A.
+It is licensed under the Apache License v.2.0.
+***********************************************/
+using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
