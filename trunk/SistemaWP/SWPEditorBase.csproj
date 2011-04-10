@@ -96,6 +96,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="IU\DocumentPosition.cs" />
+    <Compile Include="Dominio\Margen.cs" />
     <Compile Include="IU\SWPControlGenerico.cs" />
     <Compile Include="IU\Graficos\Lapiz.cs" />
     <Compile Include="IU\PresentacionDocumento\AvanceBloques.cs" />
@@ -109,7 +110,7 @@
     <Compile Include="IU\PresentacionDocumento\ListaPaginas.cs" />
     <Compile Include="IU\PresentacionDocumento\Posicion.cs" />
     <Compile Include="IU\PresentacionDocumento\Punto.cs" />
-    <Compile Include="IU\PresentacionDocumento\TamBloque.cs" />
+    <Compile Include="Dominio\TamBloque.cs" />
     <Compile Include="IU\PresentacionDocumento\Estilo.cs" />
     <Compile Include="IU\PresentacionDocumento\Linea.cs" />
     <Compile Include="IU\PresentacionDocumento\Pagina.cs" />

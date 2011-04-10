@@ -88,5 +88,12 @@ namespace SWPEditor.Dominio.TextoFormato
         {
             return FormatoTexto??Formato.ObtenerPredefinido();
         }
+
+        internal static FormatoParrafo CrearEspacioAnterior(Medicion valor)
+        {
+            FormatoParrafo f = new FormatoParrafo();
+            f.EspacioAnterior = valor;
+            return f;
+        }
     }
 }

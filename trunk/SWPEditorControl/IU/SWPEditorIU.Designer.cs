@@ -63,11 +63,13 @@
             this.BackgroundColor = new System.Windows.Forms.ToolStripButton();
             this.IncreaseLineSpace = new System.Windows.Forms.ToolStripButton();
             this.DecreaseLineSpace = new System.Windows.Forms.ToolStripButton();
-            this.swpEditor1 = new SWPEditor.IU.SWPEditorControl();
+            this.IncreaseSpaceBeforeParagraph = new System.Windows.Forms.ToolStripButton();
+            this.DecreaseSpaceBeforeParagraph = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.LabelPage = new System.Windows.Forms.ToolStripStatusLabel();
             this.LabelLine = new System.Windows.Forms.ToolStripStatusLabel();
             this.LabelCharacter = new System.Windows.Forms.ToolStripStatusLabel();
+            this.swpEditor1 = new SWPEditor.IU.SWPEditorControl();
             this.menuStrip1.SuspendLayout();
             this.ToolBar.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -80,7 +82,7 @@
             this.formatToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(470, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(538, 24);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -226,10 +228,12 @@
             this.FontColor,
             this.BackgroundColor,
             this.IncreaseLineSpace,
-            this.DecreaseLineSpace});
+            this.DecreaseLineSpace,
+            this.IncreaseSpaceBeforeParagraph,
+            this.DecreaseSpaceBeforeParagraph});
             this.ToolBar.Location = new System.Drawing.Point(0, 24);
             this.ToolBar.Name = "ToolBar";
-            this.ToolBar.Size = new System.Drawing.Size(470, 25);
+            this.ToolBar.Size = new System.Drawing.Size(538, 25);
             this.ToolBar.TabIndex = 2;
             this.ToolBar.Text = "toolStrip1";
             // 
@@ -399,14 +403,25 @@
             this.DecreaseLineSpace.Text = "Decrease Line Space";
             this.DecreaseLineSpace.Click += new System.EventHandler(this.DecreaseLineSpace_Click);
             // 
-            // swpEditor1
+            // IncreaseSpaceBeforeParagraph
             // 
-            this.swpEditor1.CausesValidation = false;
-            this.swpEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.swpEditor1.Location = new System.Drawing.Point(0, 49);
-            this.swpEditor1.Name = "swpEditor1";
-            this.swpEditor1.Size = new System.Drawing.Size(470, 256);
-            this.swpEditor1.TabIndex = 1;
+            this.IncreaseSpaceBeforeParagraph.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.IncreaseSpaceBeforeParagraph.Image = ((System.Drawing.Image)(resources.GetObject("IncreaseSpaceBeforeParagraph.Image")));
+            this.IncreaseSpaceBeforeParagraph.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.IncreaseSpaceBeforeParagraph.Name = "IncreaseSpaceBeforeParagraph";
+            this.IncreaseSpaceBeforeParagraph.Size = new System.Drawing.Size(23, 22);
+            this.IncreaseSpaceBeforeParagraph.Text = "IncreaseSpaceBeforeParagraph";
+            this.IncreaseSpaceBeforeParagraph.Click += new System.EventHandler(this.IncreaseSpaceBeforeParagraph_Click);
+            // 
+            // DecreaseSpaceBeforeParagraph
+            // 
+            this.DecreaseSpaceBeforeParagraph.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.DecreaseSpaceBeforeParagraph.Image = ((System.Drawing.Image)(resources.GetObject("DecreaseSpaceBeforeParagraph.Image")));
+            this.DecreaseSpaceBeforeParagraph.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.DecreaseSpaceBeforeParagraph.Name = "DecreaseSpaceBeforeParagraph";
+            this.DecreaseSpaceBeforeParagraph.Size = new System.Drawing.Size(23, 22);
+            this.DecreaseSpaceBeforeParagraph.Text = "ReduceSpaceBeforeParagraph";
+            this.DecreaseSpaceBeforeParagraph.Click += new System.EventHandler(this.DecreaseSpaceBeforeParagraph_Click);
             // 
             // statusStrip1
             // 
@@ -416,7 +431,7 @@
             this.LabelCharacter});
             this.statusStrip1.Location = new System.Drawing.Point(0, 305);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(470, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(538, 22);
             this.statusStrip1.TabIndex = 3;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -435,11 +450,21 @@
             this.LabelCharacter.Name = "LabelCharacter";
             this.LabelCharacter.Size = new System.Drawing.Size(0, 17);
             // 
+            // swpEditor1
+            // 
+            this.swpEditor1.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.swpEditor1.CausesValidation = false;
+            this.swpEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.swpEditor1.Location = new System.Drawing.Point(0, 49);
+            this.swpEditor1.Name = "swpEditor1";
+            this.swpEditor1.Size = new System.Drawing.Size(538, 256);
+            this.swpEditor1.TabIndex = 1;
+            // 
             // SWPEditorIU
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(470, 327);
+            this.ClientSize = new System.Drawing.Size(538, 327);
             this.Controls.Add(this.swpEditor1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.ToolBar);
@@ -501,5 +526,7 @@
         private System.Windows.Forms.ToolStripStatusLabel LabelPage;
         private System.Windows.Forms.ToolStripStatusLabel LabelLine;
         private System.Windows.Forms.ToolStripStatusLabel LabelCharacter;
+        private System.Windows.Forms.ToolStripButton IncreaseSpaceBeforeParagraph;
+        private System.Windows.Forms.ToolStripButton DecreaseSpaceBeforeParagraph;
     }
 }

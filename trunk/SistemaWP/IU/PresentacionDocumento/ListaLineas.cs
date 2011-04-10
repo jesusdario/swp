@@ -306,33 +306,24 @@ namespace SWPEditor.IU.PresentacionDocumento
             return res;
         }
 
-        #region Miembros de IEnumerable<Linea>
-
         public IEnumerator<Linea> GetEnumerator()
         {
-            foreach (Linea l in _lineas)
+            for (int i = 0; i < _lineas.Count; i++)
             {
-                yield return l;
+                yield return _lineas[i];
+                AsegurarHasta(i + 1);
             }
         }
-
-        #endregion
-
-        #region Miembros de IEnumerable
-
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
-
-        #endregion
-
-        internal void Limpiar()
+        private void Limpiar()
         {
             _lineas.Clear();
         }
 
-        internal void RemoverDesde(int lineainicio)
+        private void RemoverDesde(int lineainicio)
         {
             _lineas.RemoveRange(lineainicio, _lineas.Count - lineainicio);
         }
@@ -349,9 +340,6 @@ namespace SWPEditor.IU.PresentacionDocumento
                 return false;
             }
         }
-
-
-        
     }
 }
 

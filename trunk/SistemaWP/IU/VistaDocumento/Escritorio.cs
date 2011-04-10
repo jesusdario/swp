@@ -6,6 +6,7 @@ using SWPEditor.Dominio;
 using SWPEditor.IU.PresentacionDocumento;
 using SWPEditor.Aplicacion;
 using System.Diagnostics;
+using SWPEditor.Dominio.TextoFormato;
 
 namespace SWPEditor.IU.VistaDocumento
 {
@@ -56,17 +57,31 @@ namespace SWPEditor.IU.VistaDocumento
             }
         }
         private IGraficador _graficadorConsultas;
-        BrochaSolida fondo = new BrochaSolida(new SWPEditor.Dominio.TextoFormato.ColorDocumento(50,25,25));
-        public Escritorio(Documento _documento,IGraficador graficadorConsultas)
+        BrochaSolida fondo;
+        ColorDocumento _colorFondo;
+        public ColorDocumento ColorFondo
+        {
+            get
+            {
+                return _colorFondo;
+            }
+            set
+            {
+                _colorFondo = value;
+                fondo = new BrochaSolida(_colorFondo);
+            }
+        }
+        public Escritorio(Documento _documento, IGraficador graficadorConsultas)
         {
             if (graficadorConsultas == null)
                 throw new Exception("Debe indicarse un objeto graficador para efectuar consultas");
+            ColorFondo = new SWPEditor.Dominio.TextoFormato.ColorDocumento(50, 25, 25);
             _graficadorConsultas = graficadorConsultas;
             AsegurarGraficador();
             ContPresentarDocumento controlador = new ContPresentarDocumento(_documento);
             EspacioEntrePaginas = new Medicion(10,Unidad.Milimetros);
             ControlDocumento = controlador;
-            EsquinaSuperior = new Punto(Medicion.Cero, Medicion.Cero);
+            EsquinaSuperior = new Punto(Medicion.Cero, Medicion.Cero);            
         }
         public void Dibujar(IGraficador graficador,Seleccion seleccion,bool dibujarCursor)
         {

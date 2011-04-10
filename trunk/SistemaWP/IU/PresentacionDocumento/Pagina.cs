@@ -209,11 +209,5 @@ namespace SWPEditor.IU.PresentacionDocumento
             return Dimensiones.Alto - Margen.Superior - Margen.Inferior;
         }
     }
-    public class Margen
-    {
-        public Medicion Derecho { get; set; }
-        public Medicion Izquierdo { get; set; }
-        public Medicion Superior { get; set; }
-        public Medicion Inferior { get; set; }
-    }
+    
 }

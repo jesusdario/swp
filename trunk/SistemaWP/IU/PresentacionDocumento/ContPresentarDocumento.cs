@@ -366,27 +366,39 @@ namespace SWPEditor.IU.PresentacionDocumento
             conttexto.DisminuirInterlineado();
             EnActualizarPresentacion(true);
         }
+        public void AumentarEspacioAntesParrafo()
+        {
+            conttexto.AumentarEspacioAntesParrafo();
+            EnActualizarPresentacion(true);
+        }
+
+        public void QuitarEspacioAntesParrafo()
+        {
+            conttexto.DisminuirEspacioAntesParrafo();
+            EnActualizarPresentacion(true);
+        }
 
 
-
-        internal void IrAInicioDocumento(bool moverSeleccion)
+        public void IrAInicioDocumento(bool moverSeleccion)
         {
             IrAnteriorCaracter(moverSeleccion, TipoAvance.AvanzarPorDocumento);
         }
 
-        internal void IrAFinDocumento(bool moverSeleccion)
+        public void IrAFinDocumento(bool moverSeleccion)
         {
             IrSiguienteCaracter(moverSeleccion, TipoAvance.AvanzarPorDocumento);
         }
 
-        internal void IrAParrafoSiguiente(bool moverSeleccion)
+        public void IrAParrafoSiguiente(bool moverSeleccion)
         {
             IrSiguienteCaracter(moverSeleccion, TipoAvance.AvanzarPorParrafos);
         }
 
-        internal void IrAParrafoAnterior(bool moverSeleccion)
+        public void IrAParrafoAnterior(bool moverSeleccion)
         {
             IrAnteriorCaracter(moverSeleccion, TipoAvance.AvanzarPorParrafos); 
         }
+
+        
     }
 }
