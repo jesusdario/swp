@@ -264,6 +264,7 @@ namespace SWPEditor.IU.VistaDocumento
         public void IrAPosicion(Punto punto, bool ampliarSeleccion)
         {
             AsegurarGraficador();
+            
             Punto pt2 = punto + EsquinaSuperior;
             int pagsig = PaginaSuperior;
             int indice = PaginaSuperior;
@@ -277,6 +278,20 @@ namespace SWPEditor.IU.VistaDocumento
                 else
                     break;
                 indice++;
+            }
+            if (punto.Y < Medicion.Cero&&indice>0)
+            {
+                indice--;
+                pt2.Y -= _Documento.ObtenerPagina(indice).Dimensiones.Alto + EspacioEntrePaginas;
+            }
+            if (punto.Y > Dimensiones.Alto)
+            {
+                indice++;
+                Pagina p=_Documento.ObtenerPagina(indice);
+                if (p!=null) {
+                    pt2.Y -= p.Dimensiones.Alto + EspacioEntrePaginas;                    
+                } else
+                    indice--;
             }
             ControlDocumento.RegistrarPosicion(indice, pt2, ampliarSeleccion);
         }       

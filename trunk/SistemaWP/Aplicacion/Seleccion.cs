@@ -88,13 +88,19 @@ namespace SWPEditor.Aplicacion
         {
             Parrafo ini = ObtenerParrafoInicial();
             Parrafo fin = ObtenerParrafoFinal();
+            int posini = ObtenerPosicionInicial();
+            int posfin = ObtenerPosicionFinal();
+            if (Inicio == Fin && Inicio == parrafo)
+            {
+                return numcaracter >= posini && numcaracter <= posfin;
+            }
             if (parrafo == Inicio)
             {
-                return numcaracter>=PosicionParrafoInicio;
+                return numcaracter>=posini;
             }
             else if (parrafo == Fin)
             {
-                return numcaracter <= PosicionParrafoFin;
+                return numcaracter <= posfin;
             }
             else
             {

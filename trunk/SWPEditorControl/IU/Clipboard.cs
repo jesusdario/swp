@@ -156,7 +156,7 @@ namespace SWPEditor.IU
                 }
                 else*/
                 {
-                    string cad = (string)obj.GetData(DataFormats.Text, true);
+                    string cad = (string)obj.GetData(DataFormats.UnicodeText, true);
                     if (cad != null)
                     {
                         editor.InsertarTexto(cad);
