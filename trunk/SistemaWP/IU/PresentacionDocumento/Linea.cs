@@ -210,8 +210,10 @@ namespace SWPEditor.IU.PresentacionDocumento
                 int posbase = Inicio;
                 
                 Medicion altobase = AltoBase;
+                Bloque ultb=new Bloque(0,Parrafo.Formato.ObtenerFormatoTexto());
                 foreach (Bloque b in lista)
                 {
+                    ultb = b;
                     if (b.Cantidad == 0) continue;
                     Estilo e = new Estilo(b);
                     Medicion baset = e.MedirAlto();
@@ -221,6 +223,17 @@ namespace SWPEditor.IU.PresentacionDocumento
                     Dibujar(g, posdibujo, seleccion, e, posbase, b.Cantidad, total,i);
                     posbase += b.Cantidad;
                     deltax += tb.Ancho;
+                    
+                }
+                if (seleccion != null && EsUltimaLineaParrafo && seleccion.Contiene(Parrafo, Inicio + Cantidad))
+                {
+                    Estilo e = new Estilo(ultb);
+                    Medicion baset = e.MedirAlto();
+                    Estilo sel = e.Clonar();
+                    sel.ColorFondo = new BrochaSolida(new ColorDocumento(0, 0, 0));
+                    sel.ColorLetra = new BrochaSolida(new ColorDocumento(255, 255, 255));
+                    Punto posdibujo = new Punto(deltax, posicion.Y + (altolinea - baset) - altobase);
+                    DibujarConTam(sel, g, posdibujo," ", "", i);
                 }
             }
             return new Punto(posicion.X, posicion.Y + AltoLinea);
