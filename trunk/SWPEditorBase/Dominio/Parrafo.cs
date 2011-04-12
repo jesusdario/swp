@@ -143,31 +143,31 @@ namespace SWPEditor.Dominio
             ID = indicellave;
         }
 
-        internal void InsertarAnterior(Parrafo nuevo)
-        {
-            if (_Anterior != null)
-            {
-                _Anterior._Siguiente = nuevo;
-            }
-            nuevo._Anterior = _Anterior;
-            nuevo._Siguiente = this;
-            _Anterior = nuevo;
-            _contenedor.NotificarCambioOrden();
+        //internal void InsertarAnterior(Parrafo nuevo)
+        //{
+        //    if (_Anterior != null)
+        //    {
+        //        _Anterior._Siguiente = nuevo;
+        //    }
+        //    nuevo._Anterior = _Anterior;
+        //    nuevo._Siguiente = this;
+        //    _Anterior = nuevo;
+        //    _contenedor.NotificarCambioOrden();
             
-            /*Parrafo ant=_Anterior;
-            int contador = Posicion-5;
-            while (ant != null)
-            {
-                ant.Posicion = contador;
-                ant = ant._Anterior;
-                int incremento=Math.Max(1,ant!=null&&ant.Posicion<contador?(ant.Posicion-contador)/2:10);
-                contador-=incremento;
-                if (ant != null && ant.Posicion < contador)
-                {
-                    break;
-                }
-            }*/
-        }
+        //    /*Parrafo ant=_Anterior;
+        //    int contador = Posicion-5;
+        //    while (ant != null)
+        //    {
+        //        ant.Posicion = contador;
+        //        ant = ant._Anterior;
+        //        int incremento=Math.Max(1,ant!=null&&ant.Posicion<contador?(ant.Posicion-contador)/2:10);
+        //        contador-=incremento;
+        //        if (ant != null && ant.Posicion < contador)
+        //        {
+        //            break;
+        //        }
+        //    }*/
+        //}
         public bool EsSiguiente(Parrafo parrafo2)
         {
             _contenedor.AsegurarOrden();
@@ -184,9 +184,26 @@ namespace SWPEditor.Dominio
                 _Siguiente._Anterior = nuevo;
             }
             nuevo._Anterior = this;
+            Parrafo anteriorsig = _Siguiente;
             nuevo._Siguiente = _Siguiente;
             _Siguiente = nuevo;
-            _contenedor.NotificarCambioOrden();
+            if (anteriorsig != null)
+            {
+                if (anteriorsig.Posicion > Posicion + 1)
+                {
+                    _contenedor.AsegurarOrden();
+                    nuevo.Posicion = Posicion + 1;
+                }
+                else
+                {
+                    _contenedor.NotificarCambioOrden();
+                }
+            }
+            else //Si es el último párrafo
+            {
+                _contenedor.AsegurarOrden();
+                nuevo.Posicion = Posicion + 100;
+            }
             /*
             Parrafo sig = _Siguiente;
             int contador = Posicion+5;
