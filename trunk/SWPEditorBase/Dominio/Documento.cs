@@ -155,7 +155,8 @@ namespace SWPEditor.Dominio
                     parrafo.ConectarDespues(parrafoSiguiente.Siguiente);
                     EliminarParrafo(parrafoSiguiente.ID);
                     EnParrafosCambiados(parrafo, parrafoSiguiente.Siguiente);
-                    NotificarCambioOrden();                    
+                    //Las posiciones no deberían haber cambiado
+                    //NotificarCambioOrden();                    
                 }
                 else
                 {
@@ -169,7 +170,7 @@ namespace SWPEditor.Dominio
         {
             lock (m_Parrafos)
             {
-                if (posicionInsercion == 0&&parrafoSeleccionado.Longitud!=0)
+                /*if (posicionInsercion == 0&&parrafoSeleccionado.Longitud!=0)
                 {
                     int idnuevo = CrearNuevoID(parrafoSeleccionado.ID);
                     Parrafo p = new Parrafo(this,idnuevo,
@@ -180,7 +181,7 @@ namespace SWPEditor.Dominio
                     EnParrafosCambiados(p, parrafoSeleccionado);
                     return parrafoSeleccionado;
                 }
-                else if (posicionInsercion == parrafoSeleccionado.Longitud)
+                else */if (posicionInsercion == parrafoSeleccionado.Longitud)
                 {
                     int idnuevo = CrearNuevoID(parrafoSeleccionado.ID + 1);
                     Parrafo p = new Parrafo(this, idnuevo, parrafoSeleccionado, parrafoSeleccionado.Siguiente, parrafoSeleccionado);
@@ -477,7 +478,7 @@ namespace SWPEditor.Dominio
                     {
                         p.IndicarOrden(contador);
                         p = p.Siguiente;
-                        contador ++;
+                        contador +=1000;
                         //sig.Posicion = contador;
                         //sig = sig._Siguiente;
                         //int incremento = Math.Max(1, p != null && p.Posicion > contador ? (p.Posicion - contador) / 2 : 10);
