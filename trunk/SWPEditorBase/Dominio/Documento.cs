@@ -19,7 +19,7 @@ namespace SWPEditor.Dominio
         void ParrafoEliminado(Parrafo p);
         void ParrafosCambiados(Parrafo parrafoInicio, Parrafo parrafoFin);
     }
-    public class Documento:IEnumerable<Parrafo>
+    public class Documento:IEnumerable<Parrafo>,IEscritor
     {
         Dictionary<int, Parrafo> m_Parrafos = new Dictionary<int, Parrafo>();
         List<IObservadorDocumento> m_Observadores = new List<IObservadorDocumento>();
@@ -517,5 +517,46 @@ namespace SWPEditor.Dominio
             NotificarCambios(inicio, fin);
             return fin;
         }
+
+        #region Miembros de IEscritor
+        Parrafo parrafoActual;
+        int posicionInsercion;
+        Parrafo parrafoIns;
+        void IEscritor.IniciarDocumento()
+        {
+            parrafoIns = ObtenerUltimoParrafo();
+            posicionInsercion = parrafoIns.Longitud;
+        }
+
+        void IEscritor.IniciarParrafo(FormatoParrafo formato)
+        {
+            parrafoActual = InsertarParrafo(parrafoIns,posicionInsercion);
+            parrafoActual.Formato = formato.Clonar();
+            posicionInsercion = 0;
+        }
+
+        void IEscritor.EscribirTexto(string texto, Formato formato)
+        {
+            parrafoActual.CambiarFormato(formato, posicionInsercion, 0);
+            parrafoActual.AgregarCadena(texto);
+            posicionInsercion = parrafoActual.Longitud;
+        }
+
+        void IEscritor.TerminarParrafo()
+        {
+            posicionInsercion = parrafoActual.Longitud;
+        }
+
+        void IEscritor.TerminarDocumento()
+        {
+            
+        }
+
+        public byte[] ObtenerBytes()
+        {
+            return null;
+        }
+
+        #endregion
     }
 }
