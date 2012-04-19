@@ -77,7 +77,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aplicacion\ContEditarTexto.cs" />
+    <Compile Include="Dominio\Datos\SWPWriter.cs" />
     <Compile Include="Dominio\IEscritor.cs" />
+    <Compile Include="Dominio\ILector.cs" />
     <Compile Include="Dominio\Medicion.cs">
       <SubType>Code</SubType>
     </Compile>

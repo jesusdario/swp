@@ -15,7 +15,7 @@ namespace SWPEditor.Dominio
         Documento _contenedor;
         TextoFormato.Texto bufferTexto = new TextoFormato.Texto();
         internal int ID { get; private set; }       
-        private int Posicion { get; set; }
+        private long Posicion { get; set; }
         private Parrafo _Anterior;
         private Parrafo _Siguiente;
         internal Parrafo Anterior { get { return _Anterior; } }

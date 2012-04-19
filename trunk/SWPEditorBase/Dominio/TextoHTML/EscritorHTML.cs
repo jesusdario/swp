@@ -44,8 +44,8 @@ namespace SWPEditor.Dominio.Html
             Medicion medicionAnterior  = formato.ObtenerEspacioAnterior();
             Medicion medicionPosterior = formato.ObtenerEspacioPosterior();
             string estilos="";
-            estilos += "margin-top:"+medicionAnterior.ConvertirA(Unidad.Puntos)+"pt;";
-            estilos += "margin-bottom:" + medicionPosterior.ConvertirA(Unidad.Puntos) + "pt;";
+            estilos += "margin-top:"+medicionAnterior.ConvertirA(Unidad.Puntos).Valor.ToString(System.Globalization.CultureInfo.InvariantCulture)+"pt;";
+            estilos += "margin-bottom:" + medicionPosterior.ConvertirA(Unidad.Puntos).Valor.ToString(System.Globalization.CultureInfo.InvariantCulture) + "pt;";
             estilos += "line-spacing:"+formato.ObtenerEspaciadoInterlineal()+"em;";
             _html.Append("<p style='"+estilos+"'>");            
         }
