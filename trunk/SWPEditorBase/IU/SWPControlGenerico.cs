@@ -230,6 +230,10 @@ namespace SWPEditor.IU
         public string GetText() {
             return _ControlDocumento.ObtenerTexto();
         }
+        public string GetHTML()
+        {
+            return _ControlDocumento.ObtenerHTML();
+        }
         public void SetText(string value) {
             _ControlDocumento.SeleccionarTodo();
             _ControlDocumento.InsertarTexto(value);        

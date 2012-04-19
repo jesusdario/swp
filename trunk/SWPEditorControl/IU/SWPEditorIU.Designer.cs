@@ -70,6 +70,7 @@
             this.LabelLine = new System.Windows.Forms.ToolStripStatusLabel();
             this.LabelCharacter = new System.Windows.Forms.ToolStripStatusLabel();
             this.swpEditor1 = new SWPEditor.IU.SWPEditorControl();
+            this.getHTMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.ToolBar.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -94,7 +95,8 @@
             this.pegarToolStripMenuItem,
             this.imprimirToolStripMenuItem,
             this.toolStripSeparator3,
-            this.selectAllToolStripMenuItem});
+            this.selectAllToolStripMenuItem,
+            this.getHTMLToolStripMenuItem});
             this.ediciónToolStripMenuItem.Name = "ediciónToolStripMenuItem";
             this.ediciónToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.ediciónToolStripMenuItem.Text = "Edit";
@@ -102,40 +104,40 @@
             // cortarToolStripMenuItem
             // 
             this.cortarToolStripMenuItem.Name = "cortarToolStripMenuItem";
-            this.cortarToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.cortarToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.cortarToolStripMenuItem.Text = "Cut";
             this.cortarToolStripMenuItem.Click += new System.EventHandler(this.cortarToolStripMenuItem_Click);
             // 
             // copiarToolStripMenuItem
             // 
             this.copiarToolStripMenuItem.Name = "copiarToolStripMenuItem";
-            this.copiarToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.copiarToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.copiarToolStripMenuItem.Text = "Copy";
             this.copiarToolStripMenuItem.Click += new System.EventHandler(this.copiarToolStripMenuItem_Click);
             // 
             // pegarToolStripMenuItem
             // 
             this.pegarToolStripMenuItem.Name = "pegarToolStripMenuItem";
-            this.pegarToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.pegarToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.pegarToolStripMenuItem.Text = "Paste";
             this.pegarToolStripMenuItem.Click += new System.EventHandler(this.pegarToolStripMenuItem_Click);
             // 
             // imprimirToolStripMenuItem
             // 
             this.imprimirToolStripMenuItem.Name = "imprimirToolStripMenuItem";
-            this.imprimirToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.imprimirToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.imprimirToolStripMenuItem.Text = "Print";
             this.imprimirToolStripMenuItem.Click += new System.EventHandler(this.imprimirToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(119, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
             // 
             // selectAllToolStripMenuItem
             // 
             this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.selectAllToolStripMenuItem.Text = "Select All";
             this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
             // 
@@ -460,6 +462,13 @@
             this.swpEditor1.Size = new System.Drawing.Size(538, 256);
             this.swpEditor1.TabIndex = 1;
             // 
+            // getHTMLToolStripMenuItem
+            // 
+            this.getHTMLToolStripMenuItem.Name = "getHTMLToolStripMenuItem";
+            this.getHTMLToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.getHTMLToolStripMenuItem.Text = "Get HTML...";
+            this.getHTMLToolStripMenuItem.Click += new System.EventHandler(this.getHTMLToolStripMenuItem_Click);
+            // 
             // SWPEditorIU
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -528,5 +537,6 @@
         private System.Windows.Forms.ToolStripStatusLabel LabelCharacter;
         private System.Windows.Forms.ToolStripButton IncreaseSpaceBeforeParagraph;
         private System.Windows.Forms.ToolStripButton DecreaseSpaceBeforeParagraph;
+        private System.Windows.Forms.ToolStripMenuItem getHTMLToolStripMenuItem;
     }
 }
