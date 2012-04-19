@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using SWPEditor.Dominio;
 using SWPEditor.IU.Graficos;
 using SWPEditor.Dominio.TextoFormato;
+using SWPEditor.Dominio.Html;
 
 namespace SWPEditor.IU.PresentacionDocumento
 {
@@ -224,6 +225,10 @@ namespace SWPEditor.IU.PresentacionDocumento
             //e.Graphics.DrawLine(Pens.Black, new PointF(pos.PosicionPixelX, pos.PosicionPixelY), new PointF(pos.PosicionPixelX, pos.PosicionPixelY + pos.AltoLinea));
         }
 
+        public string ObtenerHTML()
+        {
+            return _documento.Documento.ObtenerHTML();
+        }
         public void RegistrarPosicion(int pagina,Punto punto, bool ampliarSeleccion)
         {
             lock (this)
@@ -403,6 +408,7 @@ namespace SWPEditor.IU.PresentacionDocumento
             IrAnteriorCaracter(moverSeleccion, TipoAvance.AvanzarPorParrafos); 
         }
 
-        
+
+
     }
 }

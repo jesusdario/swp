@@ -17,6 +17,8 @@ using SWPEditor.IU.Graficos;
 using System.Threading;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
+using System.IO;
+using System.Diagnostics;
 
 namespace SWPEditor.IU
 {
@@ -245,6 +247,21 @@ namespace SWPEditor.IU
         private void DecreaseSpaceBeforeParagraph_Click(object sender, EventArgs e)
         {
             swpEditor1.DecreaseSpaceBeforeParagraph();
+        }
+
+        private void getHTMLToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string html = swpEditor1.GetHTML();
+            SaveFileDialog s = new SaveFileDialog();
+            s.DefaultExt = "html";
+            if (s.ShowDialog() == DialogResult.OK)
+            {
+                using (StreamWriter st = File.CreateText(s.FileName))
+                {
+                    st.Write(html);
+                }
+                Process.Start(s.FileName);
+            }
         }
         
 

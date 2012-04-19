@@ -349,37 +349,37 @@ namespace SWPEditor.IU
             _base.ReduceFontSize();
         }
 
-        internal void ChangeFont(Font font)
+        public void ChangeFont(Font font)
         {
             _base.ChangeFont(font.FontFamily.Name,new Medicion(font.SizeInPoints,Unidad.Puntos));
         }
 
-        internal void SetFontSizeInPoints(decimal valor)
+        public void SetFontSizeInPoints(decimal valor)
         {
             _base.SetFontSizeInPoints(valor);
         }
 
-        internal void AlignLeft()
+        public void AlignLeft()
         {
             _base.AlignLeft();
         }
 
-        internal void AlignCenter()
+        public void AlignCenter()
         {
             _base.AlignCenter();
         }
 
-        internal void AlignRight()
+        public void AlignRight()
         {
             _base.AlignRight();
         }
 
-        internal void IncreaseLineSpace()
+        public void IncreaseLineSpace()
         {
             _base.IncreaseLineSpace();
         }
 
-        internal void DecreaseLineSpace()
+        public void DecreaseLineSpace()
         {
             _base.DecreaseLineSpace();
         }
@@ -389,15 +389,21 @@ namespace SWPEditor.IU
             }
         }
 
-        internal void IncreaseSpaceBeforeParagraph()
+        public void IncreaseSpaceBeforeParagraph()
         {
             _base.AddSpaceBeforeParagraph();
         }
 
-        internal void DecreaseSpaceBeforeParagraph()
+        public void DecreaseSpaceBeforeParagraph()
         {
             _base.RemoveSpaceBeforeParagraph();
         }
+
+        public string GetHTML()
+        {
+            return _base.GetHTML();
+        }
+
     }
     
 }
